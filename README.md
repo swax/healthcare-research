@@ -7,10 +7,12 @@ native TypeScript on Node 24 (no compile step — Node strips the types and runs
 
 The data lives in two files, split by how often you touch them:
 
-- **`data/graph.json`** (~8 KB, the one you edit) — `meta` plus the canonical flow model:
-  a `nodes` list and an `edges` list. Each edge = `{from, to, amount, channel, source}`;
-  the edge row *is* the declarative connection — an adjacency list, the standard way to
-  store a graph.
+- **`data/graph.json`** (the one you edit) — `meta`, three small lookup tables
+  (`layers`, `groups`, `sources`), plus the canonical flow model: a `nodes` list and an
+  `edges` list. Nodes carry a stable slug `id` and a display `label`; edges reference nodes
+  by `id` and each is `{id, from, to, amount, channel, source, confidence}` — the edge row
+  *is* the declarative connection (an adjacency list, the standard way to store a graph).
+  `source` keys into the `sources` table; `confidence` is `reported` or `estimate`.
 - **`data/workbook.json`** (~630 KB, bulk) — the full 16-sheet workbook content (cells,
   formulas, styles). Generated; you rarely open it by hand.
 
@@ -68,9 +70,14 @@ What the tests guard:
 - **Build smoke** — `node src/build.ts` runs clean and the workbook loads with all 17 sheets
   plus the Sankey html.
 
-`npm run check` prints inflow/outflow/net per node and flags imbalances. Note the known ones
-(e.g. Health Insurance shows a large positive net because insurer→provider claims aren't
-itemized in the source flow map) — these are expected, not bugs.
+`npm run check` prints inflow/outflow/net per node and flags imbalances. The insurer→provider
+claim edges (`Health Insurance → Hospitals / Providers / Pharma / Long-Term Care`, derived from
+CMS NHE 2023 private-insurance + MA + MCO spending by service category) are now modeled, so
+**Health Insurance balances**. The remaining net imbalance (~$417B) sits on the provider
+**cost side**: Hospitals and Providers & Clinicians still net negative while Pharma & Rx and
+Long-Term Care net positive — symptoms of the rough labor/non-labor split estimates (flagged
+`confidence: estimate`), not the flow structure. Reconciling those provider outflows against
+NHE category totals is the open thread.
 
 `build.ts` also runs `validateGraph` itself, so a broken `data/graph.json` fails the build
 loudly instead of producing a silently-wrong diagram.

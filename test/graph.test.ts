@@ -5,10 +5,11 @@ import { dirname, join } from 'node:path';
 import { loadGraph, validateGraph, findCycles, computeFlows } from '../src/graph.ts';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const { graph } = loadGraph(root);
+const file = loadGraph(root);
+const { graph } = file;
 
 test('graph passes all structural & invariant validations', () => {
-  const problems = validateGraph(graph);
+  const problems = validateGraph(file);
   assert.deepEqual(problems, [], 'validateGraph found problems:\n' + problems.join('\n'));
 });
 

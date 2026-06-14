@@ -9,6 +9,7 @@
     "check": "node src/check.ts",
     "test": "node --test",
     "test:update": "node test/update-expected.ts",
+    "derive:claims": "node scripts/derive_hi_claims.mjs",
     "extract": "python3 extract.py"
   },
   "engines": {

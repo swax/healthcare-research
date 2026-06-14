@@ -1,18 +1,18 @@
 {
-  "total": 9873.5527,
+  "total": 11955.8527,
   "throughput": {
-    "Individuals": 2191.744,
-    "Employers": 993,
-    "Federal Government": 1131,
-    "State Governments": 280,
-    "Medicare": 925.5,
-    "Medicaid": 894,
-    "Health Insurance": 2312,
-    "Hospitals": 1470,
-    "Providers & Clinicians": 1292.1212,
-    "Pharma & Rx": 229.72875,
-    "Long-Term Care": 348.23,
-    "Healthcare Workers": 2331.1652,
-    "Suppliers & Vendors": 1238.6435000000001
+    "individuals": 2191.744,
+    "employers": 993,
+    "federal_government": 1131,
+    "state_governments": 280,
+    "medicare": 925.5,
+    "medicaid": 894,
+    "health_insurance": 2312.0287500000004,
+    "hospitals": 1470,
+    "providers_clinicians": 1292.1212,
+    "pharma_rx": 383.424,
+    "long_term_care": 524.1,
+    "healthcare_workers": 2331.1652,
+    "suppliers_vendors": 1238.6435000000001
   }
 }

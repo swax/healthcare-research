@@ -4,355 +4,98 @@
     "year": 2023,
     "units": "USD billions",
     "sources": "CMS NHE, MedPAC, MACPAC, AHA, KFF, PhRMA",
-    "generatedNote": "Canonical graph + source of truth for the Sankey. Edit here, then run: node src/build.ts"
+    "generatedNote": "Canonical graph + source of truth for the Sankey. Nodes/edges use stable slug ids; `label` is the display name. Edit here, then run: node src/build.ts"
+  },
+  "layers": [
+    { "n": 0, "name": "Payers / Households", "x": 0.02, "annotation": "Payers" },
+    { "n": 1, "name": "Government", "x": 0.26, "annotation": "Government" },
+    { "n": 2, "name": "Programs & Insurers", "x": 0.50, "annotation": "Programs & Insurers" },
+    { "n": 3, "name": "Providers", "x": 0.74, "annotation": "Providers" },
+    { "n": 4, "name": "Factors of Production", "x": 0.98, "annotation": "Factors" }
+  ],
+  "groups": [
+    { "id": "payers", "label": "Payers / Households", "color": "1565C0" },
+    { "id": "government", "label": "Government", "color": "0D47A1" },
+    { "id": "programs_insurers", "label": "Programs & Insurers", "color": "00838F" },
+    { "id": "providers", "label": "Providers", "color": "2E7D32" },
+    { "id": "factors", "label": "Factors of Production", "color": "6A1B9A" }
+  ],
+  "sources": {
+    "cms_nhe": "CMS NHE",
+    "cms_nhe_t7": "CMS NHE Table 7",
+    "cms_nhe_t8": "CMS NHE Table 8",
+    "cms_nhe_t16": "CMS NHE Table 16",
+    "cms_nhe_trustees": "CMS NHE / Trustees",
+    "cms_trustees": "CMS / Trustees",
+    "trustees": "Trustees Report",
+    "trustees_irs": "Trustees / IRS",
+    "macpac": "MACPAC",
+    "macpac_cms64": "MACPAC / CMS-64",
+    "kff_ehbs_2023": "KFF EHBS 2023",
+    "cbo_hhs": "CBO / HHS",
+    "medpac_kff": "MedPAC / KFF",
+    "aha_2023": "AHA Annual Survey 2023",
+    "aha_cms_nhe": "AHA / CMS NHE",
+    "nhe2024": "CMS NHE 2024 release (CY2023), by service & source of funds",
+    "estimate": "Author estimate"
   },
   "graph": {
     "nodes": [
-      {
-        "id": "Individuals",
-        "layer": 0,
-        "group": "Payers / Households",
-        "color": "1565C0",
-        "role": "source"
-      },
-      {
-        "id": "Employers",
-        "layer": 0,
-        "group": "Payers / Households",
-        "color": "1565C0",
-        "role": "source"
-      },
-      {
-        "id": "Federal Government",
-        "layer": 1,
-        "group": "Government",
-        "color": "0D47A1",
-        "role": "intermediary"
-      },
-      {
-        "id": "State Governments",
-        "layer": 1,
-        "group": "Government",
-        "color": "0D47A1",
-        "role": "intermediary"
-      },
-      {
-        "id": "Medicare",
-        "layer": 2,
-        "group": "Programs & Insurers",
-        "color": "00838F",
-        "role": "intermediary"
-      },
-      {
-        "id": "Medicaid",
-        "layer": 2,
-        "group": "Programs & Insurers",
-        "color": "00838F",
-        "role": "intermediary"
-      },
-      {
-        "id": "Health Insurance",
-        "layer": 2,
-        "group": "Programs & Insurers",
-        "color": "00838F",
-        "role": "intermediary"
-      },
-      {
-        "id": "Hospitals",
-        "layer": 3,
-        "group": "Providers",
-        "color": "2E7D32",
-        "role": "intermediary"
-      },
-      {
-        "id": "Providers & Clinicians",
-        "layer": 3,
-        "group": "Providers",
-        "color": "2E7D32",
-        "role": "intermediary"
-      },
-      {
-        "id": "Pharma & Rx",
-        "layer": 3,
-        "group": "Providers",
-        "color": "2E7D32",
-        "role": "intermediary"
-      },
-      {
-        "id": "Long-Term Care",
-        "layer": 3,
-        "group": "Providers",
-        "color": "2E7D32",
-        "role": "intermediary"
-      },
-      {
-        "id": "Healthcare Workers",
-        "layer": 4,
-        "group": "Factors of Production",
-        "color": "6A1B9A",
-        "role": "sink"
-      },
-      {
-        "id": "Suppliers & Vendors",
-        "layer": 4,
-        "group": "Factors of Production",
-        "color": "6A1B9A",
-        "role": "sink"
-      }
+      { "id": "individuals", "label": "Individuals", "layer": 0, "group": "payers", "role": "source" },
+      { "id": "employers", "label": "Employers", "layer": 0, "group": "payers", "role": "source" },
+      { "id": "federal_government", "label": "Federal Government", "layer": 1, "group": "government", "role": "intermediary" },
+      { "id": "state_governments", "label": "State Governments", "layer": 1, "group": "government", "role": "intermediary" },
+      { "id": "medicare", "label": "Medicare", "layer": 2, "group": "programs_insurers", "role": "intermediary" },
+      { "id": "medicaid", "label": "Medicaid", "layer": 2, "group": "programs_insurers", "role": "intermediary" },
+      { "id": "health_insurance", "label": "Health Insurance", "layer": 2, "group": "programs_insurers", "role": "intermediary" },
+      { "id": "hospitals", "label": "Hospitals", "layer": 3, "group": "providers", "role": "intermediary" },
+      { "id": "providers_clinicians", "label": "Providers & Clinicians", "layer": 3, "group": "providers", "role": "intermediary" },
+      { "id": "pharma_rx", "label": "Pharma & Rx", "layer": 3, "group": "providers", "role": "intermediary" },
+      { "id": "long_term_care", "label": "Long-Term Care", "layer": 3, "group": "providers", "role": "intermediary" },
+      { "id": "healthcare_workers", "label": "Healthcare Workers", "layer": 4, "group": "factors", "role": "sink" },
+      { "id": "suppliers_vendors", "label": "Suppliers & Vendors", "layer": 4, "group": "factors", "role": "sink" }
     ],
     "edges": [
-      {
-        "from": "Individuals",
-        "to": "Federal Government",
-        "amount": 437,
-        "channel": "General revenue",
-        "source": "CMS NHE / Trustees"
-      },
-      {
-        "from": "Federal Government",
-        "to": "Medicare",
-        "amount": 437,
-        "channel": "General revenue funding",
-        "source": "CMS NHE / Trustees"
-      },
-      {
-        "from": "Individuals",
-        "to": "Medicare",
-        "amount": 162.5,
-        "channel": "Payroll tax (employee HI)",
-        "source": "Trustees Report"
-      },
-      {
-        "from": "Individuals",
-        "to": "Medicare",
-        "amount": 163,
-        "channel": "Beneficiary premiums",
-        "source": "CMS / Trustees"
-      },
-      {
-        "from": "Individuals",
-        "to": "Federal Government",
-        "amount": 614,
-        "channel": "General revenue",
-        "source": "MACPAC / CMS-64"
-      },
-      {
-        "from": "Federal Government",
-        "to": "Medicaid",
-        "amount": 614,
-        "channel": "Federal share (FMAP)",
-        "source": "MACPAC / CMS-64"
-      },
-      {
-        "from": "Individuals",
-        "to": "State Governments",
-        "amount": 280,
-        "channel": "State taxes",
-        "source": "MACPAC / CMS-64"
-      },
-      {
-        "from": "State Governments",
-        "to": "Medicaid",
-        "amount": 280,
-        "channel": "State share",
-        "source": "MACPAC / CMS-64"
-      },
-      {
-        "from": "Employers",
-        "to": "Health Insurance",
-        "amount": 830,
-        "channel": "ESI premiums",
-        "source": "KFF EHBS 2023"
-      },
-      {
-        "from": "Employers",
-        "to": "Medicare",
-        "amount": 163,
-        "channel": "Payroll tax (employer HI)",
-        "source": "Trustees / IRS"
-      },
-      {
-        "from": "Individuals",
-        "to": "Health Insurance",
-        "amount": 235,
-        "channel": "ESI worker share",
-        "source": "KFF EHBS 2023"
-      },
-      {
-        "from": "Individuals",
-        "to": "Health Insurance",
-        "amount": 120,
-        "channel": "Individual market premiums",
-        "source": "CMS NHE"
-      },
-      {
-        "from": "Federal Government",
-        "to": "Health Insurance",
-        "amount": 80,
-        "channel": "ACA APTC subsidies",
-        "source": "CBO / HHS"
-      },
-      {
-        "from": "Medicare",
-        "to": "Health Insurance",
-        "amount": 539,
-        "channel": "MA Part C capitation",
-        "source": "MedPAC / KFF"
-      },
-      {
-        "from": "Medicaid",
-        "to": "Health Insurance",
-        "amount": 508,
-        "channel": "MCO capitation",
-        "source": "MACPAC"
-      },
-      {
-        "from": "Medicare",
-        "to": "Hospitals",
-        "amount": 150,
-        "channel": "FFS",
-        "source": "CMS NHE Table 7"
-      },
-      {
-        "from": "Medicare",
-        "to": "Providers & Clinicians",
-        "amount": 95,
-        "channel": "FFS",
-        "source": "CMS NHE Table 8"
-      },
-      {
-        "from": "Medicare",
-        "to": "Pharma & Rx",
-        "amount": 55,
-        "channel": "Part D",
-        "source": "CMS NHE Table 16"
-      },
-      {
-        "from": "Medicare",
-        "to": "Long-Term Care",
-        "amount": 76,
-        "channel": "FFS",
-        "source": "CMS NHE"
-      },
-      {
-        "from": "Medicaid",
-        "to": "Hospitals",
-        "amount": 45,
-        "channel": "FFS + DSH",
-        "source": "MACPAC"
-      },
-      {
-        "from": "Medicaid",
-        "to": "Providers & Clinicians",
-        "amount": 40,
-        "channel": "FFS",
-        "source": "MACPAC"
-      },
-      {
-        "from": "Medicaid",
-        "to": "Long-Term Care",
-        "amount": 170,
-        "channel": "LTSS (nursing + HCBS)",
-        "source": "MACPAC"
-      },
-      {
-        "from": "Medicaid",
-        "to": "Pharma & Rx",
-        "amount": 30,
-        "channel": "FFS Rx",
-        "source": "MACPAC"
-      },
-      {
-        "from": "Individuals",
-        "to": "Hospitals",
-        "amount": 37.525,
-        "channel": "Out-of-pocket",
-        "source": "CMS NHE Table 7"
-      },
-      {
-        "from": "Individuals",
-        "to": "Providers & Clinicians",
-        "amount": 87.295,
-        "channel": "Out-of-pocket",
-        "source": "CMS NHE Table 8"
-      },
-      {
-        "from": "Individuals",
-        "to": "Pharma & Rx",
-        "amount": 55.424,
-        "channel": "Out-of-pocket",
-        "source": "CMS NHE Table 16"
-      },
-      {
-        "from": "Hospitals",
-        "to": "Healthcare Workers",
-        "amount": 810,
-        "channel": "Labor (facility-fee)",
-        "source": "AHA Annual Survey 2023"
-      },
-      {
-        "from": "Providers & Clinicians",
-        "to": "Healthcare Workers",
-        "amount": 1034.7852,
-        "channel": "Labor (prof-fee)",
-        "source": "CMS NHE"
-      },
-      {
-        "from": "Long-Term Care",
-        "to": "Healthcare Workers",
-        "amount": 253.38,
-        "channel": "Labor (nursing + home health)",
-        "source": "CMS NHE"
-      },
-      {
-        "from": "Pharma & Rx",
-        "to": "Healthcare Workers",
-        "amount": 116.5,
-        "channel": "Labor (est. 50% Pharma+Insurance split)",
-        "source": "estimate"
-      },
-      {
-        "from": "Health Insurance",
-        "to": "Healthcare Workers",
-        "amount": 116.5,
-        "channel": "Labor (est. 50% Pharma+Insurance split)",
-        "source": "estimate"
-      },
-      {
-        "from": "Hospitals",
-        "to": "Suppliers & Vendors",
-        "amount": 660,
-        "channel": "Non-labor",
-        "source": "AHA / CMS NHE"
-      },
-      {
-        "from": "Providers & Clinicians",
-        "to": "Suppliers & Vendors",
-        "amount": 257.336,
-        "channel": "Non-labor (practice overhead)",
-        "source": "estimate"
-      },
-      {
-        "from": "Long-Term Care",
-        "to": "Suppliers & Vendors",
-        "amount": 94.85,
-        "channel": "Non-labor",
-        "source": "estimate"
-      },
-      {
-        "from": "Pharma & Rx",
-        "to": "Suppliers & Vendors",
-        "amount": 113.22875,
-        "channel": "Non-labor (est. 50% split)",
-        "source": "estimate"
-      },
-      {
-        "from": "Health Insurance",
-        "to": "Suppliers & Vendors",
-        "amount": 113.22875,
-        "channel": "Non-labor (est. 50% split)",
-        "source": "estimate"
-      }
+      { "id": "ind_fed_medicare_genrev", "from": "individuals", "to": "federal_government", "amount": 437, "channel": "General revenue (Medicare)", "source": "cms_nhe_trustees", "confidence": "reported" },
+      { "id": "fed_medicare_genrev", "from": "federal_government", "to": "medicare", "amount": 437, "channel": "General revenue funding", "source": "cms_nhe_trustees", "confidence": "reported" },
+      { "id": "ind_medicare_payroll_ee", "from": "individuals", "to": "medicare", "amount": 162.5, "channel": "Payroll tax (employee HI)", "source": "trustees", "confidence": "reported" },
+      { "id": "ind_medicare_premiums", "from": "individuals", "to": "medicare", "amount": 163, "channel": "Beneficiary premiums", "source": "cms_trustees", "confidence": "reported" },
+      { "id": "ind_fed_medicaid_genrev", "from": "individuals", "to": "federal_government", "amount": 614, "channel": "General revenue (Medicaid)", "source": "macpac_cms64", "confidence": "reported" },
+      { "id": "fed_medicaid_fmap", "from": "federal_government", "to": "medicaid", "amount": 614, "channel": "Federal share (FMAP)", "source": "macpac_cms64", "confidence": "reported" },
+      { "id": "ind_state_taxes", "from": "individuals", "to": "state_governments", "amount": 280, "channel": "State taxes", "source": "macpac_cms64", "confidence": "reported" },
+      { "id": "state_medicaid_share", "from": "state_governments", "to": "medicaid", "amount": 280, "channel": "State share", "source": "macpac_cms64", "confidence": "reported" },
+      { "id": "emp_hi_esi", "from": "employers", "to": "health_insurance", "amount": 830, "channel": "ESI premiums", "source": "kff_ehbs_2023", "confidence": "reported" },
+      { "id": "emp_medicare_payroll_er", "from": "employers", "to": "medicare", "amount": 163, "channel": "Payroll tax (employer HI)", "source": "trustees_irs", "confidence": "reported" },
+      { "id": "ind_hi_esi_worker", "from": "individuals", "to": "health_insurance", "amount": 235, "channel": "ESI worker share", "source": "kff_ehbs_2023", "confidence": "reported" },
+      { "id": "ind_hi_individual_mkt", "from": "individuals", "to": "health_insurance", "amount": 120, "channel": "Individual market premiums", "source": "cms_nhe", "confidence": "reported" },
+      { "id": "fed_hi_aca_aptc", "from": "federal_government", "to": "health_insurance", "amount": 80, "channel": "ACA APTC subsidies", "source": "cbo_hhs", "confidence": "reported" },
+      { "id": "medicare_hi_ma", "from": "medicare", "to": "health_insurance", "amount": 539, "channel": "MA Part C capitation", "source": "medpac_kff", "confidence": "reported" },
+      { "id": "medicaid_hi_mco", "from": "medicaid", "to": "health_insurance", "amount": 508, "channel": "MCO capitation", "source": "macpac", "confidence": "reported" },
+      { "id": "hi_hospitals_claims", "from": "health_insurance", "to": "hospitals", "amount": 820.5, "channel": "Claims (commercial + MA + MCO)", "source": "nhe2024", "confidence": "estimate" },
+      { "id": "hi_providers_claims", "from": "health_insurance", "to": "providers_clinicians", "amount": 740.7, "channel": "Claims (commercial + MA + MCO)", "source": "nhe2024", "confidence": "estimate" },
+      { "id": "hi_pharma_claims", "from": "health_insurance", "to": "pharma_rx", "amount": 243.0, "channel": "Claims (commercial + MA + MCO)", "source": "nhe2024", "confidence": "estimate" },
+      { "id": "hi_ltc_claims", "from": "health_insurance", "to": "long_term_care", "amount": 278.1, "channel": "Claims (commercial + MA + MCO)", "source": "nhe2024", "confidence": "estimate" },
+      { "id": "medicare_hospitals_ffs", "from": "medicare", "to": "hospitals", "amount": 150, "channel": "FFS", "source": "cms_nhe_t7", "confidence": "reported" },
+      { "id": "medicare_providers_ffs", "from": "medicare", "to": "providers_clinicians", "amount": 95, "channel": "FFS", "source": "cms_nhe_t8", "confidence": "reported" },
+      { "id": "medicare_pharma_partd", "from": "medicare", "to": "pharma_rx", "amount": 55, "channel": "Part D", "source": "cms_nhe_t16", "confidence": "reported" },
+      { "id": "medicare_ltc_ffs", "from": "medicare", "to": "long_term_care", "amount": 76, "channel": "FFS", "source": "cms_nhe", "confidence": "reported" },
+      { "id": "medicaid_hospitals_ffs", "from": "medicaid", "to": "hospitals", "amount": 45, "channel": "FFS + DSH", "source": "macpac", "confidence": "reported" },
+      { "id": "medicaid_providers_ffs", "from": "medicaid", "to": "providers_clinicians", "amount": 40, "channel": "FFS", "source": "macpac", "confidence": "reported" },
+      { "id": "medicaid_ltc_ltss", "from": "medicaid", "to": "long_term_care", "amount": 170, "channel": "LTSS (nursing + HCBS)", "source": "macpac", "confidence": "reported" },
+      { "id": "medicaid_pharma_ffs", "from": "medicaid", "to": "pharma_rx", "amount": 30, "channel": "FFS Rx", "source": "macpac", "confidence": "reported" },
+      { "id": "ind_hospitals_oop", "from": "individuals", "to": "hospitals", "amount": 37.525, "channel": "Out-of-pocket", "source": "cms_nhe_t7", "confidence": "reported" },
+      { "id": "ind_providers_oop", "from": "individuals", "to": "providers_clinicians", "amount": 87.295, "channel": "Out-of-pocket", "source": "cms_nhe_t8", "confidence": "reported" },
+      { "id": "ind_pharma_oop", "from": "individuals", "to": "pharma_rx", "amount": 55.424, "channel": "Out-of-pocket", "source": "cms_nhe_t16", "confidence": "reported" },
+      { "id": "hospitals_workers_labor", "from": "hospitals", "to": "healthcare_workers", "amount": 810, "channel": "Labor (facility-fee)", "source": "aha_2023", "confidence": "reported" },
+      { "id": "providers_workers_labor", "from": "providers_clinicians", "to": "healthcare_workers", "amount": 1034.7852, "channel": "Labor (prof-fee)", "source": "cms_nhe", "confidence": "reported" },
+      { "id": "ltc_workers_labor", "from": "long_term_care", "to": "healthcare_workers", "amount": 253.38, "channel": "Labor (nursing + home health)", "source": "cms_nhe", "confidence": "reported" },
+      { "id": "pharma_workers_labor", "from": "pharma_rx", "to": "healthcare_workers", "amount": 116.5, "channel": "Labor (est. 50% Pharma+Insurance split)", "source": "estimate", "confidence": "estimate" },
+      { "id": "hi_workers_labor", "from": "health_insurance", "to": "healthcare_workers", "amount": 116.5, "channel": "Labor (est. 50% Pharma+Insurance split)", "source": "estimate", "confidence": "estimate" },
+      { "id": "hospitals_suppliers_nonlabor", "from": "hospitals", "to": "suppliers_vendors", "amount": 660, "channel": "Non-labor", "source": "aha_cms_nhe", "confidence": "reported" },
+      { "id": "providers_suppliers_nonlabor", "from": "providers_clinicians", "to": "suppliers_vendors", "amount": 257.336, "channel": "Non-labor (practice overhead)", "source": "estimate", "confidence": "estimate" },
+      { "id": "ltc_suppliers_nonlabor", "from": "long_term_care", "to": "suppliers_vendors", "amount": 94.85, "channel": "Non-labor", "source": "estimate", "confidence": "estimate" },
+      { "id": "pharma_suppliers_nonlabor", "from": "pharma_rx", "to": "suppliers_vendors", "amount": 113.22875, "channel": "Non-labor (est. 50% split)", "source": "estimate", "confidence": "estimate" },
+      { "id": "hi_suppliers_nonlabor", "from": "health_insurance", "to": "suppliers_vendors", "amount": 113.22875, "channel": "Non-labor (est. 50% split)", "source": "estimate", "confidence": "estimate" }
     ]
   }
 }

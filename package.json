@@ -1,0 +1,20 @@
+{
+  "name": "healthcare-flow-graph",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Single source of truth (data/data.json) -> Excel workbook + Sankey, built with native TypeScript on Node 24.",
+  "scripts": {
+    "build": "node src/build.ts",
+    "check": "node src/check.ts",
+    "test": "node --test",
+    "test:update": "node test/update-expected.ts",
+    "extract": "python3 extract.py"
+  },
+  "engines": {
+    "node": ">=22.6"
+  },
+  "dependencies": {
+    "exceljs": "^4.4.0"
+  }
+}

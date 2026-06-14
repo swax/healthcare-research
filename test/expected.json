@@ -1,0 +1,18 @@
+{
+  "total": 9873.5527,
+  "throughput": {
+    "Individuals": 2191.744,
+    "Employers": 993,
+    "Federal Government": 1131,
+    "State Governments": 280,
+    "Medicare": 925.5,
+    "Medicaid": 894,
+    "Health Insurance": 2312,
+    "Hospitals": 1470,
+    "Providers & Clinicians": 1292.1212,
+    "Pharma & Rx": 229.72875,
+    "Long-Term Care": 348.23,
+    "Healthcare Workers": 2331.1652,
+    "Suppliers & Vendors": 1238.6435000000001
+  }
+}

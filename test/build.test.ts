@@ -8,7 +8,9 @@ import ExcelJS from 'exceljs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-before(() => { execSync('node src/build.ts', { cwd: root, stdio: 'ignore' }); });
+before(() => {
+  execSync('node src/build.ts', { cwd: root, stdio: 'ignore' });
+});
 
 test('build produces a loadable workbook with the Graph Data sheet', async () => {
   const p = join(root, 'dist', '2023_healthcare_spending.xlsx');

@@ -27,13 +27,18 @@ test('every edge endpoint references a real node (no dangling refs)', () => {
 });
 
 test('all amounts are positive finite numbers', () => {
-  for (const e of graph.edges) assert.ok(e.amount > 0 && isFinite(e.amount), `${e.from}->${e.to}: ${e.amount}`);
+  for (const e of graph.edges)
+    assert.ok(e.amount > 0 && isFinite(e.amount), `${e.from}->${e.to}: ${e.amount}`);
 });
 
 test('flows never go backward across layers (keeps it a DAG)', () => {
   const layer: Record<string, number> = {};
   for (const n of graph.nodes) layer[n.id] = n.layer;
-  for (const e of graph.edges) assert.ok(layer[e.to] >= layer[e.from], `backward: ${e.from}(${layer[e.from]})->${e.to}(${layer[e.to]})`);
+  for (const e of graph.edges)
+    assert.ok(
+      layer[e.to] >= layer[e.from],
+      `backward: ${e.from}(${layer[e.from]})->${e.to}(${layer[e.to]})`,
+    );
 });
 
 test('graph is acyclic', () => {

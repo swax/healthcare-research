@@ -10,4 +10,10 @@ const { throughput } = computeFlows(graph.nodes, graph.edges);
 const total = graph.edges.reduce((s, e) => s + e.amount, 0);
 const out = { total, throughput };
 writeFileSync(join(root, 'test', 'expected.json'), JSON.stringify(out, null, 2) + '\n');
-console.log('updated test/expected.json (total $' + Math.round(total) + 'B, ' + Object.keys(throughput).length + ' nodes)');
+console.log(
+  'updated test/expected.json (total $' +
+    Math.round(total) +
+    'B, ' +
+    Object.keys(throughput).length +
+    ' nodes)',
+);

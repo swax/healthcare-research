@@ -9,6 +9,10 @@
     "check": "node src/check.ts",
     "test": "node --test",
     "test:update": "node test/update-expected.ts",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "derive:claims": "node scripts/derive_hi_claims.mjs",
     "extract": "python3 extract.py"
   },
@@ -17,5 +21,13 @@
   },
   "dependencies": {
     "exceljs": "^4.4.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.5.0",
+    "globals": "^17.6.0",
+    "prettier": "^3.8.4",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.61.0"
   }
 }

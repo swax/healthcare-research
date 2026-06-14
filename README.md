@@ -11,7 +11,7 @@ The data lives in two files, split by how often you touch them:
   (`layers`, `groups`, `sources`), plus the canonical flow model: a `nodes` list and an
   `edges` list. Nodes carry a stable slug `id` and a display `label`; edges reference nodes
   by `id` and each is `{id, from, to, amount, channel, source, confidence}` — the edge row
-  *is* the declarative connection (an adjacency list, the standard way to store a graph).
+  _is_ the declarative connection (an adjacency list, the standard way to store a graph).
   `source` keys into the `sources` table; `confidence` is `reported` or `estimate`.
 - **`data/workbook.json`** (~630 KB, bulk) — the full 16-sheet workbook content (cells,
   formulas, styles). Generated; you rarely open it by hand.
@@ -84,11 +84,11 @@ loudly instead of producing a silently-wrong diagram.
 
 ## Files
 
-| Path | Role |
-|------|------|
-| `data/graph.json` | **source of truth you edit** (canonical nodes + edges) |
-| `data/workbook.json` | bulk 16-sheet content (generated) |
-| `src/build.ts`   | generator → xlsx + Sankey html |
-| `extract.py`     | one-way importer: xlsx → data.json |
-| `dist/`          | generated output (git-ignored) |
-| `tsconfig.json`  | editor/type-check config (`erasableSyntaxOnly`) |
+| Path                 | Role                                                   |
+| -------------------- | ------------------------------------------------------ |
+| `data/graph.json`    | **source of truth you edit** (canonical nodes + edges) |
+| `data/workbook.json` | bulk 16-sheet content (generated)                      |
+| `src/build.ts`       | generator → xlsx + Sankey html                         |
+| `extract.py`         | one-way importer: xlsx → data.json                     |
+| `dist/`              | generated output (git-ignored)                         |
+| `tsconfig.json`      | editor/type-check config (`erasableSyntaxOnly`)        |

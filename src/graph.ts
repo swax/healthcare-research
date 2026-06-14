@@ -3,11 +3,37 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-export interface GNode { id: string; label: string; layer: number; group: string; role?: string; }
-export interface Edge { id: string; from: string; to: string; amount: number; channel: string; source: string; confidence?: string; }
-export interface LayerDef { n: number; name: string; x: number; annotation?: string; }
-export interface GroupDef { id: string; label: string; color: string; }
-export interface Graph { nodes: GNode[]; edges: Edge[]; }
+export interface GNode {
+  id: string;
+  label: string;
+  layer: number;
+  group: string;
+  role?: string;
+}
+export interface Edge {
+  id: string;
+  from: string;
+  to: string;
+  amount: number;
+  channel: string;
+  source: string;
+  confidence?: string;
+}
+export interface LayerDef {
+  n: number;
+  name: string;
+  x: number;
+  annotation?: string;
+}
+export interface GroupDef {
+  id: string;
+  label: string;
+  color: string;
+}
+export interface Graph {
+  nodes: GNode[];
+  edges: Edge[];
+}
 export interface GraphFile {
   meta: Record<string, unknown>;
   layers: LayerDef[];
@@ -20,12 +46,20 @@ export function loadGraph(root: string): GraphFile {
   return JSON.parse(readFileSync(join(root, 'data', 'graph.json'), 'utf8'));
 }
 
-export function computeFlows(nodes: GNode[], edges: Edge[]): {
-  inflow: Record<string, number>; outflow: Record<string, number>; throughput: Record<string, number>;
+export function computeFlows(
+  nodes: GNode[],
+  edges: Edge[],
+): {
+  inflow: Record<string, number>;
+  outflow: Record<string, number>;
+  throughput: Record<string, number>;
 } {
   const inflow: Record<string, number> = {};
   const outflow: Record<string, number> = {};
-  for (const n of nodes) { inflow[n.id] = 0; outflow[n.id] = 0; }
+  for (const n of nodes) {
+    inflow[n.id] = 0;
+    outflow[n.id] = 0;
+  }
   for (const e of edges) {
     outflow[e.from] = (outflow[e.from] ?? 0) + e.amount;
     inflow[e.to] = (inflow[e.to] ?? 0) + e.amount;
@@ -43,12 +77,14 @@ export function findCycles(nodes: GNode[], edges: Edge[]): string[] {
   const stack: string[] = [];
   const cycles: string[] = [];
   function dfs(u: string): void {
-    state[u] = 1; stack.push(u);
+    state[u] = 1;
+    stack.push(u);
     for (const v of adj[u] || []) {
       if (state[v] === 1) cycles.push(stack.slice(stack.indexOf(v)).concat(v).join(' -> '));
       else if (!state[v]) dfs(v);
     }
-    stack.pop(); state[u] = 2;
+    stack.pop();
+    state[u] = 2;
   }
   for (const n of nodes) if (!state[n.id]) dfs(n.id);
   return cycles;
@@ -69,14 +105,16 @@ export function validateGraph(file: GraphFile): string[] {
     if (layerNums.has(l.n)) problems.push(`duplicate layer number: ${l.n}`);
     layerNums.add(l.n);
     if (!l.name) problems.push(`layer ${l.n}: missing name`);
-    if (typeof l.x !== 'number' || l.x < 0 || l.x > 1) problems.push(`layer ${l.n}: x must be 0..1 (got ${l.x})`);
+    if (typeof l.x !== 'number' || l.x < 0 || l.x > 1)
+      problems.push(`layer ${l.n}: x must be 0..1 (got ${l.x})`);
   }
   const groupIds = new Set<string>();
   for (const g of groups) {
     if (groupIds.has(g.id)) problems.push(`duplicate group id: "${g.id}"`);
     groupIds.add(g.id);
     if (!g.label) problems.push(`group "${g.id}": missing label`);
-    if (!/^[0-9A-Fa-f]{6}$/.test(g.color)) problems.push(`group "${g.id}": invalid color "${g.color}"`);
+    if (!/^[0-9A-Fa-f]{6}$/.test(g.color))
+      problems.push(`group "${g.id}": invalid color "${g.color}"`);
   }
   const sourceIds = new Set<string>(Object.keys(sources ?? {}));
 
@@ -85,12 +123,17 @@ export function validateGraph(file: GraphFile): string[] {
   const layer: Record<string, number> = {};
   for (const n of nodes) {
     if (ids.has(n.id)) problems.push(`duplicate node id: "${n.id}"`);
-    ids.add(n.id); layer[n.id] = n.layer;
+    ids.add(n.id);
+    layer[n.id] = n.layer;
     if (!n.label) problems.push(`node "${n.id}": missing label`);
-    if (!Number.isInteger(n.layer) || n.layer < 0) problems.push(`node "${n.id}": invalid layer ${n.layer}`);
-    else if (!layerNums.has(n.layer)) problems.push(`node "${n.id}": layer ${n.layer} not defined in layers[]`);
-    if (!groupIds.has(n.group)) problems.push(`node "${n.id}": group "${n.group}" not defined in groups[]`);
-    if (n.role !== undefined && !ROLES.has(n.role)) problems.push(`node "${n.id}": invalid role "${n.role}"`);
+    if (!Number.isInteger(n.layer) || n.layer < 0)
+      problems.push(`node "${n.id}": invalid layer ${n.layer}`);
+    else if (!layerNums.has(n.layer))
+      problems.push(`node "${n.id}": layer ${n.layer} not defined in layers[]`);
+    if (!groupIds.has(n.group))
+      problems.push(`node "${n.id}": group "${n.group}" not defined in groups[]`);
+    if (n.role !== undefined && !ROLES.has(n.role))
+      problems.push(`node "${n.id}": invalid role "${n.role}"`);
   }
 
   // ---- edges ----
@@ -107,12 +150,18 @@ export function validateGraph(file: GraphFile): string[] {
     if (typeof e.amount !== 'number' || !isFinite(e.amount) || e.amount <= 0)
       problems.push(`edge ${e.id || tag}: amount must be a positive number (got ${e.amount})`);
     if (ids.has(e.from) && ids.has(e.to) && layer[e.to] < layer[e.from])
-      problems.push(`edge ${e.id || tag}: backward flow (layer ${layer[e.from]} -> ${layer[e.to]})`);
-    if (!sourceIds.has(e.source)) problems.push(`edge ${e.id || tag}: source "${e.source}" not defined in sources{}`);
+      problems.push(
+        `edge ${e.id || tag}: backward flow (layer ${layer[e.from]} -> ${layer[e.to]})`,
+      );
+    if (!sourceIds.has(e.source))
+      problems.push(`edge ${e.id || tag}: source "${e.source}" not defined in sources{}`);
     if (e.confidence !== undefined && !CONFIDENCE.has(e.confidence))
       problems.push(`edge ${e.id || tag}: invalid confidence "${e.confidence}"`);
     const key = `${e.from}|${e.to}|${e.channel}`;
-    if (pairChannel.has(key)) problems.push(`edge ${e.id || tag}: duplicate (from,to,channel) "${e.channel}" — give it a distinct channel`);
+    if (pairChannel.has(key))
+      problems.push(
+        `edge ${e.id || tag}: duplicate (from,to,channel) "${e.channel}" — give it a distinct channel`,
+      );
     pairChannel.add(key);
   }
 

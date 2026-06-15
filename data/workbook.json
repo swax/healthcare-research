@@ -9717,7 +9717,7 @@
     {
      "r": 17,
      "c": 4,
-     "v": "Post-acute care, rehab stays",
+     "v": "Medicare FFS SNF (post-acute); full Medicare nursing incl. MA = $44B (see Long-Term Care)",
      "s": {
       "sz": 9.0,
       "color": "666666",
@@ -9768,7 +9768,7 @@
     {
      "r": 18,
      "c": 4,
-     "v": "Home-based skilled care",
+     "v": "Medicare FFS home health; full Medicare home health incl. MA = $52B (see Long-Term Care)",
      "s": {
       "sz": 9.0,
       "color": "666666",

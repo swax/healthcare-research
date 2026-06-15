@@ -2,6 +2,7 @@
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { loadGraph, computeFlows, validateGraph } from './graph.ts';
+import { loadWorkbook, reconcileWorkbook } from './reconcile.ts';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const file = loadGraph(root);
@@ -31,8 +32,50 @@ for (const n of sorted) {
 const total = graph.edges.reduce((s, e) => s + e.amount, 0);
 console.log('-'.repeat(70));
 console.log(`${graph.nodes.length} nodes, ${graph.edges.length} edges, total flow ${fmt(total)}\n`);
+
+// ---- cross-sheet reconciliation (narrative workbook vs the canonical graph) ----
+const recon = reconcileWorkbook(file, loadWorkbook(root));
+const modeledCount = recon.pairs.filter((p) => p.status !== 'context-only').length;
+console.log('Cross-sheet reconciliation — modeled flows (program FFS/OOP payments vs graph):\n');
+if (!recon.mismatches.length) {
+  console.log(
+    `✓ all ${modeledCount} modeled provider-payment pairs agree within $${recon.tolerance}B\n`,
+  );
+} else {
+  console.log(
+    `⚠ ${recon.mismatches.length} of ${modeledCount} modeled pairs disagree by more than ` +
+      `$${recon.tolerance}B:\n`,
+  );
+  for (const p of recon.mismatches) {
+    const parts = [
+      `graph ${p.graph === null ? '(no edge)' : fmt(p.graph)}`,
+      ...p.modeled.map((s) => `${s.sheet} ${fmt(s.amount)}`),
+    ];
+    const tag = p.status === 'absent-in-graph' ? ' [missing graph edge]' : '';
+    console.log(`  ${p.fromLabel} → ${p.toLabel}  Δ${fmt(p.spread)}${tag}`);
+    console.log(`      ${parts.join('  vs  ')}`);
+  }
+  console.log('');
+}
+
+// National-NHE context: all-payer figures (include MA/MCO routed via insurers),
+// shown alongside the modeled FFS edge — informational, not a pass/fail.
+if (recon.context.length) {
+  console.log('National-NHE payer-mix context (all-payer; not expected to equal the FFS edges):\n');
+  for (const p of recon.context) {
+    const modeled = p.graph === null ? 'no direct edge' : `modeled ${fmt(p.graph)}`;
+    const nat = p.national.map((s) => `${fmt(s.amount)} (${s.sheet})`).join(', ');
+    console.log(`  ${p.fromLabel} → ${p.toLabel}:  national ${nat}  vs  ${modeled}`);
+  }
+  console.log('');
+}
+
 if (problems.length) {
   console.error('VALIDATION ERRORS:\n - ' + problems.join('\n - '));
   process.exit(1);
 }
+const reconNote = recon.mismatches.length
+  ? `⚠ ${recon.mismatches.length} modeled-flow reconciliation mismatch(es) — see above`
+  : '✓ modeled-flow reconciliation clean';
 console.log('✓ all structural & invariant checks passed');
+console.log(reconNote);

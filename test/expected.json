@@ -1,7 +1,7 @@
 {
-  "total": 11955.8527,
+  "total": 12109.1337,
   "throughput": {
-    "individuals": 2191.744,
+    "individuals": 2345.025,
     "employers": 993,
     "federal_government": 1131,
     "state_governments": 280,
@@ -11,7 +11,7 @@
     "hospitals": 1470,
     "providers_clinicians": 1292.1212,
     "pharma_rx": 383.424,
-    "long_term_care": 524.1,
+    "long_term_care": 597.3810000000001,
     "healthcare_workers": 2331.1652,
     "suppliers_vendors": 1238.6435000000001
   }

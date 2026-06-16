@@ -1,0 +1,118 @@
+{
+  "node": "medicaid",
+  "subtitle": "Total: ~$894B | Enrollment: ~91.7M | Source: CMS NHE, MACPAC, CRS",
+  "tabColor": "0D47A1",
+  "inflows": [
+    {
+      "edge": "fed_medicaid_fmap",
+      "label": "Federal share (general revenue)",
+      "note": "~69% FMAP; elevated by pandemic phase-down",
+      "source": "MACPAC MACStats Dec 2024 Exhibit 16; CMS-64 FMR data; federal share $619.9B (MACPAC)"
+    },
+    {
+      "edge": "state_medicaid_share",
+      "label": "State share (state taxes & revenue)",
+      "note": "~31% state match",
+      "source": "MACPAC MACStats Dec 2024 Exhibit 16; CMS-64 data; state share $280.4B (MACPAC)"
+    }
+  ],
+  "outflows": [
+    {
+      "edge": "medicaid_hi_mco",
+      "label": "Managed care organizations (MCOs) → Health Insurance",
+      "note": "57% via MCOs; $508B total",
+      "source": "MACPAC MACStats Dec 2024 Exhibit 17; CMS NHE 2023; Milliman MCO analysis"
+    },
+    {
+      "edge": "medicaid_ltc_ltss",
+      "split": [
+        {
+          "label": "Nursing facilities (institutional LTSS) → Long-Term Care",
+          "amount": 59,
+          "note": "Subset of LTSS; 83% of institutional",
+          "source": "MACPAC MACStats Dec 2024 Exhibit 17; KFF nursing facility brief; CMS NHE Table 10"
+        },
+        {
+          "label": "Home & community-based (HCBS) → Long-Term Care",
+          "amount": 111,
+          "note": "Growing share of LTSS",
+          "source": "MACPAC MACStats Dec 2024 Exhibit 17; CMS HCBS expenditure reports"
+        }
+      ]
+    },
+    {
+      "edge": "medicaid_hospitals_ffs",
+      "label": "Hospital care (FFS + DSH) → Hospitals",
+      "note": "Includes disproportionate share payments",
+      "source": "MACPAC MACStats Dec 2024 Exhibit 17; CMS NHE Table 7 (hospital by payer)"
+    },
+    {
+      "edge": "medicaid_providers_ffs",
+      "label": "Physician & clinical (FFS) → Physicians & Clinicians",
+      "note": "12% of national physician spending",
+      "source": "MACPAC MACStats Dec 2024 Exhibit 17; CMS NHE Table 8 (physician by payer)"
+    },
+    {
+      "edge": "medicaid_pharma_ffs",
+      "label": "Prescription drugs (FFS) → Pharma & Rx",
+      "note": "11% of national Rx spending",
+      "source": "MACPAC MACStats Dec 2024 Exhibit 17; CMS NHE Table 16 (Rx by payer); Exhibit 28 drug rebates"
+    },
+    {
+      "extra": true,
+      "label": "Dental & other professional services",
+      "amount": 12,
+      "note": "11% of national dental spending",
+      "source": "MACPAC MACStats Dec 2024 Exhibit 17; CMS NHE (dental services)"
+    },
+    {
+      "extra": true,
+      "label": "Other FFS (lab, DME, rehab, etc.)",
+      "amount": 55,
+      "note": "Various FFS services",
+      "source": "MACPAC MACStats Dec 2024 Exhibit 17; CMS NHE (other FFS)"
+    },
+    {
+      "extra": true,
+      "label": "Administration (state + federal)",
+      "amount": 34,
+      "note": "State & federal admin costs",
+      "source": "MACPAC MACStats Dec 2024 Exhibit 31 (admin by state); CMS-64 data"
+    }
+  ],
+  "validation": [
+    {
+      "metric": "Total Medicaid (MACPAC/CMS-64)",
+      "independent": 900,
+      "model": { "ref": "totalInflows" },
+      "note": "MACPAC: $900.3B total; our $894B from NHE basis (different accounting)",
+      "emphasis": true
+    },
+    {
+      "metric": "Federal share (MACPAC)",
+      "independent": 620,
+      "model": { "ref": "inflow", "edge": "fed_medicaid_fmap" },
+      "note": "MACPAC: $619.9B; our $614B (rounding/timing)"
+    },
+    {
+      "metric": "State share (MACPAC)",
+      "independent": 280,
+      "model": { "ref": "inflow", "edge": "state_medicaid_share" },
+      "note": "MACPAC: $280.4B; our $280B — close match"
+    },
+    {
+      "metric": "Medicaid % of NHE",
+      "independent": 0.179,
+      "independentFmt": "pct",
+      "model": { "ref": "totalInflows", "over": 4867 },
+      "modelFmt": "pct",
+      "note": "CMS NHE: 17.9%; NHE total $4,866.5B"
+    },
+    {
+      "metric": "MCO spending (MACPAC Exhibit 17)",
+      "independent": 508,
+      "model": { "ref": "outflow", "edge": "medicaid_hi_mco" },
+      "note": "Strong match — $508B in both MACPAC and NHE data"
+    }
+  ]
+}

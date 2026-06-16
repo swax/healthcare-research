@@ -7,6 +7,8 @@
   "scripts": {
     "build": "node src/build.ts",
     "check": "node src/check.ts",
+    "build:v2": "node data_v2/build.ts",
+    "check:v2": "node data_v2/check.ts",
     "test": "node --test",
     "test:update": "node test/update-expected.ts",
     "lint": "eslint .",

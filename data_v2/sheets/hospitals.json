@@ -1,0 +1,56 @@
+{
+  "node": "hospitals",
+  "subtitle": "All-payer hospital care  ·  NHE national total $1,501B (2023)  ·  CMS NHE Table 7 / AHA / BLS",
+  "rows": {
+    "hi_hospitals_claims": {
+      "label": "Private insurance + MA + MCO claims",
+      "note": "Commercial PHI direct (~$506B, 33.7%) + Medicare Advantage & Medicaid MCO passthrough to hospitals"
+    },
+    "medicare_hospitals_ffs": {
+      "label": "Medicare FFS (inpatient + outpatient)",
+      "note": "Direct FFS; total Medicare hospital incl. MA ~$411B = 27.4% of national hospital care"
+    },
+    "medicaid_hospitals_ffs": {
+      "label": "Medicaid FFS + DSH",
+      "note": "Direct FFS + disproportionate-share; total Medicaid hospital incl. MCO ~$294B = 19.6%"
+    },
+    "ind_hospitals_oop": {
+      "label": "Out-of-pocket (copays, deductibles)",
+      "note": "2.5% of national hospital care; CMS NHE Table 7 ~$37B"
+    },
+    "hospitals_workers_labor": {
+      "label": "Labor — wages, benefits, contract staff (~54%)",
+      "note": "5.6M workers; RNs ~$200B · employed physicians ~$125B · other clinical ~$210B · admin/support ~$150B · contract/agency ~$75B (AHA 2023 / BLS OES)"
+    },
+    "hospitals_suppliers_nonlabor": {
+      "label": "Non-labor — supplies, drugs, capital, services (~44%)",
+      "note": "Supplies/drugs/devices ~$225B · other operating (utilities, malpractice, bad debt) ~$235B · capital & depreciation ~$95B · purchased services ~$75B · interest ~$30B (AHA 2023)"
+    },
+    "hospitals_capital_margin": {
+      "label": "Net margin → capital markets (~2%)",
+      "note": "AHA industry-average operating margin 3-5%; varies widely by system and payer mix"
+    }
+  },
+  "checks": [
+    {
+      "metric": "National hospital spending (CMS NHE)",
+      "independent": 1501,
+      "model": { "sum": ["total:outflows"] },
+      "emphasis": true,
+      "note": "CMS NHE 2023 Table 7 = $1,501B; the cost-structure outflows decompose the full national total"
+    },
+    {
+      "metric": "Total hospital expenses (AHA)",
+      "independent": 1470,
+      "model": { "sum": ["total:outflows"] },
+      "note": "AHA Hospital Statistics: community ~$1.29T + non-community ~$0.18T ≈ $1.47T (independent cost-report basis)"
+    },
+    {
+      "metric": "Labor share of expenses (BLS/AHA)",
+      "independent": 0.55,
+      "fmt": "pct",
+      "model": { "sum": ["edge:hospitals_workers_labor"], "over": 1501 },
+      "note": "BLS: healthcare-sector labor ~55-57% of output; labor ÷ NHE national $1,501B"
+    }
+  ]
+}

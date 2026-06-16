@@ -1,0 +1,1069 @@
+{
+  "meta": {
+    "schemaVersion": 2,
+    "title": "2023 U.S. Healthcare Flow-of-Funds (v2)",
+    "year": 2023,
+    "units": "USD billions",
+    "sources": "CMS NHE, MedPAC, MACPAC, AHA, KFF, PhRMA",
+    "generatedNote": "v2 schema. Each edge carries an `observations[]` array (a value per source/basis) instead of a single `amount`+`source`. Exactly one observation per edge is canonical (implicit when there is only one; flagged `\"canonical\": true` otherwise) — that value is what downstream build/check treats as the edge amount. Nothing in src/ loads this file yet; it is the v2 source-of-truth being built in parallel with data/graph.json. See data_v2/README.md."
+  },
+  "layers": [
+    { "n": 0, "name": "Payers / Households", "x": 0.02, "annotation": "Payers" },
+    { "n": 1, "name": "Government", "x": 0.26, "annotation": "Government" },
+    { "n": 2, "name": "Programs & Insurers", "x": 0.5, "annotation": "Programs & Insurers" },
+    { "n": 3, "name": "Providers", "x": 0.74, "annotation": "Providers" },
+    { "n": 4, "name": "Factors of Production", "x": 0.98, "annotation": "Factors" }
+  ],
+  "groups": [
+    { "id": "payers", "label": "Payers / Households", "color": "1565C0" },
+    { "id": "government", "label": "Government", "color": "0D47A1" },
+    { "id": "programs_insurers", "label": "Programs & Insurers", "color": "00838F" },
+    { "id": "providers", "label": "Providers", "color": "2E7D32" },
+    { "id": "factors", "label": "Factors of Production", "color": "6A1B9A" }
+  ],
+  "sources": {
+    "cms_nhe": "CMS NHE",
+    "cms_nhe_t7": "CMS NHE Table 7",
+    "cms_nhe_t8": "CMS NHE Table 8",
+    "cms_nhe_t16": "CMS NHE Table 16",
+    "cms_nhe_trustees": "CMS NHE / Trustees",
+    "cms_trustees": "CMS / Trustees",
+    "trustees": "Trustees Report",
+    "trustees_irs": "Trustees / IRS",
+    "macpac": "MACPAC",
+    "macpac_cms64": "MACPAC / CMS-64",
+    "macpac_macstats": "MACPAC MACStats Dec 2024",
+    "kff_ehbs_2023": "KFF EHBS 2023",
+    "kff_ma_2024": "KFF Medicare Advantage Spending Brief 2024",
+    "cbo_hhs": "CBO / HHS",
+    "medpac_kff": "MedPAC / KFF",
+    "aha_2023": "AHA Annual Survey 2023",
+    "aha_cms_nhe": "AHA / CMS NHE",
+    "nhe2024": "CMS NHE 2024 release (CY2023), by service & source of funds",
+    "estimate": "Author estimate"
+  },
+  "graph": {
+    "nodes": [
+      {
+        "id": "individuals",
+        "label": "Individuals",
+        "layer": 0,
+        "group": "payers",
+        "role": "source"
+      },
+      { "id": "employers", "label": "Employers", "layer": 0, "group": "payers", "role": "source" },
+      {
+        "id": "federal_government",
+        "label": "Federal Government",
+        "layer": 1,
+        "group": "government",
+        "role": "intermediary"
+      },
+      {
+        "id": "state_governments",
+        "label": "State Governments",
+        "layer": 1,
+        "group": "government",
+        "role": "intermediary"
+      },
+      {
+        "id": "medicare",
+        "label": "Medicare",
+        "layer": 2,
+        "group": "programs_insurers",
+        "role": "intermediary"
+      },
+      {
+        "id": "medicaid",
+        "label": "Medicaid",
+        "layer": 2,
+        "group": "programs_insurers",
+        "role": "intermediary"
+      },
+      {
+        "id": "health_insurance",
+        "label": "Health Insurance",
+        "layer": 2,
+        "group": "programs_insurers",
+        "role": "intermediary"
+      },
+      {
+        "id": "hospitals",
+        "label": "Hospitals",
+        "layer": 3,
+        "group": "providers",
+        "role": "intermediary"
+      },
+      {
+        "id": "providers_clinicians",
+        "label": "Providers & Clinicians",
+        "layer": 3,
+        "group": "providers",
+        "role": "intermediary"
+      },
+      {
+        "id": "providers_physician",
+        "label": "Physician & Clinical",
+        "layer": 3,
+        "group": "providers",
+        "role": "intermediary",
+        "parent": "providers_clinicians"
+      },
+      {
+        "id": "providers_dental",
+        "label": "Dental",
+        "layer": 3,
+        "group": "providers",
+        "role": "intermediary",
+        "parent": "providers_clinicians"
+      },
+      {
+        "id": "providers_other",
+        "label": "Other Professional",
+        "layer": 3,
+        "group": "providers",
+        "role": "intermediary",
+        "parent": "providers_clinicians"
+      },
+      {
+        "id": "pharma_rx",
+        "label": "Pharma & Rx",
+        "layer": 3,
+        "group": "providers",
+        "role": "intermediary"
+      },
+      {
+        "id": "long_term_care",
+        "label": "Long-Term Care",
+        "layer": 3,
+        "group": "providers",
+        "role": "intermediary"
+      },
+      {
+        "id": "ltc_nursing",
+        "label": "Nursing Facilities",
+        "layer": 3,
+        "group": "providers",
+        "role": "intermediary",
+        "parent": "long_term_care"
+      },
+      {
+        "id": "ltc_homehealth",
+        "label": "Home Health & Hospice",
+        "layer": 3,
+        "group": "providers",
+        "role": "intermediary",
+        "parent": "long_term_care"
+      },
+      {
+        "id": "healthcare_workers",
+        "label": "Healthcare Workers",
+        "layer": 4,
+        "group": "factors",
+        "role": "sink"
+      },
+      {
+        "id": "suppliers_vendors",
+        "label": "Suppliers & Vendors",
+        "layer": 4,
+        "group": "factors",
+        "role": "sink"
+      },
+      {
+        "id": "capital_markets",
+        "label": "Capital & Shareholders",
+        "layer": 4,
+        "group": "factors",
+        "role": "sink"
+      }
+    ],
+    "edges": [
+      {
+        "id": "ind_fed_medicare_genrev",
+        "from": "individuals",
+        "to": "federal_government",
+        "channel": "General revenue (Medicare)",
+        "category": "General revenue",
+        "observations": [
+          {
+            "value": 437,
+            "source": "cms_nhe_trustees",
+            "basis": "modeled",
+            "confidence": "reported"
+          }
+        ]
+      },
+      {
+        "id": "fed_medicare_genrev",
+        "from": "federal_government",
+        "to": "medicare",
+        "channel": "General revenue funding",
+        "observations": [
+          {
+            "value": 437,
+            "source": "cms_nhe_trustees",
+            "basis": "modeled",
+            "confidence": "reported"
+          }
+        ]
+      },
+      {
+        "id": "ind_medicare_payroll_ee",
+        "from": "individuals",
+        "to": "medicare",
+        "channel": "Payroll tax (employee HI)",
+        "observations": [
+          { "value": 162.5, "source": "trustees", "basis": "modeled", "confidence": "reported" }
+        ]
+      },
+      {
+        "id": "ind_medicare_premiums",
+        "from": "individuals",
+        "to": "medicare",
+        "channel": "Beneficiary premiums",
+        "observations": [
+          { "value": 163, "source": "cms_trustees", "basis": "modeled", "confidence": "reported" }
+        ]
+      },
+      {
+        "id": "ind_fed_medicaid_genrev",
+        "from": "individuals",
+        "to": "federal_government",
+        "channel": "General revenue (Medicaid)",
+        "category": "General revenue",
+        "observations": [
+          { "value": 614, "source": "macpac_cms64", "basis": "modeled", "confidence": "reported" }
+        ]
+      },
+      {
+        "id": "fed_medicaid_fmap",
+        "from": "federal_government",
+        "to": "medicaid",
+        "channel": "Federal share (FMAP)",
+        "observations": [
+          {
+            "value": 614,
+            "source": "macpac_cms64",
+            "basis": "modeled",
+            "confidence": "reported",
+            "canonical": true
+          },
+          {
+            "value": 619.9,
+            "source": "macpac_macstats",
+            "basis": "modeled",
+            "confidence": "reported",
+            "note": "MACPAC MACStats Exhibit 16 federal share; we carry $614B (CMS-64 basis, rounding/timing)"
+          }
+        ]
+      },
+      {
+        "id": "ind_state_taxes",
+        "from": "individuals",
+        "to": "state_governments",
+        "channel": "State taxes",
+        "observations": [
+          { "value": 280, "source": "macpac_cms64", "basis": "modeled", "confidence": "reported" }
+        ]
+      },
+      {
+        "id": "state_medicaid_share",
+        "from": "state_governments",
+        "to": "medicaid",
+        "channel": "State share",
+        "observations": [
+          {
+            "value": 280,
+            "source": "macpac_cms64",
+            "basis": "modeled",
+            "confidence": "reported",
+            "canonical": true
+          },
+          {
+            "value": 280.4,
+            "source": "macpac_macstats",
+            "basis": "modeled",
+            "confidence": "reported",
+            "note": "MACPAC MACStats Exhibit 16 state share — close match"
+          }
+        ]
+      },
+      {
+        "id": "emp_hi_esi",
+        "from": "employers",
+        "to": "health_insurance",
+        "channel": "ESI premiums",
+        "observations": [
+          { "value": 830, "source": "kff_ehbs_2023", "basis": "modeled", "confidence": "reported" }
+        ]
+      },
+      {
+        "id": "emp_medicare_payroll_er",
+        "from": "employers",
+        "to": "medicare",
+        "channel": "Payroll tax (employer HI)",
+        "observations": [
+          { "value": 163, "source": "trustees_irs", "basis": "modeled", "confidence": "reported" }
+        ]
+      },
+      {
+        "id": "ind_hi_esi_worker",
+        "from": "individuals",
+        "to": "health_insurance",
+        "channel": "ESI worker share",
+        "observations": [
+          { "value": 235, "source": "kff_ehbs_2023", "basis": "modeled", "confidence": "reported" }
+        ]
+      },
+      {
+        "id": "ind_hi_individual_mkt",
+        "from": "individuals",
+        "to": "health_insurance",
+        "channel": "Individual market premiums",
+        "observations": [
+          { "value": 120, "source": "cms_nhe", "basis": "modeled", "confidence": "reported" }
+        ]
+      },
+      {
+        "id": "ind_fed_aca_genrev",
+        "from": "individuals",
+        "to": "federal_government",
+        "channel": "General revenue (ACA subsidies)",
+        "category": "General revenue",
+        "observations": [
+          { "value": 80, "source": "cbo_hhs", "basis": "modeled", "confidence": "reported" }
+        ]
+      },
+      {
+        "id": "fed_hi_aca_aptc",
+        "from": "federal_government",
+        "to": "health_insurance",
+        "channel": "ACA APTC subsidies",
+        "observations": [
+          { "value": 80, "source": "cbo_hhs", "basis": "modeled", "confidence": "reported" }
+        ]
+      },
+      {
+        "id": "medicare_hi_ma",
+        "from": "medicare",
+        "to": "health_insurance",
+        "channel": "MA Part C capitation",
+        "observations": [
+          {
+            "value": 539,
+            "source": "medpac_kff",
+            "basis": "modeled",
+            "confidence": "reported",
+            "canonical": true,
+            "note": "Gross MA capitation (includes premiums, rebates)"
+          },
+          {
+            "value": 454,
+            "source": "kff_ma_2024",
+            "basis": "national",
+            "confidence": "reported",
+            "note": "MA federal spending NET of beneficiary premiums — a different basis, not a disagreement"
+          }
+        ]
+      },
+      {
+        "id": "medicaid_hi_mco",
+        "from": "medicaid",
+        "to": "health_insurance",
+        "channel": "MCO capitation",
+        "observations": [
+          {
+            "value": 508,
+            "source": "macpac",
+            "basis": "modeled",
+            "confidence": "reported",
+            "canonical": true
+          },
+          {
+            "value": 508,
+            "source": "macpac_macstats",
+            "basis": "modeled",
+            "confidence": "reported",
+            "note": "MACPAC MACStats Exhibit 17 — strong match, $508B in both MACPAC and NHE data"
+          }
+        ]
+      },
+      {
+        "id": "hi_hospitals_claims",
+        "from": "health_insurance",
+        "to": "hospitals",
+        "channel": "Claims (commercial + MA + MCO)",
+        "observations": [
+          { "value": 820.5, "source": "nhe2024", "basis": "modeled", "confidence": "estimate" }
+        ]
+      },
+      {
+        "id": "hi_providers_physician_claims",
+        "from": "health_insurance",
+        "to": "providers_physician",
+        "channel": "Claims (commercial + MA + MCO)",
+        "observations": [
+          { "value": 533.3, "source": "nhe2024", "basis": "modeled", "confidence": "estimate" }
+        ]
+      },
+      {
+        "id": "hi_providers_dental_claims",
+        "from": "health_insurance",
+        "to": "providers_dental",
+        "channel": "Claims (commercial)",
+        "observations": [
+          { "value": 133.3, "source": "nhe2024", "basis": "modeled", "confidence": "estimate" }
+        ]
+      },
+      {
+        "id": "hi_providers_other_claims",
+        "from": "health_insurance",
+        "to": "providers_other",
+        "channel": "Claims (commercial + MA + MCO)",
+        "observations": [
+          { "value": 74.1, "source": "nhe2024", "basis": "modeled", "confidence": "estimate" }
+        ]
+      },
+      {
+        "id": "hi_pharma_claims",
+        "from": "health_insurance",
+        "to": "pharma_rx",
+        "channel": "Claims (commercial + MA + MCO)",
+        "observations": [
+          { "value": 243.0, "source": "nhe2024", "basis": "modeled", "confidence": "estimate" }
+        ]
+      },
+      {
+        "id": "hi_ltc_nursing_claims",
+        "from": "health_insurance",
+        "to": "ltc_nursing",
+        "channel": "Claims (commercial + MA + MCO)",
+        "observations": [
+          { "value": 159, "source": "nhe2024", "basis": "modeled", "confidence": "estimate" }
+        ]
+      },
+      {
+        "id": "hi_ltc_homehealth_claims",
+        "from": "health_insurance",
+        "to": "ltc_homehealth",
+        "channel": "Claims (commercial + MA + MCO)",
+        "observations": [
+          { "value": 119.1, "source": "nhe2024", "basis": "modeled", "confidence": "estimate" }
+        ]
+      },
+      {
+        "id": "medicare_hospitals_ffs",
+        "from": "medicare",
+        "to": "hospitals",
+        "channel": "FFS",
+        "observations": [
+          { "value": 150, "source": "cms_nhe_t7", "basis": "modeled", "confidence": "reported" }
+        ]
+      },
+      {
+        "id": "medicare_providers_physician_ffs",
+        "from": "medicare",
+        "to": "providers_physician",
+        "channel": "FFS",
+        "observations": [
+          { "value": 85, "source": "cms_nhe_t8", "basis": "modeled", "confidence": "estimate" }
+        ]
+      },
+      {
+        "id": "medicare_providers_other_ffs",
+        "from": "medicare",
+        "to": "providers_other",
+        "channel": "FFS",
+        "observations": [
+          { "value": 10, "source": "cms_nhe_t8", "basis": "modeled", "confidence": "estimate" }
+        ]
+      },
+      {
+        "id": "medicare_pharma_partd",
+        "from": "medicare",
+        "to": "pharma_rx",
+        "channel": "Part D",
+        "observations": [
+          { "value": 55, "source": "cms_nhe_t16", "basis": "modeled", "confidence": "reported" }
+        ]
+      },
+      {
+        "id": "medicare_ltc_nursing_snf",
+        "from": "medicare",
+        "to": "ltc_nursing",
+        "channel": "Skilled nursing facility (SNF, FFS)",
+        "observations": [
+          { "value": 35, "source": "cms_nhe", "basis": "modeled", "confidence": "estimate" }
+        ]
+      },
+      {
+        "id": "medicare_ltc_homehealth",
+        "from": "medicare",
+        "to": "ltc_homehealth",
+        "channel": "Home health & hospice (FFS)",
+        "observations": [
+          {
+            "value": 41,
+            "source": "cms_nhe",
+            "basis": "modeled",
+            "confidence": "estimate",
+            "note": "Home health ~$17B + hospice ~$24B"
+          }
+        ]
+      },
+      {
+        "id": "medicaid_hospitals_ffs",
+        "from": "medicaid",
+        "to": "hospitals",
+        "channel": "FFS + DSH",
+        "observations": [
+          { "value": 45, "source": "macpac", "basis": "modeled", "confidence": "reported" }
+        ]
+      },
+      {
+        "id": "medicaid_providers_physician_ffs",
+        "from": "medicaid",
+        "to": "providers_physician",
+        "channel": "FFS",
+        "observations": [
+          { "value": 28, "source": "macpac", "basis": "modeled", "confidence": "estimate" }
+        ]
+      },
+      {
+        "id": "medicaid_providers_dental_ffs",
+        "from": "medicaid",
+        "to": "providers_dental",
+        "channel": "FFS (pediatric + adult dental)",
+        "observations": [
+          { "value": 8, "source": "macpac", "basis": "modeled", "confidence": "estimate" }
+        ]
+      },
+      {
+        "id": "medicaid_providers_other_ffs",
+        "from": "medicaid",
+        "to": "providers_other",
+        "channel": "FFS",
+        "observations": [
+          { "value": 4, "source": "macpac", "basis": "modeled", "confidence": "estimate" }
+        ]
+      },
+      {
+        "id": "medicaid_ltc_nursing",
+        "from": "medicaid",
+        "to": "ltc_nursing",
+        "channel": "Nursing facilities (LTSS)",
+        "observations": [
+          { "value": 59, "source": "macpac", "basis": "modeled", "confidence": "estimate" }
+        ]
+      },
+      {
+        "id": "medicaid_ltc_hcbs",
+        "from": "medicaid",
+        "to": "ltc_homehealth",
+        "channel": "Home & community-based services (HCBS)",
+        "observations": [
+          { "value": 111, "source": "macpac", "basis": "modeled", "confidence": "estimate" }
+        ]
+      },
+      {
+        "id": "medicaid_pharma_ffs",
+        "from": "medicaid",
+        "to": "pharma_rx",
+        "channel": "FFS Rx",
+        "observations": [
+          { "value": 30, "source": "macpac", "basis": "modeled", "confidence": "reported" }
+        ]
+      },
+      {
+        "id": "ind_hospitals_oop",
+        "from": "individuals",
+        "to": "hospitals",
+        "channel": "Out-of-pocket",
+        "observations": [
+          { "value": 37.525, "source": "cms_nhe_t7", "basis": "modeled", "confidence": "reported" }
+        ]
+      },
+      {
+        "id": "ind_providers_physician_oop",
+        "from": "individuals",
+        "to": "providers_physician",
+        "channel": "Out-of-pocket",
+        "observations": [
+          { "value": 39, "source": "cms_nhe_t8", "basis": "modeled", "confidence": "estimate" }
+        ]
+      },
+      {
+        "id": "ind_providers_dental_oop",
+        "from": "individuals",
+        "to": "providers_dental",
+        "channel": "Out-of-pocket",
+        "observations": [
+          {
+            "value": 35,
+            "source": "cms_nhe_t8",
+            "basis": "modeled",
+            "confidence": "estimate",
+            "note": "Dental is heavily out-of-pocket (~40% of dental spend)"
+          }
+        ]
+      },
+      {
+        "id": "ind_providers_other_oop",
+        "from": "individuals",
+        "to": "providers_other",
+        "channel": "Out-of-pocket",
+        "observations": [
+          { "value": 13.295, "source": "cms_nhe_t8", "basis": "modeled", "confidence": "estimate" }
+        ]
+      },
+      {
+        "id": "ind_pharma_oop",
+        "from": "individuals",
+        "to": "pharma_rx",
+        "channel": "Out-of-pocket",
+        "observations": [
+          { "value": 55.424, "source": "cms_nhe_t16", "basis": "modeled", "confidence": "reported" }
+        ]
+      },
+      {
+        "id": "ind_ltc_nursing_oop",
+        "from": "individuals",
+        "to": "ltc_nursing",
+        "channel": "Out-of-pocket",
+        "observations": [
+          { "value": 42, "source": "cms_nhe", "basis": "modeled", "confidence": "estimate" }
+        ]
+      },
+      {
+        "id": "ind_ltc_homehealth_oop",
+        "from": "individuals",
+        "to": "ltc_homehealth",
+        "channel": "Out-of-pocket",
+        "observations": [
+          { "value": 31.281, "source": "cms_nhe", "basis": "modeled", "confidence": "estimate" }
+        ]
+      },
+      {
+        "id": "hospitals_workers_labor",
+        "from": "hospitals",
+        "to": "healthcare_workers",
+        "channel": "Labor (facility-fee)",
+        "observations": [
+          { "value": 810, "source": "aha_2023", "basis": "modeled", "confidence": "reported" }
+        ]
+      },
+      {
+        "id": "providers_physician_workers_labor",
+        "from": "providers_physician",
+        "to": "healthcare_workers",
+        "channel": "Labor (incl. hospital-employed physician comp)",
+        "observations": [
+          { "value": 800, "source": "cms_nhe", "basis": "modeled", "confidence": "estimate" }
+        ]
+      },
+      {
+        "id": "providers_dental_workers_labor",
+        "from": "providers_dental",
+        "to": "healthcare_workers",
+        "channel": "Labor (dentists, hygienists, staff)",
+        "observations": [
+          { "value": 110, "source": "cms_nhe", "basis": "modeled", "confidence": "estimate" }
+        ]
+      },
+      {
+        "id": "providers_other_workers_labor",
+        "from": "providers_other",
+        "to": "healthcare_workers",
+        "channel": "Labor",
+        "observations": [
+          { "value": 124.7852, "source": "cms_nhe", "basis": "modeled", "confidence": "estimate" }
+        ]
+      },
+      {
+        "id": "ltc_nursing_workers_labor",
+        "from": "ltc_nursing",
+        "to": "healthcare_workers",
+        "channel": "Labor (nursing facilities)",
+        "observations": [
+          { "value": 144.68, "source": "cms_nhe", "basis": "modeled", "confidence": "estimate" }
+        ]
+      },
+      {
+        "id": "ltc_homehealth_workers_labor",
+        "from": "ltc_homehealth",
+        "to": "healthcare_workers",
+        "channel": "Labor (home health & hospice)",
+        "observations": [
+          { "value": 108.7, "source": "cms_nhe", "basis": "modeled", "confidence": "estimate" }
+        ]
+      },
+      {
+        "id": "pharma_workers_labor",
+        "from": "pharma_rx",
+        "to": "healthcare_workers",
+        "channel": "Labor (est. 50% Pharma+Insurance split)",
+        "observations": [
+          { "value": 116.5, "source": "estimate", "basis": "modeled", "confidence": "estimate" }
+        ],
+        "split": [
+          {
+            "label": "R&D — scientists, clinical, CROs",
+            "value": 50,
+            "confidence": "estimate",
+            "note": "Labor portion of ~$102B US R&D (PhRMA); CRO/materials sit in non-labor"
+          },
+          { "label": "Manufacturing & quality labor", "value": 30, "confidence": "estimate" },
+          {
+            "label": "SG&A — sales force, market access, admin",
+            "value": 36.5,
+            "confidence": "estimate",
+            "note": "Incl. physician detailing; DTC advertising ~$8B sits in non-labor"
+          }
+        ]
+      },
+      {
+        "id": "hi_workers_labor",
+        "from": "health_insurance",
+        "to": "healthcare_workers",
+        "channel": "Labor (est. 50% Pharma+Insurance split)",
+        "observations": [
+          { "value": 116.5, "source": "estimate", "basis": "modeled", "confidence": "estimate" }
+        ]
+      },
+      {
+        "id": "hospitals_suppliers_nonlabor",
+        "from": "hospitals",
+        "to": "suppliers_vendors",
+        "channel": "Non-labor",
+        "observations": [
+          { "value": 660, "source": "aha_cms_nhe", "basis": "modeled", "confidence": "reported" }
+        ]
+      },
+      {
+        "id": "providers_physician_suppliers_nonlabor",
+        "from": "providers_physician",
+        "to": "suppliers_vendors",
+        "channel": "Non-labor (practice overhead)",
+        "observations": [
+          { "value": 160, "source": "estimate", "basis": "modeled", "confidence": "estimate" }
+        ]
+      },
+      {
+        "id": "providers_dental_suppliers_nonlabor",
+        "from": "providers_dental",
+        "to": "suppliers_vendors",
+        "channel": "Non-labor (dental materials, lab, equipment)",
+        "observations": [
+          { "value": 60, "source": "estimate", "basis": "modeled", "confidence": "estimate" }
+        ]
+      },
+      {
+        "id": "providers_other_suppliers_nonlabor",
+        "from": "providers_other",
+        "to": "suppliers_vendors",
+        "channel": "Non-labor (practice overhead)",
+        "observations": [
+          { "value": 37.336, "source": "estimate", "basis": "modeled", "confidence": "estimate" }
+        ]
+      },
+      {
+        "id": "ltc_nursing_suppliers_nonlabor",
+        "from": "ltc_nursing",
+        "to": "suppliers_vendors",
+        "channel": "Non-labor",
+        "observations": [
+          { "value": 54.16, "source": "estimate", "basis": "modeled", "confidence": "estimate" }
+        ]
+      },
+      {
+        "id": "ltc_homehealth_suppliers_nonlabor",
+        "from": "ltc_homehealth",
+        "to": "suppliers_vendors",
+        "channel": "Non-labor",
+        "observations": [
+          { "value": 40.69, "source": "estimate", "basis": "modeled", "confidence": "estimate" }
+        ]
+      },
+      {
+        "id": "pharma_suppliers_nonlabor",
+        "from": "pharma_rx",
+        "to": "suppliers_vendors",
+        "channel": "Non-labor (est. 50% split)",
+        "observations": [
+          { "value": 113.22875, "source": "estimate", "basis": "modeled", "confidence": "estimate" }
+        ],
+        "split": [
+          {
+            "label": "COGS — raw materials, APIs, contract manufacturing",
+            "value": 78,
+            "confidence": "estimate",
+            "note": "~25% of net revenue; generics ~50% COGS, biologics lower"
+          },
+          {
+            "label": "Distribution & channel — wholesalers, PBMs, pharmacies",
+            "value": 35.22875,
+            "confidence": "estimate",
+            "note": "Wholesaler fees, PBM admin, pharmacy dispensing margins"
+          }
+        ]
+      },
+      {
+        "id": "hi_suppliers_nonlabor",
+        "from": "health_insurance",
+        "to": "suppliers_vendors",
+        "channel": "Non-labor (est. 50% split)",
+        "observations": [
+          { "value": 113.22875, "source": "estimate", "basis": "modeled", "confidence": "estimate" }
+        ]
+      },
+      {
+        "id": "hospitals_capital_margin",
+        "from": "hospitals",
+        "to": "capital_markets",
+        "channel": "After-tax margin (for-profit + nonprofit surplus)",
+        "observations": [
+          {
+            "value": 28,
+            "source": "estimate",
+            "basis": "modeled",
+            "confidence": "estimate",
+            "note": "Net of ~$3B corporate income tax (for-profit share only; most hospitals are tax-exempt) routed to Government via hospitals_fed_tax"
+          }
+        ]
+      },
+      {
+        "id": "providers_physician_capital_margin",
+        "from": "providers_physician",
+        "to": "capital_markets",
+        "channel": "Net margin / PE & corporate returns (after tax)",
+        "observations": [
+          {
+            "value": 22,
+            "source": "estimate",
+            "basis": "modeled",
+            "confidence": "estimate",
+            "note": "Net of ~$2.4B corporate income tax via providers_physician_fed_tax (much of physician income is pass-through, taxed at the owner level)"
+          }
+        ]
+      },
+      {
+        "id": "providers_dental_capital_margin",
+        "from": "providers_dental",
+        "to": "capital_markets",
+        "channel": "Net margin (independent owners, after tax)",
+        "observations": [
+          {
+            "value": 11,
+            "source": "estimate",
+            "basis": "modeled",
+            "confidence": "estimate",
+            "note": "Net of ~$1.1B corporate income tax via providers_dental_fed_tax"
+          }
+        ]
+      },
+      {
+        "id": "providers_other_capital_margin",
+        "from": "providers_other",
+        "to": "capital_markets",
+        "channel": "Net margin (after tax)",
+        "observations": [
+          {
+            "value": 4.6,
+            "source": "estimate",
+            "basis": "modeled",
+            "confidence": "estimate",
+            "note": "Net of ~$0.5B corporate income tax via providers_other_fed_tax"
+          }
+        ]
+      },
+      {
+        "id": "pharma_capital_margin",
+        "from": "pharma_rx",
+        "to": "capital_markets",
+        "channel": "Net profit (after tax)",
+        "observations": [
+          {
+            "value": 58,
+            "source": "estimate",
+            "basis": "modeled",
+            "confidence": "estimate",
+            "note": "Retained earnings, dividends, buybacks. Net of ~$17.5B corporate income tax routed to Government via pharma_fed_tax"
+          }
+        ]
+      },
+      {
+        "id": "ltc_nursing_capital_margin",
+        "from": "ltc_nursing",
+        "to": "capital_markets",
+        "channel": "Net margin (after tax)",
+        "observations": [
+          {
+            "value": 4.97,
+            "source": "estimate",
+            "basis": "modeled",
+            "confidence": "estimate",
+            "note": "Net of ~$1.1B corporate income tax (for-profit operator share) via ltc_nursing_fed_tax"
+          }
+        ]
+      },
+      {
+        "id": "ltc_homehealth_capital_margin",
+        "from": "ltc_homehealth",
+        "to": "capital_markets",
+        "channel": "Net margin (after tax)",
+        "observations": [
+          {
+            "value": 3.73,
+            "source": "estimate",
+            "basis": "modeled",
+            "confidence": "estimate",
+            "note": "Net of ~$0.9B corporate income tax (for-profit operator share) via ltc_homehealth_fed_tax"
+          }
+        ]
+      },
+      {
+        "id": "hi_capital_margin",
+        "from": "health_insurance",
+        "to": "capital_markets",
+        "channel": "Insurer net profit (PHI + MA + MCO, after tax)",
+        "observations": [
+          {
+            "value": 51,
+            "source": "estimate",
+            "basis": "modeled",
+            "confidence": "estimate",
+            "note": "Net of ~$13B corporate income tax (insurers are taxable C-corps) routed to Government via hi_fed_tax"
+          }
+        ]
+      },
+      {
+        "id": "pharma_fed_tax",
+        "from": "pharma_rx",
+        "to": "federal_government",
+        "channel": "Corporate income tax",
+        "category": "Corporate income tax",
+        "observations": [
+          {
+            "value": 17.5,
+            "source": "estimate",
+            "basis": "modeled",
+            "confidence": "estimate",
+            "note": "Feedback edge: ~23% effective on pre-tax surplus. Carved from pharma_capital_margin so the node total is conserved"
+          }
+        ]
+      },
+      {
+        "id": "hi_fed_tax",
+        "from": "health_insurance",
+        "to": "federal_government",
+        "channel": "Corporate income tax",
+        "category": "Corporate income tax",
+        "observations": [
+          {
+            "value": 13,
+            "source": "estimate",
+            "basis": "modeled",
+            "confidence": "estimate",
+            "note": "Feedback edge: insurer corporate income tax (~20% effective). Carved from hi_capital_margin"
+          }
+        ]
+      },
+      {
+        "id": "hospitals_fed_tax",
+        "from": "hospitals",
+        "to": "federal_government",
+        "channel": "Corporate income tax",
+        "category": "Corporate income tax",
+        "observations": [
+          {
+            "value": 3,
+            "source": "estimate",
+            "basis": "modeled",
+            "confidence": "estimate",
+            "note": "Feedback edge: for-profit hospital share only (most hospitals are tax-exempt). Carved from hospitals_capital_margin"
+          }
+        ]
+      },
+      {
+        "id": "providers_physician_fed_tax",
+        "from": "providers_physician",
+        "to": "federal_government",
+        "channel": "Corporate income tax",
+        "category": "Corporate income tax",
+        "observations": [
+          {
+            "value": 2.4,
+            "source": "estimate",
+            "basis": "modeled",
+            "confidence": "estimate",
+            "note": "Feedback edge: PE/corporate-owned physician share. Carved from providers_physician_capital_margin"
+          }
+        ]
+      },
+      {
+        "id": "providers_dental_fed_tax",
+        "from": "providers_dental",
+        "to": "federal_government",
+        "channel": "Corporate income tax",
+        "category": "Corporate income tax",
+        "observations": [
+          {
+            "value": 1.1,
+            "source": "estimate",
+            "basis": "modeled",
+            "confidence": "estimate",
+            "note": "Feedback edge: for-profit dental practice share. Carved from providers_dental_capital_margin"
+          }
+        ]
+      },
+      {
+        "id": "providers_other_fed_tax",
+        "from": "providers_other",
+        "to": "federal_government",
+        "channel": "Corporate income tax",
+        "category": "Corporate income tax",
+        "observations": [
+          {
+            "value": 0.5,
+            "source": "estimate",
+            "basis": "modeled",
+            "confidence": "estimate",
+            "note": "Feedback edge: for-profit share. Carved from providers_other_capital_margin"
+          }
+        ]
+      },
+      {
+        "id": "ltc_nursing_fed_tax",
+        "from": "ltc_nursing",
+        "to": "federal_government",
+        "channel": "Corporate income tax",
+        "category": "Corporate income tax",
+        "observations": [
+          {
+            "value": 1.14,
+            "source": "estimate",
+            "basis": "modeled",
+            "confidence": "estimate",
+            "note": "Feedback edge: for-profit nursing-facility share. Carved from ltc_nursing_capital_margin"
+          }
+        ]
+      },
+      {
+        "id": "ltc_homehealth_fed_tax",
+        "from": "ltc_homehealth",
+        "to": "federal_government",
+        "channel": "Corporate income tax",
+        "category": "Corporate income tax",
+        "observations": [
+          {
+            "value": 0.86,
+            "source": "estimate",
+            "basis": "modeled",
+            "confidence": "estimate",
+            "note": "Feedback edge: for-profit home-health share. Carved from ltc_homehealth_capital_margin"
+          }
+        ]
+      }
+    ]
+  }
+}

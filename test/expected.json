@@ -1,5 +1,5 @@
 {
-  "total": 12109.1337,
+  "total": 12331.933700000001,
   "throughput": {
     "individuals": 2345.025,
     "employers": 993,
@@ -7,12 +7,13 @@
     "state_governments": 280,
     "medicare": 925.5,
     "medicaid": 894,
-    "health_insurance": 2312.0287500000004,
-    "hospitals": 1470,
-    "providers_clinicians": 1292.1212,
+    "health_insurance": 2376.0287500000004,
+    "hospitals": 1501,
+    "providers_clinicians": 1333.7212,
     "pharma_rx": 383.424,
     "long_term_care": 597.3810000000001,
     "healthcare_workers": 2331.1652,
-    "suppliers_vendors": 1238.6435000000001
+    "suppliers_vendors": 1238.6435000000001,
+    "capital_markets": 222.79999999999998
   }
 }

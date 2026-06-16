@@ -1,0 +1,54 @@
+{
+  "node": "pharma_rx",
+  "subtitle": "Retail Rx — NET of rebates (~$200B rebates/discounts net out; gross list ~$700B+)  ·  CMS NHE Table 16 / PhRMA / SEC 10-Ks",
+  "rows": {
+    "hi_pharma_claims": {
+      "label": "Private insurance + MA-PD + MCO Rx claims",
+      "note": "Commercial PHI ~$160B (37.0%) + MA-PD and Medicaid MCO pharmacy-benefit passthrough"
+    },
+    "medicare_pharma_partd": {
+      "label": "Medicare Part D (FFS retail)",
+      "note": "Total Medicare Rx incl. MA-PD & physician-administered Part B drugs ~$144B = 33.3% of retail Rx"
+    },
+    "medicaid_pharma_ffs": {
+      "label": "Medicaid Rx (FFS, net of rebates)",
+      "note": "Total Medicaid Rx incl. MCO ~$52B = 12.0%; net of substantial Medicaid statutory rebates"
+    },
+    "ind_pharma_oop": {
+      "label": "Out-of-pocket (copays, uninsured)",
+      "note": "12.8% of retail Rx; CMS NHE Table 16 ~$55B"
+    },
+    "pharma_workers_labor": {
+      "label": "Labor — R&D, manufacturing, SG&A staff",
+      "note": "Incl. ~$102B US R&D (PhRMA 2024: member companies $101.6B); clinical trials, drug discovery, sales force, market access"
+    },
+    "pharma_suppliers_nonlabor": {
+      "label": "Non-labor — COGS, distribution, materials",
+      "note": "Manufacturing COGS ~25% of net revenue (generics ~50%, biologics lower); wholesaler / PBM / pharmacy distribution ~5%"
+    },
+    "pharma_capital_margin": {
+      "label": "Net profit (after tax) → capital markets",
+      "note": "Retained earnings, dividends, buybacks; ~13-14% of net revenue after corporate income tax"
+    },
+    "pharma_fed_tax": {
+      "label": "Corporate income tax → Federal Government",
+      "note": "Feedback edge: ~23% effective on pre-tax surplus; carved from the margin so the node total is conserved"
+    }
+  },
+  "checks": [
+    {
+      "metric": "National retail Rx (CMS NHE)",
+      "independent": 433,
+      "model": { "sum": ["total:inflows"] },
+      "emphasis": true,
+      "note": "CMS NHE Table 16 net retail Rx = $433B; model traces $383B of payer flows — gap ≈ other payers (VA/DoD ~$21B) + basis. Excludes hospital-administered Rx (~$80B+)."
+    },
+    {
+      "metric": "Pre-tax profit margin (SEC 10-Ks)",
+      "independent": 0.18,
+      "fmt": "pct",
+      "model": { "sum": ["edge:pharma_capital_margin", "edge:pharma_fed_tax"], "over": 433 },
+      "note": "Net profit + corporate tax (pre-tax surplus) ÷ NHE net retail Rx $433B; industry avg 15-22%, top-20 median ~18%."
+    }
+  ]
+}

@@ -22,19 +22,29 @@ for (const n of sorted) {
   const i = inflow[n.id] ?? 0,
     o = outflow[n.id] ?? 0,
     net = i - o;
+  // This is a traced-flow model of major channels, not closed national accounting,
+  // so intermediary net ≠ $0 is expected, not an error: a positive net is money
+  // traced in but not traced onward (admin/overhead/margin beyond the modeled
+  // edges); a negative net is an inflow modeled below the node's national revenue
+  // (the claims edges are a curated subset). See docs/data-model.md.
   let note: string;
   if (n.role === 'source') note = 'source (out only)';
   else if (n.role === 'sink') note = 'sink (in only)';
-  else if (Math.abs(net) > 1) note = `⚠ imbalance ${fmt(net)} — check`;
+  else if (net > 1) note = `+${fmt(net)} not traced onward`;
+  else if (net < -1) note = `${fmt(net)} inflow below national`;
   else note = 'balanced';
   console.log(pad(n.label, 26) + pad(fmt(i), 11) + pad(fmt(o), 11) + pad(fmt(net), 11) + note);
 }
 const total = graph.edges.reduce((s, e) => s + e.amount, 0);
 console.log('-'.repeat(70));
 console.log(`${graph.nodes.length} nodes, ${graph.edges.length} edges, total flow ${fmt(total)}\n`);
+console.log(
+  'Traced-flow model of major channels, not closed national accounting — an\n' +
+    'intermediary net ≠ $0 is expected, not an error (see docs/data-model.md).\n',
+);
 
 // ---- cross-sheet reconciliation (narrative workbook vs the canonical graph) ----
-const recon = reconcileWorkbook(file, loadWorkbook(root));
+const recon = reconcileWorkbook(file, loadWorkbook(root, file));
 const modeledCount = recon.pairs.filter((p) => p.status !== 'context-only').length;
 console.log('Cross-sheet reconciliation — modeled flows (program FFS/OOP payments vs graph):\n');
 if (!recon.mismatches.length) {

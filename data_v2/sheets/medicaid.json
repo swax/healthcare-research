@@ -1,0 +1,61 @@
+{
+  "node": "medicaid",
+  "subtitle": "~$894B modeled  ·  ~91.7M enrolled  ·  CMS NHE / MACPAC / CRS",
+  "rows": {
+    "fed_medicaid_fmap": {
+      "label": "Federal share (general revenue, ~69% FMAP)",
+      "note": "Elevated by pandemic FMAP phase-down"
+    },
+    "state_medicaid_share": { "label": "State share (state taxes & revenue, ~31%)" },
+    "medicaid_hi_mco": {
+      "label": "Managed care organizations (MCO capitation)",
+      "note": "~57% of Medicaid flows through MCOs"
+    },
+    "medicaid_ltc_nursing": { "label": "Nursing facilities (LTSS)" },
+    "medicaid_ltc_hcbs": { "label": "Home & community-based services (HCBS)" },
+    "medicaid_hospitals_ffs": { "label": "Hospital care (FFS + DSH)" },
+    "medicaid_providers_physician_ffs": { "label": "Physician & clinical services (FFS)" },
+    "medicaid_providers_dental_ffs": { "label": "Dental services (FFS)" },
+    "medicaid_providers_other_ffs": { "label": "Other professional services (FFS)" },
+    "medicaid_pharma_ffs": { "label": "Prescription drugs (FFS, net of rebates)" }
+  },
+  "extraOutflows": [
+    {
+      "id": "dental_other",
+      "label": "Dental & other professional services",
+      "amount": 12,
+      "note": "Not a traced graph edge",
+      "source": "macpac_macstats"
+    },
+    {
+      "id": "other_ffs",
+      "label": "Other FFS (lab, DME, rehab, etc.)",
+      "amount": 55,
+      "note": "Not a traced graph edge",
+      "source": "macpac_macstats"
+    },
+    {
+      "id": "admin",
+      "label": "Administration (state + federal)",
+      "amount": 34,
+      "note": "Not a traced graph edge",
+      "source": "macpac_macstats"
+    }
+  ],
+  "checks": [
+    {
+      "metric": "Total Medicaid (MACPAC/CMS-64)",
+      "independent": 900,
+      "model": { "sum": ["total:inflows"] },
+      "emphasis": true,
+      "note": "MACPAC $900.3B; our $894B (NHE basis). Federal/state/MCO cross-checks now live as edge observations (see Notes)."
+    },
+    {
+      "metric": "Medicaid % of NHE",
+      "independent": 0.179,
+      "fmt": "pct",
+      "model": { "sum": ["total:inflows"], "over": 4867 },
+      "note": "CMS NHE 17.9%; NHE total $4,866.5B"
+    }
+  ]
+}

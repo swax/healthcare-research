@@ -6,10 +6,10 @@ in USD billions.
 
 ## The two files
 
-| File | Size | You edit it? | Contents |
-| --- | --- | --- | --- |
-| `data/graph.json` | ~11 KB | **Yes** | The canonical flow model: nodes + edges, plus small lookup tables. |
-| `data/workbook.json` | ~630 KB | Rarely | Full content of the 16 narrative workbook sheets (cells, formulas, styles). Generated. |
+| File                 | Size    | You edit it? | Contents                                                                               |
+| -------------------- | ------- | ------------ | -------------------------------------------------------------------------------------- |
+| `data/graph.json`    | ~11 KB  | **Yes**      | The canonical flow model: nodes + edges, plus small lookup tables.                     |
+| `data/workbook.json` | ~630 KB | Rarely       | Full content of the 16 narrative workbook sheets (cells, formulas, styles). Generated. |
 
 Everything below is about `graph.json` — the file you actually maintain.
 
@@ -36,13 +36,13 @@ for humans.
 Five layers, left to right, modeling money moving from those who pay to the
 factors of production it ultimately buys.
 
-| `n` | `name` | `x` | What sits here |
-| --- | --- | --- | --- |
-| 0 | Payers / Households | 0.02 | Individuals, Employers |
-| 1 | Government | 0.26 | Federal, State |
-| 2 | Programs & Insurers | 0.50 | Medicare, Medicaid, Health Insurance |
-| 3 | Providers | 0.74 | Hospitals, Providers & Clinicians, Pharma & Rx, Long-Term Care |
-| 4 | Factors of Production | 0.98 | Healthcare Workers, Suppliers & Vendors |
+| `n` | `name`                | `x`  | What sits here                                                  |
+| --- | --------------------- | ---- | --------------------------------------------------------------- |
+| 0   | Payers / Households   | 0.02 | Individuals, Employers                                          |
+| 1   | Government            | 0.26 | Federal, State                                                  |
+| 2   | Programs & Insurers   | 0.50 | Medicare, Medicaid, Health Insurance                            |
+| 3   | Providers             | 0.74 | Hospitals, Providers & Clinicians, Pharma & Rx, Long-Term Care  |
+| 4   | Factors of Production | 0.98 | Healthcare Workers, Suppliers & Vendors, Capital & Shareholders |
 
 - `n` — integer layer number; nodes reference it via `node.layer`.
 - `x` — horizontal position (0–1) of the column in the Sankey.
@@ -68,45 +68,61 @@ The expanded text is also shown in the Sankey tooltip. Keys include `cms_nhe`,
 
 ### `graph.nodes[]` — the entities
 
-13 nodes. Each:
+14 nodes. Each:
 
 ```jsonc
-{ "id": "medicare", "label": "Medicare", "layer": 2,
-  "group": "programs_insurers", "role": "intermediary" }
+{
+  "id": "medicare",
+  "label": "Medicare",
+  "layer": 2,
+  "group": "programs_insurers",
+  "role": "intermediary",
+}
 ```
 
-| Field | Meaning |
-| --- | --- |
-| `id` | Stable kebab/slug identifier. Edges reference nodes by this, never by label. Renaming the display name never breaks edges. |
-| `label` | Display name (workbook + diagram). |
-| `layer` | Which `layers[].n` column it sits in. |
-| `group` | Which `groups[].id` bucket (drives color). |
-| `role` | `source` (out only), `intermediary`, or `sink` (in only). Optional, but enforced when present. |
+| Field   | Meaning                                                                                                                    |
+| ------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `id`    | Stable kebab/slug identifier. Edges reference nodes by this, never by label. Renaming the display name never breaks edges. |
+| `label` | Display name (workbook + diagram).                                                                                         |
+| `layer` | Which `layers[].n` column it sits in.                                                                                      |
+| `group` | Which `groups[].id` bucket (drives color).                                                                                 |
+| `role`  | `source` (out only), `intermediary`, or `sink` (in only). Optional, but enforced when present.                             |
 
-The 13 nodes: Individuals, Employers (sources) → Federal Government, State
+The 14 nodes: Individuals, Employers (sources) → Federal Government, State
 Governments → Medicare, Medicaid, Health Insurance → Hospitals, Providers &
 Clinicians, Pharma & Rx, Long-Term Care → Healthcare Workers, Suppliers &
-Vendors (sinks).
+Vendors, Capital & Shareholders (sinks). **Capital & Shareholders** is an
+insight node: it receives each sector's net margin/profit (Pharma, Hospitals,
+Providers, Long-Term Care, insurers) so the diagram shows where healthcare
+profits land. It is intentionally a sink — its onward distribution (dividends,
+buybacks, PE returns) lives on the Capital Markets workbook sheet, not as graph
+edges.
 
 ### `graph.edges[]` — the flows (adjacency list)
 
-40 edges. Each edge **is** a directed money flow — the declarative connection,
+47 edges. Each edge **is** a directed money flow — the declarative connection,
 stored as a standard adjacency list:
 
 ```jsonc
-{ "id": "medicare_hi_ma", "from": "medicare", "to": "health_insurance",
-  "amount": 539, "channel": "MA Part C capitation",
-  "source": "medpac_kff", "confidence": "reported" }
+{
+  "id": "medicare_hi_ma",
+  "from": "medicare",
+  "to": "health_insurance",
+  "amount": 539,
+  "channel": "MA Part C capitation",
+  "source": "medpac_kff",
+  "confidence": "reported",
+}
 ```
 
-| Field | Meaning |
-| --- | --- |
-| `id` | Unique, stable edge identifier. |
-| `from` / `to` | Node `id`s of the endpoints. Both must exist; must flow forward across layers. |
-| `amount` | Dollars in **billions**. Positive finite number. |
-| `channel` | What kind of flow this is (e.g. "FFS", "ESI premiums", "Out-of-pocket"). The `(from, to, channel)` triple must be unique — multiple flows between the same pair are allowed only with distinct channels. |
-| `source` | A key into `sources{}` — the citation. |
-| `confidence` | `reported` (sourced figure) or `estimate` (author-derived/split). |
+| Field         | Meaning                                                                                                                                                                                                  |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`          | Unique, stable edge identifier.                                                                                                                                                                          |
+| `from` / `to` | Node `id`s of the endpoints. Both must exist; must flow forward across layers.                                                                                                                           |
+| `amount`      | Dollars in **billions**. Positive finite number.                                                                                                                                                         |
+| `channel`     | What kind of flow this is (e.g. "FFS", "ESI premiums", "Out-of-pocket"). The `(from, to, channel)` triple must be unique — multiple flows between the same pair are allowed only with distinct channels. |
+| `source`      | A key into `sources{}` — the citation.                                                                                                                                                                   |
+| `confidence`  | `reported` (sourced figure) or `estimate` (author-derived/split).                                                                                                                                        |
 
 ## Derived quantities (not stored)
 
@@ -117,27 +133,42 @@ These are computed at build time by `computeFlows`, never written into the data:
   diagram and the **Throughput ($B)** column in the Graph Data sheet.
 
 The `total` and per-node throughputs are snapshotted in `test/expected.json` so
-any drift is caught. Note the grand total (~$11,956B) is the **sum of every
+any drift is caught. Note the grand total (~$12,332B) is the **sum of every
 ribbon**, so dollars are counted once per layer they cross — it is a flow total,
 not the ~$4.9T of total U.S. health spending.
 
-## Confidence and the open reconciliation thread
+## This is a traced-flow model, not closed national accounting (by design)
 
-Most edges are `reported` (CMS NHE, MedPAC, MACPAC, AHA, KFF, Trustees). The
-ones marked `estimate` are where the model splits an aggregate by assumption:
+**Intermediary nodes do not balance, and that is intentional.** This model traces
+the _major channels_ money moves through — it is not a closed system where every
+node's inflow equals its outflow. `npm run check` prints each node's net and
+labels it accordingly; an intermediary net ≠ $0 is expected context, not an error:
 
-- **The four `health_insurance → provider` claim edges** (Hospitals, Providers,
-  Pharma, Long-Term Care) are derived by `scripts/derive_hi_claims.mjs` from the
-  CMS NHE 2024 release. The "Health Insurance" node aggregates commercial private
-  insurance + Medicare Advantage + Medicaid managed care; the script blends each
-  program's service-category mix and scales the result so the node balances.
-  Because it assumes MA/MCO category mix tracks the parent program, these are
-  `estimate`. With them modeled, **Health Insurance balances**.
-- **The labor / non-labor splits** at the provider layer (Pharma & Insurance
-  admin in particular) are rough estimates. The remaining ~$417B net imbalance
-  sits here: Hospitals and Providers net negative while Pharma and Long-Term Care
-  net positive. Reconciling these provider outflows against NHE category totals
-  is the known open task — see the README's reconciliation note.
+- A **positive net** (e.g. Medicaid +$101B, Pharma) is money traced _in_ but not
+  traced _onward_ — admin, overhead, and other uses beyond the modeled edges.
+- A **negative net** (e.g. Hospitals, Providers) is an inflow modeled _below_ the
+  node's true national revenue: the `health_insurance → provider` claim edges are
+  a curated estimate, not the full all-payer total (the node's own workbook sheet
+  shows the larger national figure — e.g. Hospitals $1,053B modeled vs $1,501B).
+
+Closing these gaps would mean re-scaling every edge to national totals (a
+national-accounting model); the project deliberately stays a traced-flow model,
+so the imbalances are documented here rather than "fixed." See
+[data-audit.md](data-audit.md) for the analysis behind that choice.
+
+Most edges are `reported` (CMS NHE, MedPAC, MACPAC, AHA, KFF, Trustees). The ones
+marked `estimate` are where the model splits or allocates an aggregate by
+assumption:
+
+- **The four `health_insurance → provider` claim edges** are derived by
+  `scripts/derive_hi_claims.mjs` from the CMS NHE 2024 release, blending each
+  program's service-category mix. With them modeled, **Health Insurance balances**
+  (before the margin edge below).
+- **The five `→ Capital & Shareholders` margin edges** route each sector's net
+  profit to the insight sink (Pharma $75.5B, insurers $64B, Providers $41.6B,
+  Hospitals $31B, Long-Term Care $10.7B = ~$223B). They are `estimate` allocations
+  from the Capital Markets sheet, and they widen the provider/insurer net gaps by
+  design — profit is a real destination the model now names.
 
 ## Reference data (`references/`, git-ignored)
 

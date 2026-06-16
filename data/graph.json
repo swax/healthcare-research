@@ -53,7 +53,8 @@
       { "id": "pharma_rx", "label": "Pharma & Rx", "layer": 3, "group": "providers", "role": "intermediary" },
       { "id": "long_term_care", "label": "Long-Term Care", "layer": 3, "group": "providers", "role": "intermediary" },
       { "id": "healthcare_workers", "label": "Healthcare Workers", "layer": 4, "group": "factors", "role": "sink" },
-      { "id": "suppliers_vendors", "label": "Suppliers & Vendors", "layer": 4, "group": "factors", "role": "sink" }
+      { "id": "suppliers_vendors", "label": "Suppliers & Vendors", "layer": 4, "group": "factors", "role": "sink" },
+      { "id": "capital_markets", "label": "Capital & Shareholders", "layer": 4, "group": "factors", "role": "sink" }
     ],
     "edges": [
       { "id": "ind_fed_medicare_genrev", "from": "individuals", "to": "federal_government", "amount": 437, "channel": "General revenue (Medicare)", "source": "cms_nhe_trustees", "confidence": "reported" },
@@ -97,7 +98,12 @@
       { "id": "providers_suppliers_nonlabor", "from": "providers_clinicians", "to": "suppliers_vendors", "amount": 257.336, "channel": "Non-labor (practice overhead)", "source": "estimate", "confidence": "estimate" },
       { "id": "ltc_suppliers_nonlabor", "from": "long_term_care", "to": "suppliers_vendors", "amount": 94.85, "channel": "Non-labor", "source": "estimate", "confidence": "estimate" },
       { "id": "pharma_suppliers_nonlabor", "from": "pharma_rx", "to": "suppliers_vendors", "amount": 113.22875, "channel": "Non-labor (est. 50% split)", "source": "estimate", "confidence": "estimate" },
-      { "id": "hi_suppliers_nonlabor", "from": "health_insurance", "to": "suppliers_vendors", "amount": 113.22875, "channel": "Non-labor (est. 50% split)", "source": "estimate", "confidence": "estimate" }
+      { "id": "hi_suppliers_nonlabor", "from": "health_insurance", "to": "suppliers_vendors", "amount": 113.22875, "channel": "Non-labor (est. 50% split)", "source": "estimate", "confidence": "estimate" },
+      { "id": "hospitals_capital_margin", "from": "hospitals", "to": "capital_markets", "amount": 31, "channel": "Net margin (for-profit + nonprofit surplus)", "source": "estimate", "confidence": "estimate" },
+      { "id": "providers_capital_margin", "from": "providers_clinicians", "to": "capital_markets", "amount": 41.6, "channel": "PE / corporate investor returns", "source": "estimate", "confidence": "estimate" },
+      { "id": "pharma_capital_margin", "from": "pharma_rx", "to": "capital_markets", "amount": 75.5, "channel": "Net profit", "source": "estimate", "confidence": "estimate" },
+      { "id": "ltc_capital_margin", "from": "long_term_care", "to": "capital_markets", "amount": 10.7, "channel": "Net margins (nursing + home health)", "source": "estimate", "confidence": "estimate" },
+      { "id": "hi_capital_margin", "from": "health_insurance", "to": "capital_markets", "amount": 64, "channel": "Insurer net profit (PHI + MA + MCO)", "source": "estimate", "confidence": "estimate" }
     ]
   }
 }

@@ -29,9 +29,8 @@
 // Multi-hop rows (more than one "→") are skipped for the same reason.
 //
 // Erasable-syntax-only TypeScript so Node strips the types directly.
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
 import type { GraphFile } from './graph.ts';
+import { loadResolvedSheets } from './render-sheet.ts';
 
 interface WCell {
   r: number;
@@ -47,8 +46,12 @@ export interface WorkbookFile {
   sheets: WSheet[];
 }
 
-export function loadWorkbook(root: string): WorkbookFile {
-  return JSON.parse(readFileSync(join(root, 'data', 'workbook.json'), 'utf8')) as WorkbookFile;
+// The workbook as reconcile sees it: hand-authored sheets plus any node-ledger
+// sheet rendered from data/sheets/<node>.json (see render-sheet.ts). Going through
+// the resolver means generated sheets are reconciled too — and cross-sheet refs
+// like `=Medicaid!B8` still resolve, since the rendered layout is preserved.
+export function loadWorkbook(root: string, file?: GraphFile): WorkbookFile {
+  return { sheets: loadResolvedSheets(root, file) };
 }
 
 // ---- A1 <-> (row,col) ----

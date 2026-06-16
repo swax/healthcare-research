@@ -1,0 +1,119 @@
+{
+  "node": "health_insurance",
+  "subtitle": "Public managed care (MA + MCO) + private/commercial insurance  ·  CMS NHE / KFF / MACPAC / MedPAC",
+  "rows": {
+    "emp_hi_esi": {
+      "label": "Commercial — Employer ESI contributions (~78%)",
+      "category": "Commercial / private"
+    },
+    "ind_hi_esi_worker": {
+      "label": "Commercial — Employee ESI contributions (~22%)",
+      "category": "Commercial / private"
+    },
+    "ind_hi_individual_mkt": {
+      "label": "Commercial — Individual market premiums (ACA + off-exchange)",
+      "category": "Commercial / private"
+    },
+    "fed_hi_aca_aptc": {
+      "label": "Commercial — Federal ACA premium subsidies (APTC)",
+      "category": "Commercial / private"
+    },
+    "medicare_hi_ma": {
+      "label": "Public — Medicare Advantage (Part C) capitation",
+      "note": "52% of Medicare via MA; ~31M enrolled",
+      "category": "Public managed care"
+    },
+    "medicaid_hi_mco": {
+      "label": "Public — Medicaid MCO capitation",
+      "note": "57% of Medicaid via MCOs; ~72M managed",
+      "category": "Public managed care"
+    },
+    "hi_hospitals_claims": {
+      "label": "Hospital claims (commercial + MA + MCO)",
+      "category": "Claims paid (medical)"
+    },
+    "hi_providers_physician_claims": {
+      "label": "Physician & clinical claims",
+      "category": "Claims paid (medical)"
+    },
+    "hi_providers_dental_claims": {
+      "label": "Dental claims",
+      "category": "Claims paid (medical)"
+    },
+    "hi_providers_other_claims": {
+      "label": "Other professional claims",
+      "category": "Claims paid (medical)"
+    },
+    "hi_pharma_claims": {
+      "label": "Prescription drug claims",
+      "category": "Claims paid (medical)"
+    },
+    "hi_ltc_nursing_claims": {
+      "label": "Long-term care claims — nursing facilities",
+      "category": "Claims paid (medical)"
+    },
+    "hi_ltc_homehealth_claims": {
+      "label": "Long-term care claims — home health",
+      "category": "Claims paid (medical)"
+    },
+    "hi_workers_labor": {
+      "label": "Insurer operating cost — labor",
+      "category": "Operating, margin & tax"
+    },
+    "hi_suppliers_nonlabor": {
+      "label": "Insurer operating cost — non-labor",
+      "category": "Operating, margin & tax"
+    },
+    "hi_capital_margin": {
+      "label": "Insurer net margin (PHI + MA + MCO profit)",
+      "category": "Operating, margin & tax"
+    },
+    "hi_fed_tax": {
+      "label": "Corporate income tax → Federal Government",
+      "category": "Operating, margin & tax"
+    }
+  },
+  "extraInflows": [
+    {
+      "id": "other_employer",
+      "label": "Other employer health spending (retiree, self-insured admin)",
+      "amount": 246,
+      "note": "NHE residual: closes modeled commercial premiums to the CMS NHE PHI total",
+      "source": "cms_nhe",
+      "category": "Commercial / private"
+    }
+  ],
+  "checks": [
+    {
+      "metric": "Private health insurance total (CMS NHE)",
+      "independent": 1511,
+      "model": {
+        "sum": [
+          "edge:emp_hi_esi",
+          "edge:ind_hi_esi_worker",
+          "edge:ind_hi_individual_mkt",
+          "edge:fed_hi_aca_aptc",
+          "extra:other_employer"
+        ]
+      },
+      "emphasis": true,
+      "note": "CMS NHE 2023 PHI = $1,511B (commercial premiums + ACA subsidies + other employer)"
+    },
+    {
+      "metric": "PHI share of NHE",
+      "independent": 0.301,
+      "fmt": "pct",
+      "model": {
+        "sum": [
+          "edge:emp_hi_esi",
+          "edge:ind_hi_esi_worker",
+          "edge:ind_hi_individual_mkt",
+          "edge:fed_hi_aca_aptc",
+          "extra:other_employer"
+        ],
+        "over": 4867
+      },
+      "note": "CMS NHE 30.1%; NHE total $4,866.5B"
+    }
+  ]
+}

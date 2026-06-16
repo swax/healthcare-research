@@ -8,3 +8,4 @@ package-lock.json
 # two don't fight over formatting on every regeneration
 data/
 test/expected.json
+test/fixtures/

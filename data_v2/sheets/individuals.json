@@ -1,0 +1,21 @@
+{
+  "node": "individuals",
+  "subtitle": "Households — where the healthcare dollar leaves the family budget  ·  taxes & payroll, premiums, out-of-pocket",
+  "rows": {
+    "ind_fed_medicare_genrev": { "category": "Taxes & payroll" },
+    "ind_medicare_payroll_ee": { "category": "Taxes & payroll" },
+    "ind_fed_medicaid_genrev": { "category": "Taxes & payroll" },
+    "ind_state_taxes": { "category": "Taxes & payroll" },
+    "ind_fed_aca_genrev": { "category": "Taxes & payroll" },
+    "ind_medicare_premiums": { "category": "Insurance premiums" },
+    "ind_hi_esi_worker": { "category": "Insurance premiums" },
+    "ind_hi_individual_mkt": { "category": "Insurance premiums" },
+    "ind_hospitals_oop": { "category": "Out-of-pocket" },
+    "ind_providers_physician_oop": { "category": "Out-of-pocket" },
+    "ind_providers_dental_oop": { "category": "Out-of-pocket" },
+    "ind_providers_other_oop": { "category": "Out-of-pocket" },
+    "ind_pharma_oop": { "category": "Out-of-pocket" },
+    "ind_ltc_nursing_oop": { "category": "Out-of-pocket" },
+    "ind_ltc_homehealth_oop": { "category": "Out-of-pocket" }
+  }
+}

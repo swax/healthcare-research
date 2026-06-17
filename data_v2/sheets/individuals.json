@@ -7,6 +7,9 @@
     "ind_fed_medicaid_genrev": { "category": "Taxes & payroll" },
     "ind_state_taxes": { "category": "Taxes & payroll" },
     "ind_fed_aca_genrev": { "category": "Taxes & payroll" },
+    "ind_fed_genrev_programs": { "category": "Taxes & payroll" },
+    "ind_fed_genrev_vadod": { "category": "Taxes & payroll" },
+    "ind_state_genrev_programs": { "category": "Taxes & payroll" },
     "ind_medicare_premiums": { "category": "Insurance premiums" },
     "ind_hi_esi_worker": { "category": "Insurance premiums" },
     "ind_hi_individual_mkt": { "category": "Insurance premiums" },
@@ -17,5 +20,23 @@
     "ind_pharma_oop": { "category": "Out-of-pocket" },
     "ind_ltc_nursing_oop": { "category": "Out-of-pocket" },
     "ind_ltc_homehealth_oop": { "category": "Out-of-pocket" }
-  }
+  },
+  "checks": [
+    {
+      "metric": "Total out-of-pocket (CMS NHE)",
+      "independent": 525,
+      "model": {
+        "sum": [
+          "edge:ind_hospitals_oop",
+          "edge:ind_providers_physician_oop",
+          "edge:ind_providers_dental_oop",
+          "edge:ind_providers_other_oop",
+          "edge:ind_pharma_oop",
+          "edge:ind_ltc_nursing_oop",
+          "edge:ind_ltc_homehealth_oop"
+        ]
+      },
+      "note": "CMS NHE 2023 total OOP = $525B; we trace 7 OOP channels (~$254B). Gap ≈ untraced OOP — DME, non-durable products, residential care (traced subset, by design)."
+    }
+  ]
 }

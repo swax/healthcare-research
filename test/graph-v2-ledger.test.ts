@@ -249,7 +249,7 @@ test('a section with 2+ edge categories renders grouped sub-headers + subtotals'
   );
 });
 
-test('Individuals overlay groups 12 outflows into taxes / premiums / out-of-pocket', () => {
+test('Individuals overlay groups outflows into taxes / premiums / out-of-pocket', () => {
   const ov = loadOverlays(root).get('individuals');
   assert.ok(ov, 'data_v2/sheets/individuals.json missing');
   const { sheet } = renderNodeLedger(file, 'individuals', ov);
@@ -276,6 +276,35 @@ test('a section with one (or no) category stays flat — no grouping', () => {
   const { sheet } = renderNodeLedger(file, 'medicaid', ov);
   const t = sheet.cells.filter((c) => typeof c.v === 'string').map((c) => c.v as string);
   assert.ok(!t.some((s) => s.startsWith('Subtotal —')), 'flat section should have no subtotals');
+});
+
+test('overlay notes render as a NOTES callout section', () => {
+  const ov = loadOverlays(root).get('hospitals');
+  assert.ok(ov?.notes?.length, 'hospitals overlay should carry notes');
+  const { sheet } = renderNodeLedger(file, 'hospitals', ov);
+  const t = sheet.cells.filter((c) => typeof c.v === 'string').map((c) => c.v as string);
+  assert.ok(t.includes('NOTES'), 'expected a NOTES section header');
+  assert.ok(
+    t.some((s) => s.startsWith('Dual-billing')),
+    'expected the dual-billing note text',
+  );
+});
+
+test('node descriptions surface on the ledger subtitle and child headers', () => {
+  // a node without a curated overlay subtitle gets its description appended
+  const emp = renderNodeLedger(file, 'employers');
+  const sub = emp.sheet.cells.find((c) => c.r === 2 && c.c === 1);
+  assert.ok(
+    typeof sub?.v === 'string' && sub.v.includes('employer-sponsored insurance'),
+    'employers subtitle should carry its description',
+  );
+  // a parent node surfaces each child's description in its ▸ header band
+  const prov = renderNodeLedger(file, 'providers_clinicians');
+  const t = prov.sheet.cells.filter((c) => typeof c.v === 'string').map((c) => c.v as string);
+  assert.ok(
+    t.some((s) => s.startsWith('▸ Physician & Clinical') && s.includes('1.1M active physicians')),
+    'physician child header should carry its description',
+  );
 });
 
 test('a parent node renders each child as a nested block + a combined roll-up', () => {

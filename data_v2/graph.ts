@@ -25,6 +25,8 @@ export interface GNode {
   group: string;
   role?: string;
   parent?: string; // a sub-node: edges attach to it; its parent is a pure aggregate
+  description?: string; // one-line context (enrollment, coverage, share) — surfaced
+  // on the Overview node summary and on ledgers without a curated subtitle
 }
 export interface LayerDef {
   n: number;

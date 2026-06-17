@@ -2,7 +2,7 @@
 // data_v2/sheets/). It wears v1's layout — per-node INFLOWS/OUTFLOWS/NET ledger sheets.
 // Sheets:
 //
-//   Overview        — front page: counts, total, linked node summary, multi-source snapshot
+//   Overview        — front page: counts, total, linked node summary, flow summary, multi-source snapshot
 //   <node> ledgers  — one per top-level node (see ledger.ts); sub-nodes nest inside parents
 //   Nodes           — inflow/outflow/throughput/net summary (audit)
 //   Edges           — one row per flow: canonical value + any other sources reported
@@ -118,13 +118,85 @@ export function buildV2Workbook(file: GraphFileV2, root: string): ExcelJS.Workbo
   );
   ovr += 2;
 
+  // scope & coverage — what the model deliberately traces vs leaves out. v2 is a
+  // traced-subset model (see docs/v2.md), so this is honest framing, not a deficiency:
+  // a node's inflow is the payer flows we follow, below its NHE national total.
+  sectionBar(ov, ovr, 'SCOPE & COVERAGE', '00695C', 6);
+  ovr++;
+  for (const line of [
+    'A traced-subset model: it follows specific payer → provider → worker / supplier / capital flows,',
+    'not every dollar in the national accounts. For reference, CMS NHE 2023 = $4,866.5B.',
+    'Traced: hospitals · physician & clinical · dental · other professional · retail Rx · nursing & home health · plus',
+    'government direct spending (administration · public health · NIH research · VA / DoD) and employer retiree, workers-comp & HSA/HRA.',
+    'Not modeled (by design): DME & non-durable products · residential care · construction · the remaining other-payer residual.',
+    'Each provider sheet’s VALIDATION section shows how much of its NHE national total the model traces.',
+  ]) {
+    note(ov.getRow(ovr).getCell(1), line);
+    ovr++;
+  }
+  ovr++;
+
+  // where the money ends up — the terminal (sink) layer, computed from v2's own flows.
+  // This is v2's figure (share of the traced flow's final layer), NOT v0's NHE-based
+  // "45% to labor" — different basis, so we report what this model actually shows.
+  const sinks = topLevel
+    .filter((n) => n.role === 'sink')
+    .sort((a, b) => (inflow[b.id] ?? 0) - (inflow[a.id] ?? 0));
+  const terminalTotal = sinks.reduce((s, n) => s + (inflow[n.id] ?? 0), 0);
+  const sinkDesc: Record<string, string> = {
+    healthcare_workers: 'labor — wages, salaries, benefits',
+    suppliers_vendors: 'non-labor — drugs, devices, supplies, IT, facilities',
+    capital_markets: 'margins, dividends, buybacks, retained earnings',
+  };
+  sectionBar(ov, ovr, 'WHERE THE MONEY ENDS UP  (the traced flow’s final layer)', '4E342E', 6);
+  ovr++;
+  const wmHead = ov.getRow(ovr);
+  ['Destination', 'Amount ($B)', 'Share', 'What it is'].forEach((h, i) => {
+    wmHead.getCell(i + 1).value = h;
+    wmHead.getCell(i + 1).font = { bold: true };
+    solid(wmHead.getCell(i + 1), 'D7CCC8');
+  });
+  ovr++;
+  for (const n of sinks) {
+    const amt = inflow[n.id] ?? 0;
+    const row = ov.getRow(ovr);
+    row.getCell(1).value = n.label;
+    money(row.getCell(2), amt);
+    const pc = row.getCell(3);
+    pc.value = terminalTotal ? amt / terminalTotal : 0;
+    pc.numFmt = '0.0%';
+    row.getCell(4).value = sinkDesc[n.id] ?? '';
+    ovr++;
+  }
+  ov.getRow(ovr).getCell(1).value = 'TERMINAL TOTAL';
+  ov.getRow(ovr).getCell(1).font = { bold: true };
+  money(ov.getRow(ovr).getCell(2), terminalTotal);
+  ov.getRow(ovr).getCell(2).font = { bold: true };
+  ovr++;
+  const laborPct = terminalTotal
+    ? Math.round((100 * (inflow[sinks[0]?.id] ?? 0)) / terminalTotal)
+    : 0;
+  const taxToGov = edges
+    .filter((e) => e.channel === 'Corporate income tax')
+    .reduce((s, e) => s + canonicalObservation(e).value, 0);
+  note(
+    ov.getRow(ovr).getCell(1),
+    `~${laborPct}¢ of every traced dollar that reaches the economy ends as labor. US health administration alone runs ~15–30% of spend vs ~2–5% in peer countries (Commonwealth Fund).`,
+  );
+  ovr++;
+  note(
+    ov.getRow(ovr).getCell(1),
+    `Plus $${rnd(taxToGov)}B corporate income tax routed back to Government — a feedback edge, not a terminal destination.`,
+  );
+  ovr += 2;
+
   // node summary — linked to each node's sheet
   sectionBar(ov, ovr, 'NODE SUMMARY  (click a node to open its sheet)', '1B5E20', 6);
   ovr++;
   headerRow(
     ov,
     ovr,
-    ['Node', 'Layer', 'Inflow ($B)', 'Outflow ($B)', 'Net ($B)', 'Note'],
+    ['Node', 'Layer', 'Inflow ($B)', 'Outflow ($B)', 'Net ($B)', 'Context'],
     'C8E6C9',
   );
   ovr++;
@@ -146,10 +218,51 @@ export function buildV2Workbook(file: GraphFileV2, root: string): ExcelJS.Workbo
     money(row.getCell(3), i);
     money(row.getCell(4), o);
     money(row.getCell(5), i - o);
-    row.getCell(6).value = netNote(n, i - o);
+    row.getCell(6).value = n.description ?? netNote(n, i - o);
     ovr++;
   }
   ovr++;
+
+  // flow summary — every flow between two nodes, largest first. Sub-nodes roll up to
+  // their parent so this reads at NODE SUMMARY's grain (and From/To link to real sheets);
+  // amounts sum canonical values across all channels for a pair. Sums to the total above.
+  const parentOf: Record<string, string> = {};
+  for (const n of nodes) if (n.parent) parentOf[n.id] = n.parent;
+  const topOf = (id: string): string => parentOf[id] ?? id;
+  const pairAmt = new Map<string, { from: string; to: string; amt: number }>();
+  for (const e of edges) {
+    const from = topOf(e.from);
+    const to = topOf(e.to);
+    if (from === to) continue; // a within-parent edge would self-loop after rollup
+    const key = from + ' ' + to;
+    const agg = pairAmt.get(key) ?? { from, to, amt: 0 };
+    agg.amt += canonicalObservation(e).value;
+    pairAmt.set(key, agg);
+  }
+  const flowRows = [...pairAmt.values()].sort((a, b) => b.amt - a.amt);
+  sectionBar(ov, ovr, 'FLOW SUMMARY  (money moved between nodes, largest first)', '4527A0', 6);
+  ovr++;
+  headerRow(ov, ovr, ['From', 'To', 'Amount ($B)', '% of total'], 'D1C4E9');
+  ovr++;
+  const linkTo = (cell: ExcelJS.Cell, lbl: string): void => {
+    cell.value = { formula: `HYPERLINK("#'${lbl}'!A1","${lbl}")`, result: lbl };
+    cell.font = { color: { argb: 'FF0563C1' } };
+  };
+  for (const fl of flowRows) {
+    const row = ov.getRow(ovr);
+    linkTo(row.getCell(1), labelOf(fl.from));
+    linkTo(row.getCell(2), labelOf(fl.to));
+    money(row.getCell(3), fl.amt);
+    const pc = row.getCell(4);
+    pc.value = grandTotal ? fl.amt / grandTotal : 0;
+    pc.numFmt = '0.0%';
+    ovr++;
+  }
+  note(
+    ov.getRow(ovr).getCell(1),
+    `${flowRows.length} node-to-node flows; sub-nodes rolled into their parent. Sums to the total traced flow above.`,
+  );
+  ovr += 2;
 
   // multi-source snapshot — edges with more than one source, and the value the model
   // uses. Big-picture flow model: this is neutral context (what else was reported), not
@@ -183,7 +296,7 @@ export function buildV2Workbook(file: GraphFileV2, root: string): ExcelJS.Workbo
     ov.getRow(ovr).getCell(1),
     `${multiSource.length} of ${edges.length} edges carry a second source today — see the Edges & Observations sheets. Adding more is the main open work.`,
   );
-  [34, 20, 13, 13, 13, 50].forEach((w, i) => {
+  [34, 26, 13, 13, 13, 50].forEach((w, i) => {
     ov.getColumn(i + 1).width = w;
   });
 
@@ -435,6 +548,10 @@ export function buildV2Workbook(file: GraphFileV2, root: string): ExcelJS.Workbo
     [
       'Basis (modeled / national)',
       'The lens a figure is measured on: this model’s traced flow (modeled) vs an all-payer NHE reference (national).',
+    ],
+    [
+      'Confidence (reported / estimate)',
+      'Each observation is tagged reported (a published figure — CMS NHE, MedPAC, MACPAC, KFF, AHA, PhRMA) or estimate (derived / backsolved from ratios). Treat estimates as order-of-magnitude: a “$294B physician salaries” figure is really $1,027B × 0.52 × 0.55 — three assumptions multiplied. The big-picture flow is robust; the finer sub-splits are directional, not precise.',
     ],
     [
       'Also reported',

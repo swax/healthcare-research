@@ -108,6 +108,7 @@ export interface NodeOverlay {
   extraInflows?: ExtraRow[];
   extraOutflows?: ExtraRow[];
   checks?: CheckRow[];
+  notes?: string[]; // free-text structural callouts, rendered as a NOTES section
 }
 
 // Load every data_v2/sheets/<node>.json, keyed by node id.
@@ -164,7 +165,10 @@ export function renderNodeLedger(
     const canon = canonicalObservation(e);
     const others = e.observations.filter((o) => o !== canon);
     if (!others.length) return '';
-    return 'also reported: ' + others.map((o) => `$${round1(o.value)}B ${o.basis} (${o.source})`).join(' · ');
+    return (
+      'also reported: ' +
+      others.map((o) => `$${round1(o.value)}B ${o.basis} (${o.source})`).join(' · ')
+    );
   };
 
   const rowsFor = (edges: EdgeV2[], counterparty: (e: EdgeV2) => string): FlatRow[] =>
@@ -338,9 +342,12 @@ export function renderNodeLedger(
   if (totOut) subParts.push(`out ${fmt$(totOut)}`);
   if (totIn && totOut) subParts.push(`net ${fmt$(totIn - totOut)}`);
 
+  // Auto-subtitle = group · layer · totals, plus the node's context line when present.
+  // A curated overlay subtitle (medicare, hospitals, …) supersedes it.
+  const autoParts = node.description ? [...subParts, node.description] : subParts;
   put(1, 1, `${node.label} — FY ${year}`, THEME.title);
   band(1, 5, 5, THEME.title);
-  put(2, 1, overlay?.subtitle ?? subParts.join('  ·  '), THEME.subtitle);
+  put(2, 1, overlay?.subtitle ?? autoParts.join('  ·  '), THEME.subtitle);
 
   const flows: FlowLoc[] = [];
   const edgeRowById = new Map<string, number>();
@@ -440,7 +447,10 @@ export function renderNodeLedger(
     const childInRows: number[] = [];
     const childOutRows: number[] = [];
     for (const child of children) {
-      put(cursor, 1, `▸ ${child.label}`, { b: true, color: 'FFFFFF', fill: '455A64', h: 'left' });
+      const childHead = child.description
+        ? `▸ ${child.label}  ·  ${child.description}`
+        : `▸ ${child.label}`;
+      put(cursor, 1, childHead, { b: true, color: 'FFFFFF', fill: '455A64', h: 'left' });
       band(cursor, 2, 5, { b: true, color: 'FFFFFF', fill: '455A64' });
       cursor++;
       const blk = emitNodeBlock(child.id, cursor, [], []);
@@ -532,6 +542,18 @@ export function renderNodeLedger(
       put(r, 3, undefined, { ...emph, sz: 10, h: 'right', v: 'center', fmt }, formula);
       if (chk.note) put(r, 4, chk.note, { sz: 9, color: '666666', h: 'left' });
       r++;
+    }
+    cursor = r + 1;
+  }
+
+  // ---- NOTES (free-text structural callouts from the overlay) ----
+  if (overlay?.notes?.length) {
+    put(cursor, 1, 'NOTES', { b: true, color: 'FFFFFF', fill: '37474F', h: 'left' });
+    band(cursor, 2, 5, { b: true, color: 'FFFFFF', fill: '37474F' });
+    cursor++;
+    for (const n of overlay.notes) {
+      put(cursor, 1, n, THEME.note);
+      cursor++;
     }
   }
 

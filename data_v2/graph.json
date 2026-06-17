@@ -40,7 +40,9 @@
     "aha_2023": "AHA Annual Survey 2023",
     "aha_cms_nhe": "AHA / CMS NHE",
     "nhe2024": "CMS NHE 2024 release (CY2023), by service & source of funds",
-    "estimate": "Author estimate"
+    "estimate": "Author estimate",
+    "agency_budgets": "Agency budgets (VA, DoD, NIH, CDC, OMB) + author allocation",
+    "employer_benefits": "KFF / BLS / NASI / EBRI (employer benefits) + author allocation"
   },
   "graph": {
     "nodes": [
@@ -49,57 +51,72 @@
         "label": "Individuals",
         "layer": 0,
         "group": "payers",
-        "role": "source"
+        "role": "source",
+        "description": "~333M people — taxes, premiums & out-of-pocket; the ultimate source of every health dollar"
       },
-      { "id": "employers", "label": "Employers", "layer": 0, "group": "payers", "role": "source" },
+      {
+        "id": "employers",
+        "label": "Employers",
+        "layer": 0,
+        "group": "payers",
+        "role": "source",
+        "description": "~165M covered by employer-sponsored insurance — the largest single source of coverage"
+      },
       {
         "id": "federal_government",
         "label": "Federal Government",
         "layer": 1,
         "group": "government",
-        "role": "intermediary"
+        "role": "intermediary",
+        "description": "Medicare, Medicaid match, VA/DoD, public health & NIH — taxes in, programs out"
       },
       {
         "id": "state_governments",
         "label": "State Governments",
         "layer": 1,
         "group": "government",
-        "role": "intermediary"
+        "role": "intermediary",
+        "description": "Medicaid state share, public health departments & administration"
       },
       {
         "id": "medicare",
         "label": "Medicare",
         "layer": 2,
         "group": "programs_insurers",
-        "role": "intermediary"
+        "role": "intermediary",
+        "description": "~67M beneficiaries (65+ & disabled) · ~21% of NHE"
       },
       {
         "id": "medicaid",
         "label": "Medicaid",
         "layer": 2,
         "group": "programs_insurers",
-        "role": "intermediary"
+        "role": "intermediary",
+        "description": "~91.7M enrollees · joint federal-state · ~18% of NHE"
       },
       {
         "id": "health_insurance",
         "label": "Health Insurance",
         "layer": 2,
         "group": "programs_insurers",
-        "role": "intermediary"
+        "role": "intermediary",
+        "description": "Private insurers across public (MA, MCO) & commercial (ESI, individual) lines"
       },
       {
         "id": "hospitals",
         "label": "Hospitals",
         "layer": 3,
         "group": "providers",
-        "role": "intermediary"
+        "role": "intermediary",
+        "description": "~6,100 hospitals · $1,501B national; 27% Medicare / 20% Medicaid / 34% private"
       },
       {
         "id": "providers_clinicians",
         "label": "Providers & Clinicians",
         "layer": 3,
         "group": "providers",
-        "role": "intermediary"
+        "role": "intermediary",
+        "description": "Physician, dental & other professional services — mostly ambulatory care"
       },
       {
         "id": "providers_physician",
@@ -107,7 +124,8 @@
         "layer": 3,
         "group": "providers",
         "role": "intermediary",
-        "parent": "providers_clinicians"
+        "parent": "providers_clinicians",
+        "description": "~1.1M active physicians · ~52% hospital-employed, ~48% independent/PE"
       },
       {
         "id": "providers_dental",
@@ -115,7 +133,8 @@
         "layer": 3,
         "group": "providers",
         "role": "intermediary",
-        "parent": "providers_clinicians"
+        "parent": "providers_clinicians",
+        "description": "Dental services — the highest out-of-pocket share of any provider category"
       },
       {
         "id": "providers_other",
@@ -123,21 +142,24 @@
         "layer": 3,
         "group": "providers",
         "role": "intermediary",
-        "parent": "providers_clinicians"
+        "parent": "providers_clinicians",
+        "description": "Optometry, chiropractic, podiatry, PT/OT & behavioral health"
       },
       {
         "id": "pharma_rx",
         "label": "Pharma & Rx",
         "layer": 3,
         "group": "providers",
-        "role": "intermediary"
+        "role": "intermediary",
+        "description": "Retail prescription drugs, net of ~$200B rebates (gross list ~$700B+)"
       },
       {
         "id": "long_term_care",
         "label": "Long-Term Care",
         "layer": 3,
         "group": "providers",
-        "role": "intermediary"
+        "role": "intermediary",
+        "description": "Nursing facilities + home health & hospice — the highest labor intensity in healthcare"
       },
       {
         "id": "ltc_nursing",
@@ -145,7 +167,8 @@
         "layer": 3,
         "group": "providers",
         "role": "intermediary",
-        "parent": "long_term_care"
+        "parent": "long_term_care",
+        "description": "~15,000 nursing facilities · Medicaid the largest payer · high out-of-pocket"
       },
       {
         "id": "ltc_homehealth",
@@ -153,28 +176,32 @@
         "layer": 3,
         "group": "providers",
         "role": "intermediary",
-        "parent": "long_term_care"
+        "parent": "long_term_care",
+        "description": "Home health & hospice · ~82% of cost is labor — the most labor-intensive sector"
       },
       {
         "id": "healthcare_workers",
         "label": "Healthcare Workers",
         "layer": 4,
         "group": "factors",
-        "role": "sink"
+        "role": "sink",
+        "description": "~22M healthcare jobs (BLS) — wages, salaries & benefits across all providers"
       },
       {
         "id": "suppliers_vendors",
         "label": "Suppliers & Vendors",
         "layer": 4,
         "group": "factors",
-        "role": "sink"
+        "role": "sink",
+        "description": "Drugs, devices, supplies, IT, facilities & purchased services"
       },
       {
         "id": "capital_markets",
         "label": "Capital & Shareholders",
         "layer": 4,
         "group": "factors",
-        "role": "sink"
+        "role": "sink",
+        "description": "Margins, dividends, buybacks & retained earnings from for-profit health firms"
       }
     ],
     "edges": [
@@ -294,7 +321,20 @@
         "to": "health_insurance",
         "channel": "ESI premiums",
         "observations": [
-          { "value": 830, "source": "kff_ehbs_2023", "basis": "modeled", "confidence": "reported" }
+          {
+            "value": 830,
+            "source": "kff_ehbs_2023",
+            "basis": "modeled",
+            "confidence": "reported",
+            "canonical": true
+          },
+          {
+            "value": 830,
+            "source": "cms_nhe",
+            "basis": "modeled",
+            "confidence": "reported",
+            "note": "CMS NHE employer share of PHI premiums — concurs with KFF EHBS"
+          }
         ]
       },
       {
@@ -430,7 +470,7 @@
         "to": "pharma_rx",
         "channel": "Claims (commercial + MA + MCO)",
         "observations": [
-          { "value": 243.0, "source": "nhe2024", "basis": "modeled", "confidence": "estimate" }
+          { "value": 243, "source": "nhe2024", "basis": "modeled", "confidence": "estimate" }
         ]
       },
       {
@@ -493,7 +533,21 @@
         "to": "ltc_nursing",
         "channel": "Skilled nursing facility (SNF, FFS)",
         "observations": [
-          { "value": 35, "source": "cms_nhe", "basis": "modeled", "confidence": "estimate" }
+          {
+            "value": 35,
+            "source": "cms_nhe",
+            "basis": "modeled",
+            "confidence": "estimate",
+            "canonical": true,
+            "note": "FFS SNF only — the traced flow; MA-borne nursing rides the MA capitation edge"
+          },
+          {
+            "value": 44,
+            "source": "medpac_kff",
+            "basis": "national",
+            "confidence": "reported",
+            "note": "MedPAC/KFF: all-Medicare nursing incl MA ≈ $44B (FFS + MA-borne)"
+          }
         ]
       },
       {
@@ -1061,6 +1115,229 @@
             "basis": "modeled",
             "confidence": "estimate",
             "note": "Feedback edge: for-profit home-health share. Carved from ltc_homehealth_capital_margin"
+          }
+        ]
+      },
+      {
+        "id": "ind_fed_genrev_programs",
+        "from": "individuals",
+        "to": "federal_government",
+        "channel": "General revenue (admin, public health, NIH)",
+        "category": "General revenue",
+        "observations": [
+          {
+            "value": 153,
+            "source": "agency_budgets",
+            "basis": "modeled",
+            "confidence": "estimate",
+            "note": "Funds federal govt administration $40B + public health $65B + NIH research $48B"
+          }
+        ]
+      },
+      {
+        "id": "ind_fed_genrev_vadod",
+        "from": "individuals",
+        "to": "federal_government",
+        "channel": "General revenue (VA, DoD/TRICARE)",
+        "category": "General revenue",
+        "observations": [
+          {
+            "value": 181,
+            "source": "agency_budgets",
+            "basis": "modeled",
+            "confidence": "estimate",
+            "note": "Funds VA medical care $126B + DoD/TRICARE $55B"
+          }
+        ]
+      },
+      {
+        "id": "ind_state_genrev_programs",
+        "from": "individuals",
+        "to": "state_governments",
+        "channel": "State/local revenue (public health, admin)",
+        "observations": [
+          {
+            "value": 72,
+            "source": "agency_budgets",
+            "basis": "modeled",
+            "confidence": "estimate",
+            "note": "Funds state/local public health $55B + administration $17B"
+          }
+        ]
+      },
+      {
+        "id": "fed_workers_programs",
+        "from": "federal_government",
+        "to": "healthcare_workers",
+        "channel": "Govt programs workforce (admin, public health, NIH)",
+        "observations": [
+          { "value": 106, "source": "agency_budgets", "basis": "modeled", "confidence": "estimate" }
+        ],
+        "split": [
+          {
+            "label": "Federal administration (CMS, oversight)",
+            "value": 30,
+            "confidence": "estimate"
+          },
+          {
+            "label": "Public health workforce (CDC, HRSA, IHS, SAMHSA)",
+            "value": 45,
+            "confidence": "estimate"
+          },
+          { "label": "NIH-funded researchers", "value": 31, "confidence": "estimate" }
+        ]
+      },
+      {
+        "id": "fed_suppliers_programs",
+        "from": "federal_government",
+        "to": "suppliers_vendors",
+        "channel": "Govt programs non-labor (IT, grants, equipment)",
+        "observations": [
+          { "value": 47, "source": "agency_budgets", "basis": "modeled", "confidence": "estimate" }
+        ],
+        "split": [
+          { "label": "Administration IT & contracts", "value": 10, "confidence": "estimate" },
+          { "label": "Public health grants & supplies", "value": 20, "confidence": "estimate" },
+          { "label": "NIH lab equipment & reagents", "value": 17, "confidence": "estimate" }
+        ]
+      },
+      {
+        "id": "state_workers_programs",
+        "from": "state_governments",
+        "to": "healthcare_workers",
+        "channel": "State/local public health & admin workforce",
+        "observations": [
+          { "value": 50, "source": "agency_budgets", "basis": "modeled", "confidence": "estimate" }
+        ],
+        "split": [
+          { "label": "Public health workforce", "value": 37, "confidence": "estimate" },
+          { "label": "State administration", "value": 13, "confidence": "estimate" }
+        ]
+      },
+      {
+        "id": "state_suppliers_programs",
+        "from": "state_governments",
+        "to": "suppliers_vendors",
+        "channel": "State/local non-labor",
+        "observations": [
+          { "value": 22, "source": "agency_budgets", "basis": "modeled", "confidence": "estimate" }
+        ],
+        "split": [
+          { "label": "Public health supplies & grants", "value": 18, "confidence": "estimate" },
+          { "label": "State administration non-labor", "value": 4, "confidence": "estimate" }
+        ]
+      },
+      {
+        "id": "fed_hospitals_vadod",
+        "from": "federal_government",
+        "to": "hospitals",
+        "channel": "VA & military hospital care",
+        "observations": [
+          {
+            "value": 90,
+            "source": "agency_budgets",
+            "basis": "modeled",
+            "confidence": "estimate",
+            "note": "Not double-counted — hospital outflows already reflect the full national expense base, so this fills the inflow side only"
+          }
+        ]
+      },
+      {
+        "id": "fed_providers_physician_vadod",
+        "from": "federal_government",
+        "to": "providers_physician",
+        "channel": "VA & military outpatient/physician care",
+        "observations": [
+          { "value": 60, "source": "agency_budgets", "basis": "modeled", "confidence": "estimate" }
+        ]
+      },
+      {
+        "id": "fed_pharma_vadod",
+        "from": "federal_government",
+        "to": "pharma_rx",
+        "channel": "VA & military pharmacy",
+        "observations": [
+          { "value": 20, "source": "agency_budgets", "basis": "modeled", "confidence": "estimate" }
+        ]
+      },
+      {
+        "id": "fed_ltc_nursing_vadod",
+        "from": "federal_government",
+        "to": "ltc_nursing",
+        "channel": "VA & military long-term care",
+        "observations": [
+          { "value": 11, "source": "agency_budgets", "basis": "modeled", "confidence": "estimate" }
+        ]
+      },
+      {
+        "id": "emp_hi_retiree",
+        "from": "employers",
+        "to": "health_insurance",
+        "channel": "Retiree health benefits",
+        "observations": [
+          {
+            "value": 50,
+            "source": "employer_benefits",
+            "basis": "modeled",
+            "confidence": "estimate",
+            "note": "Employer-funded retiree coverage (declining trend)"
+          }
+        ]
+      },
+      {
+        "id": "emp_hospitals_workerscomp",
+        "from": "employers",
+        "to": "hospitals",
+        "channel": "Workers-comp medical (hospital)",
+        "observations": [
+          {
+            "value": 20,
+            "source": "employer_benefits",
+            "basis": "modeled",
+            "confidence": "estimate"
+          }
+        ]
+      },
+      {
+        "id": "emp_providers_physician_workerscomp",
+        "from": "employers",
+        "to": "providers_physician",
+        "channel": "Workers-comp medical (physician & rehab)",
+        "observations": [
+          {
+            "value": 25,
+            "source": "employer_benefits",
+            "basis": "modeled",
+            "confidence": "estimate"
+          }
+        ]
+      },
+      {
+        "id": "emp_providers_physician_hsa",
+        "from": "employers",
+        "to": "providers_physician",
+        "channel": "HSA/HRA-funded care",
+        "observations": [
+          {
+            "value": 15,
+            "source": "employer_benefits",
+            "basis": "modeled",
+            "confidence": "estimate",
+            "note": "Employer HSA/HRA contributions spent on care (modeled to physician/clinical)"
+          }
+        ]
+      },
+      {
+        "id": "emp_pharma_hsa",
+        "from": "employers",
+        "to": "pharma_rx",
+        "channel": "HSA/HRA-funded Rx",
+        "observations": [
+          {
+            "value": 15,
+            "source": "employer_benefits",
+            "basis": "modeled",
+            "confidence": "estimate"
           }
         ]
       }

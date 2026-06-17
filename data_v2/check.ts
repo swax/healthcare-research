@@ -31,8 +31,12 @@ for (const e of multi) {
     );
   }
 }
-console.log('\n  * = the value the model uses (canonical). Other rows are what else was reported —');
-console.log('  context, not a discrepancy to resolve. Pick one and note why in the canonical obs.\n');
+console.log(
+  '\n  * = the value the model uses (canonical). Other rows are what else was reported —',
+);
+console.log(
+  '  context, not a discrepancy to resolve. Pick one and note why in the canonical obs.\n',
+);
 
 const problems = validateGraphV2(file);
 if (problems.length) {

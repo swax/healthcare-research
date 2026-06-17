@@ -1,0 +1,9 @@
+{
+  "node": "providers_clinicians",
+  "notes": [
+    "Dual-billing — about 52% of physicians are hospital-employed. Their facility-fee compensation (~$125B)",
+    "is counted in Hospital Care and shows up in the Hospitals sheet's labor, NOT here. This Physician &",
+    "Clinical node carries the professional-fee stream only. Same physicians, two NHE categories — so the",
+    "two sheets are complementary, not double-counted. See the Hospitals sheet's NOTES for the other side."
+  ]
+}

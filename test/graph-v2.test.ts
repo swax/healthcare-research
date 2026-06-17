@@ -40,7 +40,7 @@ test('computeFlowsV2 conserves the grand total (sum inflows == sum outflows == a
   assert.ok(Math.abs(totalIn - totalOut) < 1e-6, `in ${totalIn} != out ${totalOut}`);
   // ...and the grand total is unchanged — splitting a node into sub-nodes (or routing tax
   // out of margin into a feedback edge) moves value between edges but conserves the whole.
-  assert.ok(Math.abs(totalOut - 12331.9337) < 1e-6, `got ${totalOut}`);
+  assert.ok(Math.abs(totalOut - 13268.9337) < 1e-6, `got ${totalOut}`);
 });
 
 test('multi-source edges keep every source; canonical is the value used (no flagging)', () => {
@@ -55,9 +55,18 @@ test('multi-source edges keep every source; canonical is the value used (no flag
     'MACStats 619.9 is retained as a non-canonical observation',
   );
 
+  // a concurring second source is also fine: two sources, same value, one canonical
+  const esi = edge('emp_hi_esi');
+  assert.equal(esi.observations.length, 2, 'ESI carries KFF + CMS NHE');
+  assert.equal(canonicalAmount(esi), 830);
+  assert.ok(
+    esi.observations.some((o) => o.source === 'cms_nhe' && !o.canonical),
+    'CMS NHE is retained as a concurring non-canonical source',
+  );
+
   // single-observation edges are canonical implicitly
-  assert.equal(edge('emp_hi_esi').observations.length, 1);
-  assert.equal(canonicalAmount(edge('emp_hi_esi')), 830);
+  assert.equal(edge('emp_medicare_payroll_er').observations.length, 1);
+  assert.equal(canonicalAmount(edge('emp_medicare_payroll_er')), 163);
 });
 
 test('corporate-tax feedback edges flow to Government and validate (no DAG constraint)', () => {

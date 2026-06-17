@@ -18,6 +18,14 @@
       "label": "Out-of-pocket (copays, deductibles)",
       "note": "2.5% of national hospital care; CMS NHE Table 7 ~$37B"
     },
+    "fed_hospitals_vadod": {
+      "label": "VA, DoD & TRICARE hospital care",
+      "note": "VA medical centers + DoD MTFs + TRICARE inpatient; fills the 'other payer' share of hospital revenue that the payer rows above don't trace"
+    },
+    "emp_hospitals_workerscomp": {
+      "label": "Workers' compensation (hospital)",
+      "note": "Employer-funded workers-comp & occupational-injury hospital care; part of the same other-payer residual"
+    },
     "hospitals_workers_labor": {
       "label": "Labor — wages, benefits, contract staff (~54%)",
       "note": "5.6M workers; RNs ~$200B · employed physicians ~$125B · other clinical ~$210B · admin/support ~$150B · contract/agency ~$75B (AHA 2023 / BLS OES)"
@@ -52,5 +60,12 @@
       "model": { "sum": ["edge:hospitals_workers_labor"], "over": 1501 },
       "note": "BLS: healthcare-sector labor ~55-57% of output; labor ÷ NHE national $1,501B"
     }
+  ],
+  "notes": [
+    "Dual-billing — hospital-employed physicians (~52% of all physicians) generate TWO NHE revenue streams:",
+    "a facility fee (counted here in Hospital Care, paid out via Hospitals → Healthcare Workers) AND a",
+    "professional fee (counted in Physician & Clinical, paid via that node's labor). Same physicians, two NHE",
+    "categories — shown separately to match CMS accounting, so the ~$125B of employed-physician comp in",
+    "hospital labor is NOT double-counted with physician-services comp on the Physician & Clinical sheet."
   ]
 }

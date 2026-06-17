@@ -3,20 +3,16 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Single source of truth (data/data.json) -> Excel workbook + Sankey, built with native TypeScript on Node 24.",
+  "description": "Single source of truth (data/graph.json, observations-first flow model) -> Excel workbook, built with native TypeScript on Node 24.",
   "scripts": {
     "build": "node src/build.ts",
     "check": "node src/check.ts",
-    "build:v2": "node data_v2/build.ts",
-    "check:v2": "node data_v2/check.ts",
     "test": "node --test",
-    "test:update": "node test/update-expected.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "derive:claims": "node scripts/derive_hi_claims.mjs",
-    "extract": "python3 extract.py"
+    "derive:claims": "node scripts/derive_hi_claims.mjs"
   },
   "engines": {
     "node": ">=22.6"

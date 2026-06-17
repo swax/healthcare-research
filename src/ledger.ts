@@ -1,25 +1,24 @@
-// Render a v1-style node-ledger Sheet from the v2 graph. Two modes:
+// Render a node-ledger Sheet from the graph. Two modes:
 //
 //   auto     renderNodeLedger(file, nodeId)            — one row per edge, no curation
 //   overlay  renderNodeLedger(file, nodeId, overlay)   — an editorial layer (curated
 //            labels/notes, `extra` rows for flows not in the graph, and an
-//            independent-source VALIDATION section) ported from v1's per-node sheets
+//            independent-source VALIDATION section)
 //
 // Either way: inflows = incoming edges, outflows = outgoing edges, amounts come from
 // each edge's canonical observation, source-only/sink-only nodes drop the empty
 // section, and where an edge carries more than one observation the cross-source flag
-// rides in the Notes column. The v2 improvement over v1: a single-edge independent
-// figure (e.g. MA net $454B) lives as that edge's observation and surfaces here
-// automatically — only genuinely composite checks (totals, Part B = a+b+c) are
-// hand-authored in `checks`.
+// rides in the Notes column. A single-edge independent figure (e.g. MA net $454B) lives
+// as that edge's observation and surfaces here automatically — only genuinely composite
+// checks (totals, Part B = a+b+c) are hand-authored in `checks`.
 //
 // Emits the shared Sheet (Cell) model so it pours through src/workbook.ts; the
 // returned `flows` let xlsx.ts wire each edge amount to its counterpart end.
 // Erasable-syntax-only TypeScript.
 import { readdirSync, readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
-import type { Sheet, Cell, Style } from '../src/render-sheet.ts';
-import { canonicalObservation, type GraphFileV2, type EdgeV2 } from './graph.ts';
+import type { Sheet, Cell, Style } from './sheet-model.ts';
+import { canonicalObservation, type GraphFile, type Edge } from './graph.ts';
 
 const CUR = '\\$#,##0;"($"#,##0\\);\\-';
 const CUR_TOTAL = '\\$#,##0';
@@ -72,7 +71,7 @@ export interface LedgerResult {
   flows: FlowLoc[];
 }
 
-// ---- editorial overlay (data_v2/sheets/<node>.json) ----
+// ---- editorial overlay (data/sheets/<node>.json) ----
 export interface OverlayRow {
   label?: string; // curated label for an edge row (else "Counterparty — channel")
   note?: string; // curated note, prepended to the observation flag
@@ -111,9 +110,9 @@ export interface NodeOverlay {
   notes?: string[]; // free-text structural callouts, rendered as a NOTES section
 }
 
-// Load every data_v2/sheets/<node>.json, keyed by node id.
+// Load every data/sheets/<node>.json, keyed by node id.
 export function loadOverlays(root: string): Map<string, NodeOverlay> {
-  const dir = join(root, 'data_v2', 'sheets');
+  const dir = join(root, 'data', 'sheets');
   const out = new Map<string, NodeOverlay>();
   if (!existsSync(dir)) return out;
   for (const f of readdirSync(dir)) {
@@ -127,7 +126,7 @@ export function loadOverlays(root: string): Map<string, NodeOverlay> {
 const round1 = (n: number): number => Math.round(n * 10) / 10;
 
 export function renderNodeLedger(
-  file: GraphFileV2,
+  file: GraphFile,
   nodeId: string,
   overlay?: NodeOverlay,
 ): LedgerResult {
@@ -159,9 +158,9 @@ export function renderNodeLedger(
   // Where an edge carries more than one observation, surface the OTHER sources as plain
   // context in the Notes column. The row's amount IS the canonical value the model uses;
   // this just records what else was reported. This is a big-picture flow model — sources
-  // a few $B apart are a footnote, not a discrepancy to flag (see docs/v2.md). The
+  // a few $B apart are a footnote, not a discrepancy to flag (see docs/data-model.md). The
   // author's reasoning for the pick ("…using $614") lives in the canonical obs note.
-  const crossNote = (e: EdgeV2): string => {
+  const crossNote = (e: Edge): string => {
     const canon = canonicalObservation(e);
     const others = e.observations.filter((o) => o !== canon);
     if (!others.length) return '';
@@ -171,7 +170,7 @@ export function renderNodeLedger(
     );
   };
 
-  const rowsFor = (edges: EdgeV2[], counterparty: (e: EdgeV2) => string): FlatRow[] =>
+  const rowsFor = (edges: Edge[], counterparty: (e: Edge) => string): FlatRow[] =>
     edges.map((e) => {
       const c = canonicalObservation(e);
       const ov = overlay?.rows?.[e.id];
@@ -327,7 +326,7 @@ export function renderNodeLedger(
   }
 
   // ---- header ----
-  const canon = (e: EdgeV2): number => canonicalObservation(e).value;
+  const canon = (e: Edge): number => canonicalObservation(e).value;
   const fmt$ = (n: number): string => '$' + Math.round(n).toLocaleString() + 'B';
   // Totals span this node plus any children (a parent has no direct edges of its own).
   const memberIds = new Set<string>([nodeId, ...children.map((c) => c.id)]);

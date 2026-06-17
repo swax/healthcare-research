@@ -1,29 +1,35 @@
 # Healthcare Flow Graph
 
-Single source of truth → both the Excel workbook **and** the Sankey diagram, built with
-native TypeScript on Node 24 (no compile step — Node strips the types and runs `build.ts` directly).
+One hand-edited data file → an Excel workbook modeling the flow of money through the U.S.
+healthcare system (FY 2023, USD billions). Built with native TypeScript on Node 24 — no
+compile step; Node strips the types and runs `src/build.ts` directly.
 
 ## The idea
 
-The data lives in two files, split by how often you touch them:
+The data lives in `data/`, an **observations-first flow model**:
 
 - **`data/graph.json`** (the one you edit) — `meta`, three small lookup tables
-  (`layers`, `groups`, `sources`), plus the canonical flow model: a `nodes` list and an
-  `edges` list. Nodes carry a stable slug `id` and a display `label`; edges reference nodes
-  by `id` and each is `{id, from, to, amount, channel, source, confidence}` — the edge row
-  _is_ the declarative connection (an adjacency list, the standard way to store a graph).
-  `source` keys into the `sources` table; `confidence` is `reported` or `estimate`.
-- **`data/workbook.json`** (~630 KB, bulk) — the full 16-sheet workbook content (cells,
-  formulas, styles). Generated; you rarely open it by hand.
+  (`layers`, `groups`, `sources`), plus the flow model: a `nodes` list and an `edges` list.
+  Nodes carry a stable slug `id` and a display `label`; an edge references nodes by `id` and
+  carries a set of **observations** — one per source measuring that flow — of which exactly
+  one is `canonical` (the value the model uses). Following the same flow across disparate
+  sources is built into the edge, not a side-table.
+- **`data/sheets/<node>.json`** (optional) — thin editorial overlays that add curated
+  labels, `extra` rows, and independent-source validation checks on top of a node's
+  auto-generated ledger.
 
-`src/build.ts` reads both and regenerates everything into `dist/`, so the workbook and the
-visualization can never drift apart.
+`src/build.ts` reads the graph and regenerates the workbook into `dist/`, so the numbers and
+the sheets can never drift apart.
 
 ```
-data/graph.json ────┐
-                    ├─> src/build.ts ──┬──> dist/2023_healthcare_spending.xlsx
-data/workbook.json ─┘                  └──> dist/healthcare_flow_sankey.html
+data/graph.json ──> src/build.ts ──> dist/2023_healthcare_spending.xlsx
+data/sheets/*.json ─┘
 ```
+
+The model is a **traced subset**, not closed national accounting: it follows specific
+payer → provider → worker / supplier / capital flows (and feedback edges like corporate tax
+back to Government), so a node's inflow need not equal its outflow. That's intentional —
+see [docs/data-model.md](docs/data-model.md).
 
 ## Use
 
@@ -32,63 +38,65 @@ npm install        # once — installs exceljs
 npm run build      # = node src/build.ts   (needs Node >= 22.6; designed for Node 24)
 ```
 
-Outputs land in `dist/`. Open the `.html` in any browser; the `.xlsx` in Excel.
+Output lands in `dist/` (git-ignored). Open the `.xlsx` in Excel; tabs lead with an
+**Overview** front page and end with a **Glossary**.
+
+If Excel holds the file open (exclusive lock on Windows), build to a temp path:
+`XLSX_OUT=dist/_tmp.xlsx npm run build`.
 
 ## Editing
 
-- **Change a flow / amount / add a connection:** edit the `edges` array in
-  `data/graph.json` (small, readable), then `npm run build`. The Sankey and the generated **Graph Data**
-  sheet update together. Node sizes and the per-node throughput totals are derived
-  automatically (max of inflow/outflow).
-- **Change workbook text/numbers:** edit the relevant entry in `data/workbook.json` and rebuild.
-- The build **fails loudly if the graph has a cycle**, because a Sankey must be acyclic.
+- **Change a flow / amount / add a connection:** edit the `edges` array in `data/graph.json`
+  (add or adjust an observation), then `npm run build`. Node sizes and the per-node
+  throughput totals are derived automatically (max of inflow/outflow).
+- **Add curated detail to a node's sheet:** edit or add its `data/sheets/<node>.json` overlay
+  — no code change.
+- The build **fails loudly if the graph is invalid** (`validateGraph`), so a broken
+  `data/graph.json` never produces a silently-wrong workbook.
 
-## Regenerating data.json from an existing workbook
-
-`extract.py` (Python + openpyxl) re-serializes a `.xlsx` back into `data/graph.json` + `data/workbook.json`.
-Only needed if you make heavy edits directly in Excel and want to fold them back into
-the source of truth. Day-to-day, edit `data/data.json` and ignore this.
+The full field-by-field schema (observations, `split[]`, `category`, sub-nodes, overlays) is
+in [`data/README.md`](data/README.md).
 
 ## Tests & checks
 
 Zero-dependency, native Node test runner (`node --test`). After any edit to `data/graph.json`:
 
 ```bash
-npm test          # structural + invariant + snapshot + build smoke tests
-npm run check     # human-readable per-node reconciliation (in / out / net)
+npm test          # structural + observation invariants + ledger/workbook rendering
+npm run check     # human-readable readout: total flow + every multi-source edge
 ```
 
 What the tests guard:
 
-- **Structural** — unique node ids; every edge endpoint resolves to a real node (catches
-  typos like `Medicaure`); amounts are positive numbers; valid layers/colors.
-- **Invariants** — flows never go backward across layers; the graph stays acyclic
-  (a Sankey requires a DAG); declared `source` nodes have no inflow and `sink` nodes no outflow.
-- **Snapshot** — every node's throughput and the grand total are pinned in
-  `test/expected.json`. If a data edit shifts a number, the test shows exactly which node
-  moved and by how much. When the change is intentional, run `npm run test:update` to re-pin.
-- **Build smoke** — `node src/build.ts` runs clean and the workbook loads with all 17 sheets
-  plus the Sankey html.
+- **Structural / reference** — unique node & edge ids; every edge endpoint resolves to a real
+  node; observation values are positive numbers; valid layers/groups/sources; sub-node parent
+  rules; role/balance sanity.
+- **Observations** — every edge has at least one observation and exactly one canonical; a
+  `split[]` sums to its canonical value within $1B.
+- **Conservation** — summing leaf nodes, total inflow == total outflow == the grand total, so
+  splitting a node or routing a feedback edge moves value without changing the whole.
+- **Rendering** — every node renders a ledger; section grouping, splits, sub-node roll-ups,
+  cross-sheet hyperlinks, and the Overview/Glossary all produce the expected cells.
 
-`npm run check` prints inflow/outflow/net per node and flags imbalances. The insurer→provider
-claim edges (`Health Insurance → Hospitals / Providers / Pharma / Long-Term Care`, derived from
-CMS NHE 2023 private-insurance + MA + MCO spending by service category) are now modeled, so
-**Health Insurance balances**. The remaining net imbalance (~$417B) sits on the provider
-**cost side**: Hospitals and Providers & Clinicians still net negative while Pharma & Rx and
-Long-Term Care net positive — symptoms of the rough labor/non-labor split estimates (flagged
-`confidence: estimate`), not the flow structure. Reconciling those provider outflows against
-NHE category totals is the open thread.
-
-`build.ts` also runs `validateGraph` itself, so a broken `data/graph.json` fails the build
-loudly instead of producing a silently-wrong diagram.
+`npm run check` prints the total traced flow and lists each edge that carries more than one
+source (the value used and what else was reported) — context, not a discrepancy to resolve.
 
 ## Files
 
-| Path                 | Role                                                   |
-| -------------------- | ------------------------------------------------------ |
-| `data/graph.json`    | **source of truth you edit** (canonical nodes + edges) |
-| `data/workbook.json` | bulk 16-sheet content (generated)                      |
-| `src/build.ts`       | generator → xlsx + Sankey html                         |
-| `extract.py`         | one-way importer: xlsx → data.json                     |
-| `dist/`              | generated output (git-ignored)                         |
-| `tsconfig.json`      | editor/type-check config (`erasableSyntaxOnly`)        |
+| Path                           | Role                                                                       |
+| ------------------------------ | -------------------------------------------------------------------------- |
+| `data/graph.json`              | **source of truth you edit** (nodes + edges with observations)             |
+| `data/sheets/<node>.json`      | optional editorial overlays (curated labels, extras, checks)               |
+| `data/README.md`               | field-by-field schema + how-to                                             |
+| `src/build.ts`                 | generator → xlsx                                                           |
+| `src/check.ts`                 | console readout: total + multi-source edges                                |
+| `src/graph.ts`                 | loader, types, flow arithmetic, `validateGraph`                            |
+| `src/ledger.ts`                | per-node ledger renderer (auto + overlay)                                  |
+| `src/xlsx.ts`                  | assembles the workbook (ledgers + audit sheets + links)                    |
+| `src/workbook.ts`              | `Sheet → ExcelJS` pour-in + citation footnoting                            |
+| `src/sheet-model.ts`           | the `Sheet`/`Cell`/`Style` cell model                                      |
+| `scripts/derive_hi_claims.mjs` | offline helper: derive insurer→provider claim amounts from the CMS NHE CSV |
+| `docs/data-model.md`           | design narrative (why observations, the circular flow)                     |
+| `docs/data-audit.md`           | the historical audit that motivated the model                              |
+| `dist/`                        | generated output (git-ignored)                                             |
+| `tsconfig.json`                | editor/type-check config (`erasableSyntaxOnly`)                            |

@@ -1,190 +1,215 @@
-# Data model
+# Data model — the observations-first flow model
 
-What's in the two data files, what every field means, and where the numbers come
-from. The model describes the **flow of funds through U.S. healthcare in FY 2023**,
-in USD billions.
+_Design narrative for the engine under `src/`, driven by `data/graph.json`. For the
+field-by-field schema and build commands, see [`data/README.md`](../data/README.md). For the
+audit that motivated the design, see [data-audit.md](data-audit.md)._
 
-## The two files
+## The premise
 
-| File                 | Size    | You edit it? | Contents                                                                               |
-| -------------------- | ------- | ------------ | -------------------------------------------------------------------------------------- |
-| `data/graph.json`    | ~11 KB  | **Yes**      | The canonical flow model: nodes + edges, plus small lookup tables.                     |
-| `data/workbook.json` | ~630 KB | Rarely       | Full content of the 16 narrative workbook sheets (cells, formulas, styles). Generated. |
+The motivating problem (see [data-audit.md](data-audit.md)): when the same dollar figure
+lives in several places — a graph edge, a sheet's outflow row, another sheet's payer-mix
+row, a validation side-table — those copies drift, and you end up needing a reconciliation
+pass just to detect the drift. This model takes the opposite stance:
 
-Everything below is about `graph.json` — the file you actually maintain.
+> **Each number lives once, and every source it came from rides on the edge — pick one,
+> note why, move on. Following the flow across disparate sources is built in, not a side-table.**
 
-## `graph.json` structure
+## The core idea: observations
 
-```jsonc
-{
-  "meta":    { ... },          // title, year, units, source list, notes
-  "layers":  [ ... ],          // the 5 columns of the Sankey
-  "groups":  [ ... ],          // color + label buckets for nodes
-  "sources": { ... },          // citation key -> human-readable citation
-  "graph":   { "nodes": [...], "edges": [...] }   // the flow model itself
-}
-```
-
-### `meta`
-
-Free-form descriptive header — `title`, `year` (2023), `units` (USD billions),
-a summary `sources` string, and a `generatedNote`. Not validated; documentation
-for humans.
-
-### `layers[]` — the columns
-
-Five layers, left to right, modeling money moving from those who pay to the
-factors of production it ultimately buys.
-
-| `n` | `name`                | `x`  | What sits here                                                  |
-| --- | --------------------- | ---- | --------------------------------------------------------------- |
-| 0   | Payers / Households   | 0.02 | Individuals, Employers                                          |
-| 1   | Government            | 0.26 | Federal, State                                                  |
-| 2   | Programs & Insurers   | 0.50 | Medicare, Medicaid, Health Insurance                            |
-| 3   | Providers             | 0.74 | Hospitals, Providers & Clinicians, Pharma & Rx, Long-Term Care  |
-| 4   | Factors of Production | 0.98 | Healthcare Workers, Suppliers & Vendors, Capital & Shareholders |
-
-- `n` — integer layer number; nodes reference it via `node.layer`.
-- `x` — horizontal position (0–1) of the column in the Sankey.
-- `annotation` — short header label drawn above the column.
-
-A core invariant: **edges may only flow forward** (`layer[to] >= layer[from]`).
-
-### `groups[]` — color buckets
-
-Each node belongs to a `group`, which supplies its color and a display label.
-Five groups, one per layer theme: `payers`, `government`, `programs_insurers`,
-`providers`, `factors`. Each has an `id`, a `label`, and a 6-hex `color` (no `#`).
-
-### `sources{}` — citation table
-
-A map from a short **citation key** to the human-readable citation text. Edges
-reference a key in their `source` field; the build expands it and numbers it as a
-`[n]` footnote in the Graph Data sheet's **Source** column, keyed to a numbered
-source list at the bottom of that sheet (see [architecture.md](architecture.md)).
-The expanded text is also shown in the Sankey tooltip. Keys include `cms_nhe`,
-`cms_nhe_t7/t8/t16`, `trustees`, `macpac`, `kff_ehbs_2023`, `nhe2024`,
-`estimate`, etc. Every edge's `source` **must** exist here or validation fails.
-
-### `graph.nodes[]` — the entities
-
-14 nodes. Each:
-
-```jsonc
-{
-  "id": "medicare",
-  "label": "Medicare",
-  "layer": 2,
-  "group": "programs_insurers",
-  "role": "intermediary",
-}
-```
-
-| Field   | Meaning                                                                                                                    |
-| ------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `id`    | Stable kebab/slug identifier. Edges reference nodes by this, never by label. Renaming the display name never breaks edges. |
-| `label` | Display name (workbook + diagram).                                                                                         |
-| `layer` | Which `layers[].n` column it sits in.                                                                                      |
-| `group` | Which `groups[].id` bucket (drives color).                                                                                 |
-| `role`  | `source` (out only), `intermediary`, or `sink` (in only). Optional, but enforced when present.                             |
-
-The 14 nodes: Individuals, Employers (sources) → Federal Government, State
-Governments → Medicare, Medicaid, Health Insurance → Hospitals, Providers &
-Clinicians, Pharma & Rx, Long-Term Care → Healthcare Workers, Suppliers &
-Vendors, Capital & Shareholders (sinks). **Capital & Shareholders** is an
-insight node: it receives each sector's net margin/profit (Pharma, Hospitals,
-Providers, Long-Term Care, insurers) so the diagram shows where healthcare
-profits land. It is intentionally a sink — its onward distribution (dividends,
-buybacks, PE returns) lives on the Capital Markets workbook sheet, not as graph
-edges.
-
-### `graph.edges[]` — the flows (adjacency list)
-
-47 edges. Each edge **is** a directed money flow — the declarative connection,
-stored as a standard adjacency list:
+An edge carries a **set of observations** — one per source measuring the same flow:
 
 ```jsonc
 {
   "id": "medicare_hi_ma",
-  "from": "medicare",
-  "to": "health_insurance",
-  "amount": 539,
   "channel": "MA Part C capitation",
-  "source": "medpac_kff",
-  "confidence": "reported",
+  "observations": [
+    {
+      "value": 539,
+      "source": "medpac_kff",
+      "basis": "modeled",
+      "confidence": "reported",
+      "canonical": true,
+    },
+    { "value": 454, "source": "kff_ma_2024", "basis": "national", "confidence": "reported" },
+  ],
 }
 ```
 
-| Field         | Meaning                                                                                                                                                                                                  |
-| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `id`          | Unique, stable edge identifier.                                                                                                                                                                          |
-| `from` / `to` | Node `id`s of the endpoints. Both must exist; must flow forward across layers.                                                                                                                           |
-| `amount`      | Dollars in **billions**. Positive finite number.                                                                                                                                                         |
-| `channel`     | What kind of flow this is (e.g. "FFS", "ESI premiums", "Out-of-pocket"). The `(from, to, channel)` triple must be unique — multiple flows between the same pair are allowed only with distinct channels. |
-| `source`      | A key into `sources{}` — the citation.                                                                                                                                                                   |
-| `confidence`  | `reported` (sourced figure) or `estimate` (author-derived/split).                                                                                                                                        |
+- **`canonical`** — the one observation that _is_ the model's number (implicit when there's
+  only one). Everything downstream treats `canonical.value` as the edge amount.
+- **`basis`** — the lens the figure is measured on: `modeled` (this model's traced flow)
+  or `national` (all-payer NHE reference).
+- **The pick** — one observation is `canonical` (the value the model uses); the others stay on the
+  edge as context. When sources differ you choose one and say why in its `note` ("…using $614").
 
-## Derived quantities (not stored)
+**This is a big-picture flow model, not a reconciliation engine.** We follow money at the $B scale,
+so sources a few $B apart are a **footnote, not a discrepancy to flag**. There is no tolerance, no
+spread/flag, no pass/fail gate. Multiple sources are simply recorded; the one in use is marked, and
+the others render as neutral "also reported: …" context. `basis` (modeled vs national) records _why_
+two numbers differ when they do — gross vs net, traced vs all-payer — so a gap reads as context.
 
-These are computed at build time by `computeFlows`, never written into the data:
+## The model owns its shape
 
-- **inflow / outflow** per node — sum of incoming / outgoing edge amounts.
-- **throughput** per node — `max(inflow, outflow)`. Drives node size in the
-  diagram and the **Throughput ($B)** column in the Graph Data sheet.
+`src/graph.ts` defines its own node/layer/group types, its own flow arithmetic
+(`computeFlows`), and its own validation (`validateGraph`).
 
-The `total` and per-node throughputs are snapshotted in `test/expected.json` so
-any drift is caught. Note the grand total (~$12,332B) is the **sum of every
-ribbon**, so dollars are counted once per layer they cross — it is a flow total,
-not the ~$4.9T of total U.S. health spending.
+`validateGraph` asserts the structural rules that matter (reference integrity, positive
+amounts, role/balance sanity) plus the observation- and split-level rules — but it
+deliberately has **no Sankey-only constraints**: there is no _forward-flow_ rule and no
+_acyclicity_ rule. A Sankey must be a layered DAG; the Excel output needs neither. Dropping
+them is what lets the model carry **feedback edges** — a flow back to an earlier layer.
 
-## This is a traced-flow model, not closed national accounting (by design)
+**The circular flow of funds.** Every taxable provider/insurer node routes **corporate
+income tax → Federal Government** (`pharma_fed_tax`, `hi_fed_tax`, `hospitals_fed_tax`,
+`providers_fed_tax`, `ltc_fed_tax`). Each is _carved out of_ that node's `capital_margin` —
+the margin edge drops by the tax and a new edge to Government adds it back — so each node's
+total outflow is **conserved**: money simply moves from Capital to Government, and the grand
+total is unchanged (a property the conservation test locks in). The tax figures are
+`confidence: estimate` first-pass values (effective rate on the for-profit / C-corp share),
+meant to be refined. This makes the model a true circular flow rather than a one-way
+layered tree.
 
-**Intermediary nodes do not balance, and that is intentional.** This model traces
-the _major channels_ money moves through — it is not a closed system where every
-node's inflow equals its outflow. `npm run check` prints each node's net and
-labels it accordingly; an intermediary net ≠ $0 is expected context, not an error:
+## File map
 
-- A **positive net** (e.g. Medicaid +$101B, Pharma) is money traced _in_ but not
-  traced _onward_ — admin, overhead, and other uses beyond the modeled edges.
-- A **negative net** (e.g. Hospitals, Providers) is an inflow modeled _below_ the
-  node's true national revenue: the `health_insurance → provider` claim edges are
-  a curated estimate, not the full all-payer total (the node's own workbook sheet
-  shows the larger national figure — e.g. Hospitals $1,053B modeled vs $1,501B).
+```
+src/
+  graph.ts              types, loadGraph, canonicalObservation, computeFlows, validateGraph
+  ledger.ts             per-node ledger renderer (auto + overlay modes), loadOverlays
+  xlsx.ts               assembles the workbook: ledgers + Nodes/Edges/Observations + cross-sheet links
+  build.ts              validate + write dist/2023_healthcare_spending.xlsx        (npm run build)
+  check.ts              validate + list the multi-source edges to the console      (npm run check)
+  workbook.ts           Sheet → ExcelJS pour-in, citation footnoting, style application
+  sheet-model.ts        the Sheet / Cell / Style cell model the renderers emit
+data/
+  graph.json            source of truth — nodes, edges with observations[], sources, layers, groups
+  sheets/<node>.json    editorial overlays (curated labels, extras, checks)
+  README.md             schema reference + how-to
+```
 
-Closing these gaps would mean re-scaling every edge to national totals (a
-national-accounting model); the project deliberately stays a traced-flow model,
-so the imbalances are documented here rather than "fixed." See
-[data-audit.md](data-audit.md) for the analysis behind that choice.
+The rendering infra is split out so the graph model and the Excel pour-in stay independent:
+`src/sheet-model.ts` is the pure `Sheet`/`Cell`/`Style` model, and `src/workbook.ts` pours
+that model into ExcelJS (plus citation footnoting and style application).
 
-Most edges are `reported` (CMS NHE, MedPAC, MACPAC, AHA, KFF, Trustees). The ones
-marked `estimate` are where the model splits or allocates an aggregate by
-assumption:
+## The workbook
 
-- **The four `health_insurance → provider` claim edges** are derived by
-  `scripts/derive_hi_claims.mjs` from the CMS NHE 2024 release, blending each
-  program's service-category mix. With them modeled, **Health Insurance balances**
-  (before the margin edge below).
-- **The five `→ Capital & Shareholders` margin edges** route each sector's net
-  profit to the insight sink (Pharma $75.5B, insurers $64B, Providers $41.6B,
-  Hospitals $31B, Long-Term Care $10.7B = ~$223B). They are `estimate` allocations
-  from the Capital Markets sheet, and they widen the provider/insurer net gaps by
-  design — profit is a real destination the model now names.
+`npm run build` writes one workbook, every sheet derived from `data/graph.json` plus any
+editorial overlays in `data/sheets/`:
 
-## Reference data (`references/`, git-ignored)
+- **Overview** (front page) — model-at-a-glance counts + total traced flow, a node summary linked to
+  each node's sheet, and a multi-source snapshot (each multi-observation edge, the value used, and
+  what else was reported). Doubles as a light coverage dashboard.
+- **Per-node ledgers** — one per **top-level** node, in an INFLOWS/OUTFLOWS/NET layout. How a
+  section renders depends on the data:
+  - **auto** — inflows = incoming edges, outflows = outgoing edges, straight from the graph.
+    Source-only nodes are OUTFLOWS-only, sink-only nodes INFLOWS-only, so every top-level node gets
+    a sheet.
+  - **overlay** — a node with a `data/sheets/<node>.json` adds curated labels, `extra` rows for
+    flows not in the graph, and an independent-source VALIDATION section.
+  - **grouped** — when a section's edges carry 2+ `category` values it splits into labeled
+    sub-groups, each with a subtotal (e.g. Government inflows → "General revenue" vs "Corporate
+    income tax").
+  - **split** — an edge with `split[]` shows indented line-item sub-rows ("% of parent"), left out
+    of the section SUM (Pharma labor → R&D / manufacturing / SG&A).
+  - **sub-nodes** — a parent node (`node.parent` children) renders each child as its own nested
+    in/out/net block, then a COMBINED roll-up; children get no separate tab (Long-Term Care,
+    Providers & Clinicians).
+  - Either way, multi-observation edges list their other sources in Notes ("also reported: …"), and every flow amount
+    is a **clickable cross-sheet hyperlink** to the same edge's other end (outflow ↔ inflow), via
+    Excel's `HYPERLINK()` with the value as the friendly name, so the cell stays numeric and
+    `SUM`/`%` keep working.
+- **Nodes / Edges / Observations** — audit sheets: per-node inflow/outflow/throughput/net; one row
+  per flow (canonical value, observation count, other sources reported); one row per source
+  measurement, ★ marking the canonical one.
+- **Glossary** — acronyms + the model vocabulary (hand-authored), plus data sources and model
+  structure generated from the graph.
 
-Source spreadsheets the numbers are derived from, kept out of git:
+The schema for `category`, `split[]`, and `node.parent` is in
+[`data/README.md`](../data/README.md).
 
-- `references/nhe2024/` — `NHE2024.csv` / `.xls`: CMS National Health
-  Expenditure 2024 release (CY2023), by type of service and source of funds.
-  The input to `derive_hi_claims.mjs`.
-- `references/2023_plan_payment/` — CMS Part C/D plan- and county-level payment
-  data and reconciliation files (Medicare Advantage / Part D).
+## The overlay pattern
 
-## Editing rules of thumb
+Curating a node is **data-only** — add `data/sheets/<node>.json`; no code change. The rule
+that keeps the data clean:
 
-- Add or change a flow → edit `edges` in `graph.json`, then `npm run build`.
-  The diagram and Graph Data sheet update together.
-- Reference nodes by `id`, never by `label`. Add a new `source` key before using
-  it in an edge.
-- Run `npm test` (catches typos, dangling refs, cycles, backward flows, snapshot
-  drift) and `npm run check` (per-node balance) after any edit.
+- A **single-edge** independent figure becomes that **edge's observation** in `graph.json`
+  (e.g. MA net $454B on `medicare_hi_ma`) and surfaces automatically in the flow's Notes.
+- Only **composite/total** checks (a node total, or `a + b − c`) stay hand-authored in the
+  overlay's `checks`, rendered as live Excel formulas against the rows they land on.
+
+Medicaid is the sharpest demonstration: three of its five validation rows (federal share,
+state share, MCO) are single-edge cross-checks that already exist as edge observations, so
+only two composite checks remain.
+
+**Curated so far:** Medicare, Medicaid, Health Insurance, Hospitals, Pharma & Rx (full overlays);
+Individuals and Federal Government (section grouping); Long-Term Care and Providers & Clinicians
+(sub-nodes). The remaining source/sink nodes are fine as auto-ledgers. (Health Insurance shows the
+national-lens tension: its ledger renders the graph's _modeled_ flows, while the CMS NHE PHI total
+$1,511B is a composite check with an `other employer` extra plugging the residual; its
+public/commercial split is handled with row categories.)
+
+Hospitals and Pharma & Rx were clean single-entity overlays: each already had its full graph skeleton
+(inflow claims from every payer; outflows decomposed into labor / non-labor / capital-margin), so
+the overlay only added curated labels, the cost-structure detail as row notes, and two-to-three
+independent-source checks (e.g. hospital labor share ≈ 54% of the $1,501B NHE national total; pharma
+net margin ≈ 17% on the rebate-net $433B). No graph or code change.
+
+### Edge splits — line-item detail without changing the flow
+
+A coarse outflow often has a known internal breakdown (Pharma labor → R&D / manufacturing /
+SG&A; non-labor → COGS / distribution; margin → net profit / taxes). An **`edge.split[]`** carries
+that as optional child components on the edge that **must sum to its canonical value** (a
+`validateGraph` rule). The edge stays one flow to its sink — totals, balance and hyperlinks are
+unchanged — but the ledger renders the parts as indented sub-rows showing "% of parent", left out
+of the section SUM so they're detail, not a second count. Pharma is decomposed by destination sink
+(labor / suppliers / capital), so a split re-buckets the P&L-function lines (COGS / R&D / SG&A / tax
+/ profit) under their destination edges. The same machinery will carry Hospitals' labor-by-worker-type
+breakdown. See
+[`data/README.md`](../data/README.md#edge-splits--line-item-breakdown-edgesplit).
+
+## Design principles
+
+1. **Big picture, not reconciliation** — this follows money at the $B scale. When sources differ,
+   record each as an observation, pick one as canonical, and note why. A few-$B gap is a footnote,
+   **not a discrepancy to flag** — there is no tolerance, spread engine, or pass/fail gate. Don't
+   add one back.
+2. **Each number lives once** — disparate sources go on the edge as observations, not into
+   restated side-tables.
+3. **The model owns its shape** — its own types, validation (`validateGraph`, no Sankey DAG
+   constraint), and flow arithmetic (`computeFlows`). The only rendering infra is the pure
+   `src/workbook.ts` Excel pour-in + `src/sheet-model.ts` cell model, so rendering doesn't fork.
+4. **Self-contained** — the build depends only on `data/graph.json` plus the pure render infra.
+5. **Test-locked** — capability is covered by `test/graph.test.ts` and `test/ledger.test.ts`.
+
+## Roadmap
+
+- **Next:** the big mission-work, still open — exercise the multi-source observations engine on the
+  ~70 single-source edges (the original reason the engine exists; only 4 of 75 edges carry a second
+  source today). Then refine the `confidence: estimate` first-pass figures (sub-node splits, tax carves).
+- **Done so far:**
+  - `edge.split[]` — line-item breakdown of a single edge, validated to sum to its canonical value
+    (live on Pharma).
+  - **Feedback edges / circular flow** — corporate income tax → Government across all taxable nodes,
+    carved from each margin so totals are conserved (first-pass `estimate` values to refine).
+  - **Row categories** — `edge.category` groups a section into labeled sub-headers + subtotals when
+    2+ categories are present (e.g. Government inflows → "General revenue" vs "Corporate income tax").
+  - **Sub-nodes (`node.parent`)** — a node renders each child as a nested in/out/net block + a
+    combined roll-up. Edges attach to children; the parent is a pure aggregate; totals conserved via
+    leaf-summing. Live on Long-Term Care (nursing / home health) and Providers & Clinicians
+    (physician / dental / other professional).
+  - **Framing sheets** — a front-page **Overview** (counts, total, linked node summary, cross-source
+    snapshot) and a **Glossary** (acronyms, model terms, generated sources + structure).
+- **Deferred concepts** (captured in `data/README.md`): more feedback categories (e.g.
+  payroll/income tax on wages → Government, investment returns); named leakage edges (turn `extra`
+  rows into edges to a sink so conservation is explicit); and node-level observations (independent
+  _totals_ like Medicare $1,030B as observations of a node, not an edge).
+
+## Commands
+
+```
+npm run build     # write dist/2023_healthcare_spending.xlsx
+npm run check     # validate + list the multi-source edges (sources & value used)
+npm test          # graph + ledger tests
+```
+
+If Excel holds the workbook open (exclusive lock on Windows), build to a temp path:
+`XLSX_OUT=dist/_tmp.xlsx npm run build`.

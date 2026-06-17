@@ -2,12 +2,12 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { loadGraphV2, validateGraphV2 } from '../data_v2/graph.ts';
-import { renderNodeLedger, loadOverlays } from '../data_v2/ledger.ts';
-import { buildV2Workbook } from '../data_v2/xlsx.ts';
+import { loadGraph, validateGraph } from '../src/graph.ts';
+import { renderNodeLedger, loadOverlays } from '../src/ledger.ts';
+import { buildWorkbook } from '../src/xlsx.ts';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const file = loadGraphV2(root);
+const file = loadGraph(root);
 const medicareOverlay = loadOverlays(root).get('medicare');
 const texts = (nodeId: string): string[] =>
   renderNodeLedger(file, nodeId)
@@ -72,7 +72,7 @@ test('renderNodeLedger reports inflow/outflow row locations for each edge', () =
 });
 
 test('the Medicare overlay adds extras, curated labels, and a VALIDATION section', () => {
-  assert.ok(medicareOverlay, 'data_v2/sheets/medicare.json missing');
+  assert.ok(medicareOverlay, 'data/sheets/medicare.json missing');
   const { sheet } = renderNodeLedger(file, 'medicare', medicareOverlay);
   const t = sheet.cells.filter((c) => typeof c.v === 'string').map((c) => c.v as string);
   assert.ok(t.includes('VALIDATION (Independent Sources)'), 'expected a VALIDATION section');
@@ -102,7 +102,7 @@ test('overlay check formulas resolve to real rows (edge + extras, totals, ratios
 
 test('Medicaid overlay: extras + composite checks; single-edge figures stay observations', () => {
   const ov = loadOverlays(root).get('medicaid');
-  assert.ok(ov, 'data_v2/sheets/medicaid.json missing');
+  assert.ok(ov, 'data/sheets/medicaid.json missing');
   const { sheet } = renderNodeLedger(file, 'medicaid', ov);
   const t = sheet.cells.filter((c) => typeof c.v === 'string').map((c) => c.v as string);
   assert.ok(t.includes('VALIDATION (Independent Sources)'));
@@ -118,7 +118,7 @@ test('Medicaid overlay: extras + composite checks; single-edge figures stay obse
 
 test('Health Insurance overlay: other-employer extra + PHI composite check (5 refs)', () => {
   const ov = loadOverlays(root).get('health_insurance');
-  assert.ok(ov, 'data_v2/sheets/health_insurance.json missing');
+  assert.ok(ov, 'data/sheets/health_insurance.json missing');
   const { sheet } = renderNodeLedger(file, 'health_insurance', ov);
   const t = sheet.cells.filter((c) => typeof c.v === 'string').map((c) => c.v as string);
   assert.ok(
@@ -146,7 +146,7 @@ test('Health Insurance overlay: other-employer extra + PHI composite check (5 re
 
 test('Hospitals overlay: cost-structure labels + national-total and labor-share checks', () => {
   const ov = loadOverlays(root).get('hospitals');
-  assert.ok(ov, 'data_v2/sheets/hospitals.json missing');
+  assert.ok(ov, 'data/sheets/hospitals.json missing');
   const { sheet } = renderNodeLedger(file, 'hospitals', ov);
   const t = sheet.cells.filter((c) => typeof c.v === 'string').map((c) => c.v as string);
   assert.ok(t.includes('VALIDATION (Independent Sources)'));
@@ -166,7 +166,7 @@ test('Hospitals overlay: cost-structure labels + national-total and labor-share 
 
 test('Pharma overlay: net-of-rebates subtitle + margin check; no extras', () => {
   const ov = loadOverlays(root).get('pharma_rx');
-  assert.ok(ov, 'data_v2/sheets/pharma_rx.json missing');
+  assert.ok(ov, 'data/sheets/pharma_rx.json missing');
   assert.ok(/NET of rebates/i.test(ov!.subtitle ?? ''), 'expected the rebate-basis subtitle');
   const { sheet } = renderNodeLedger(file, 'pharma_rx', ov);
   const formulas = sheet.cells.filter((c) => c.f).map((c) => c.f as string);
@@ -182,7 +182,7 @@ test('edge splits render as indented sub-rows that sum to the parent, not the se
   const ov = loadOverlays(root).get('pharma_rx');
   const { sheet, flows } = renderNodeLedger(file, 'pharma_rx', ov);
   const t = sheet.cells.filter((c) => typeof c.v === 'string').map((c) => c.v as string);
-  // the v1 line items are back as child rows
+  // the pharma cost line items render as child rows
   assert.ok(
     t.some((s) => s.includes('R&D — scientists')),
     'expected the R&D split line',
@@ -206,14 +206,14 @@ test('edge splits render as indented sub-rows that sum to the parent, not the se
   );
 });
 
-test('validateGraphV2 rejects a split that does not sum to the canonical value', () => {
+test('validateGraph rejects a split that does not sum to the canonical value', () => {
   const bad = JSON.parse(JSON.stringify(file)) as typeof file;
   const edge = bad.graph.edges.find((e) => e.id === 'pharma_capital_margin')!;
   edge.split = [
     { label: 'Net profit', value: 50 },
     { label: 'Other', value: 5 }, // 50 + 5 = 55 ≠ canonical 58
   ];
-  const problems = validateGraphV2(bad);
+  const problems = validateGraph(bad);
   assert.ok(
     problems.some((p) => p.includes('pharma_capital_margin') && p.includes('split sums to')),
     'expected a split-sum mismatch problem',
@@ -251,7 +251,7 @@ test('a section with 2+ edge categories renders grouped sub-headers + subtotals'
 
 test('Individuals overlay groups outflows into taxes / premiums / out-of-pocket', () => {
   const ov = loadOverlays(root).get('individuals');
-  assert.ok(ov, 'data_v2/sheets/individuals.json missing');
+  assert.ok(ov, 'data/sheets/individuals.json missing');
   const { sheet } = renderNodeLedger(file, 'individuals', ov);
   const t = sheet.cells.filter((c) => typeof c.v === 'string').map((c) => c.v as string);
   for (const g of ['Taxes & payroll', 'Insurance premiums', 'Out-of-pocket'])
@@ -341,7 +341,7 @@ test('a parent node renders each child as a nested block + a combined roll-up', 
 });
 
 test('flow amounts are cross-linked to their counterpart end via HYPERLINK', () => {
-  const wb = buildV2Workbook(file, root);
+  const wb = buildWorkbook(file, root);
   // Individuals' 437 outflow (ind_fed_medicare_genrev) links to the Federal Government inflow.
   const ind = wb.getWorksheet('Individuals');
   assert.ok(ind, 'Individuals sheet missing');
@@ -367,7 +367,7 @@ test('flow amounts are cross-linked to their counterpart end via HYPERLINK', () 
 });
 
 test('the workbook leads with Overview and ends with Glossary', () => {
-  const wb = buildV2Workbook(file, root);
+  const wb = buildWorkbook(file, root);
   const names = wb.worksheets.map((w) => w.name);
   assert.equal(names[0], 'Overview', 'Overview should be the first tab');
   assert.equal(names[names.length - 1], 'Glossary', 'Glossary should be the last tab');

@@ -1,9 +1,9 @@
 // Shared Excel plumbing: turn the renderer's Sheet (Cell) model into ExcelJS
-// worksheets, plus the citation-footnoting pass. Extracted from build.ts so the v2
-// workbook (data_v2/xlsx.ts) can render the SAME node-ledger sheets without
-// duplicating the pour-in. Erasable-syntax-only TypeScript, same as the rest of src/.
+// worksheets, plus the citation-footnoting pass. Kept separate from the workbook
+// builder (src/xlsx.ts) so the pour-in lives in one place, independent of how the
+// node-ledger sheets are produced. Erasable-syntax-only TypeScript, same as the rest of src/.
 import ExcelJS from 'exceljs';
-import type { Style, Cell, Sheet } from './render-sheet.ts';
+import type { Style, Cell, Sheet } from './sheet-model.ts';
 
 export const argb = (hex: string): string => 'FF' + hex.replace('#', '').toUpperCase();
 

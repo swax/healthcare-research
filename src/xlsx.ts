@@ -1,31 +1,31 @@
-// v2 Excel workbook, generated from data_v2/graph.json (plus the editorial overlays in
-// data_v2/sheets/). It wears v1's layout — per-node INFLOWS/OUTFLOWS/NET ledger sheets.
+// Excel workbook, generated from data/graph.json (plus the editorial overlays in
+// data/sheets/). Per-node INFLOWS/OUTFLOWS/NET ledger sheets.
 // Sheets:
 //
 //   Overview        — front page: counts, total, linked node summary, flow summary, multi-source snapshot
 //   <node> ledgers  — one per top-level node (see ledger.ts); sub-nodes nest inside parents
 //   Nodes           — inflow/outflow/throughput/net summary (audit)
 //   Edges           — one row per flow: canonical value + any other sources reported
-//   Observations    — one row per source measurement (★ = canonical) — the v2 detail
-//   Glossary        — acronyms, v2 terms, and sources/structure from the graph
+//   Observations    — one row per source measurement (★ = canonical)
+//   Glossary        — acronyms, model terms, and sources/structure from the graph
 //
 // Pure construction: returns an ExcelJS.Workbook, no file IO. Erasable-syntax-only TS.
 import ExcelJS from 'exceljs';
-import { footnoteSources, addSheetsToWorkbook } from '../src/workbook.ts';
+import { footnoteSources, addSheetsToWorkbook } from './workbook.ts';
 import { renderNodeLedger, loadOverlays } from './ledger.ts';
-import { computeFlowsV2, canonicalObservation, type GraphFileV2 } from './graph.ts';
+import { computeFlows, canonicalObservation, type GraphFile } from './graph.ts';
 
 const CUR = '$#,##0.0##';
 const argb = (hex: string): string => 'FF' + hex.replace('#', '').toUpperCase();
 const rnd = (n: number): number => Math.round(n * 1000) / 1000;
 
-export function buildV2Workbook(file: GraphFileV2, root: string): ExcelJS.Workbook {
+export function buildWorkbook(file: GraphFile, root: string): ExcelJS.Workbook {
   const wb = new ExcelJS.Workbook();
-  wb.creator = 'data_v2/build.ts';
+  wb.creator = 'src/build.ts';
 
   const nodes = file.graph.nodes;
   const edges = file.graph.edges;
-  const { inflow, outflow, throughput } = computeFlowsV2(file);
+  const { inflow, outflow, throughput } = computeFlows(file);
 
   const layerName: Record<number, string> = {};
   for (const l of file.layers) layerName[l.n] = l.name;
@@ -79,7 +79,7 @@ export function buildV2Workbook(file: GraphFileV2, root: string): ExcelJS.Workbo
   const ov = wb.addWorksheet('Overview', { views: [{ state: 'frozen', ySplit: 2 }] });
   ov.mergeCells('A1:F1');
   ov.mergeCells('A2:F2');
-  titleBar(ov, '2023 U.S. Healthcare Flow-of-Funds — v2 Overview', 6);
+  titleBar(ov, '2023 U.S. Healthcare Flow-of-Funds — Overview', 6);
   note(
     ov.getCell('A2'),
     'All amounts $B · observations-first model · CMS NHE / MedPAC / MACPAC / KFF / AHA / PhRMA',
@@ -118,8 +118,8 @@ export function buildV2Workbook(file: GraphFileV2, root: string): ExcelJS.Workbo
   );
   ovr += 2;
 
-  // scope & coverage — what the model deliberately traces vs leaves out. v2 is a
-  // traced-subset model (see docs/v2.md), so this is honest framing, not a deficiency:
+  // scope & coverage — what the model deliberately traces vs leaves out. It's a
+  // traced-subset model (see docs/data-model.md), so this is honest framing, not a deficiency:
   // a node's inflow is the payer flows we follow, below its NHE national total.
   sectionBar(ov, ovr, 'SCOPE & COVERAGE', '00695C', 6);
   ovr++;
@@ -136,8 +136,8 @@ export function buildV2Workbook(file: GraphFileV2, root: string): ExcelJS.Workbo
   }
   ovr++;
 
-  // where the money ends up — the terminal (sink) layer, computed from v2's own flows.
-  // This is v2's figure (share of the traced flow's final layer), NOT v0's NHE-based
+  // where the money ends up — the terminal (sink) layer, computed from the model's flows.
+  // This is the model's figure (share of the traced flow's final layer), NOT the NHE-based
   // "45% to labor" — different basis, so we report what this model actually shows.
   const sinks = topLevel
     .filter((n) => n.role === 'sink')
@@ -234,7 +234,7 @@ export function buildV2Workbook(file: GraphFileV2, root: string): ExcelJS.Workbo
     const from = topOf(e.from);
     const to = topOf(e.to);
     if (from === to) continue; // a within-parent edge would self-loop after rollup
-    const key = from + ' ' + to;
+    const key = from + ' ' + to;
     const agg = pairAmt.get(key) ?? { from, to, amt: 0 };
     agg.amt += canonicalObservation(e).value;
     pairAmt.set(key, agg);
@@ -266,7 +266,7 @@ export function buildV2Workbook(file: GraphFileV2, root: string): ExcelJS.Workbo
 
   // multi-source snapshot — edges with more than one source, and the value the model
   // uses. Big-picture flow model: this is neutral context (what else was reported), not
-  // a discrepancy to flag — see docs/v2.md.
+  // a discrepancy to flag — see docs/data-model.md.
   const multiSource = edges.filter((e) => e.observations.length > 1);
   sectionBar(ov, ovr, 'MULTI-SOURCE EDGES  (sources & the value used)', 'E65100', 6);
   ovr++;
@@ -300,9 +300,9 @@ export function buildV2Workbook(file: GraphFileV2, root: string): ExcelJS.Workbo
     ov.getColumn(i + 1).width = w;
   });
 
-  // ---- node-ledger sheets (v1 layout, one per node) ----
+  // ---- node-ledger sheets (one per node) ----
   // Ordered by layer so the workbook reads left-to-right with the flow. A node with
-  // a data_v2/sheets/<node>.json overlay renders curated (labels, extras, checks);
+  // a data/sheets/<node>.json overlay renders curated (labels, extras, checks);
   // the rest fall back to the auto-ledger straight from the graph.
   const overlays = loadOverlays(root);
   const rendered = [...nodes]
@@ -337,7 +337,7 @@ export function buildV2Workbook(file: GraphFileV2, root: string): ExcelJS.Workbo
   footnoteSources(ledgers);
   addSheetsToWorkbook(wb, ledgers);
 
-  // ---- audit sheets (the v2 detail) ----
+  // ---- audit sheets ----
   // ---- Nodes ----
   const ns = wb.addWorksheet('Nodes', { views: [{ state: 'frozen', ySplit: 2 }] });
   const nHead = [
@@ -354,7 +354,7 @@ export function buildV2Workbook(file: GraphFileV2, root: string): ExcelJS.Workbo
   ];
   titleBar(
     ns,
-    'v2 Nodes — derived from data_v2/graph.json (flows = canonical observations)',
+    'Nodes — derived from data/graph.json (flows = canonical observations)',
     nHead.length,
   );
   headerRow(ns, 2, nHead, 'BBDEFB');
@@ -403,7 +403,7 @@ export function buildV2Workbook(file: GraphFileV2, root: string): ExcelJS.Workbo
     '# Obs',
     'Other sources reported',
   ];
-  titleBar(es, 'v2 Edges — one row per flow; canonical value + any other sources', eHead.length);
+  titleBar(es, 'Edges — one row per flow; canonical value + any other sources', eHead.length);
   headerRow(es, 2, eHead, 'BBDEFB');
   r = 3;
   const firstEdge = r;
@@ -450,7 +450,7 @@ export function buildV2Workbook(file: GraphFileV2, root: string): ExcelJS.Workbo
     'Canonical',
     'Note',
   ];
-  titleBar(os, 'v2 Observations — every source measurement (★ = canonical)', oHead.length);
+  titleBar(os, 'Observations — every source measurement (★ = canonical)', oHead.length);
   headerRow(os, 2, oHead, 'C8E6C9');
   r = 3;
   for (const e of edges) {
@@ -476,14 +476,14 @@ export function buildV2Workbook(file: GraphFileV2, root: string): ExcelJS.Workbo
     os.getColumn(i + 1).width = w;
   });
 
-  // ---- Glossary (acronyms + v2 terms by hand; sources + structure from the graph) ----
+  // ---- Glossary (acronyms + model terms by hand; sources + structure from the graph) ----
   const gl = wb.addWorksheet('Glossary', { views: [{ state: 'frozen', ySplit: 2 }] });
   gl.mergeCells('A1:B1');
   gl.mergeCells('A2:B2');
-  titleBar(gl, 'Glossary, Acronyms & Sources — v2', 2);
+  titleBar(gl, 'Glossary, Acronyms & Sources', 2);
   note(
     gl.getCell('A2'),
-    'Quick reference for acronyms, the v2 model vocabulary, data sources, and model structure',
+    'Quick reference for acronyms, the model vocabulary, data sources, and model structure',
   );
   let gr = 4;
   const glSection = (title: string, fill: string, headers: [string, string]): void => {
@@ -538,12 +538,12 @@ export function buildV2Workbook(file: GraphFileV2, root: string): ExcelJS.Workbo
     glRow(a, m);
   gr++;
 
-  glSection('KEY TERMS (v2 model)', '00838F', ['Term', 'Meaning']);
+  glSection('KEY TERMS', '00838F', ['Term', 'Meaning']);
   for (const [t, m] of [
     ['Observation', "One source's measurement of a flow: value + source + basis + confidence."],
     [
       'Canonical observation',
-      'The one value per edge used in totals and balance checks (the v1 amount). Implicit when an edge has a single observation.',
+      'The one value per edge used in totals and balance checks. Implicit when an edge has a single observation.',
     ],
     [
       'Basis (modeled / national)',

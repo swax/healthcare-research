@@ -1,143 +1,93 @@
 {
   "node": "medicare",
-  "subtitle": "Total: ~$1,037B | Enrollment: ~67M | Source: CMS NHE, MedPAC, CBO",
-  "tabColor": "0D47A1",
-  "inflows": [
-    {
-      "edge": "fed_medicare_genrev",
+  "subtitle": "~$1,037B modeled  ·  ~67M enrolled  ·  CMS NHE / MedPAC / CBO",
+  "rows": {
+    "fed_medicare_genrev": {
       "label": "Federal general revenue (Part B/D)",
-      "note": "Largest single source; from income taxes",
-      "source": "CMS NHE 2023; CBO Medicare Baseline Mar 2024; 2024 Medicare Trustees Report Table II.B1"
+      "category": "Premiums & general revenue"
     },
-    {
-      "edges": ["ind_medicare_payroll_ee", "emp_medicare_payroll_er"],
-      "amount": 325,
-      "id": "payroll",
-      "label": "Payroll taxes (Part A — HI Trust Fund)",
-      "note": "2.9% payroll tax split employer/employee",
-      "source": "CMS NHE 2023; 2024 Medicare Trustees Report Table II.B1; payroll tax = 2.9% FICA-HI"
+    "ind_medicare_payroll_ee": {
+      "label": "Payroll tax — employee share (Part A HI)",
+      "category": "Payroll taxes (HI trust fund)"
     },
-    {
-      "edge": "ind_medicare_premiums",
+    "emp_medicare_payroll_er": {
+      "label": "Payroll tax — employer share (Part A HI)",
+      "category": "Payroll taxes (HI trust fund)"
+    },
+    "ind_medicare_premiums": {
       "label": "Beneficiary premiums (Part B & D)",
-      "note": "Part B standard ~$164.90/mo in 2023",
-      "source": "CMS NHE 2023; 2024 Trustees Report; Part B std premium $164.90/mo (CMS fact sheet)"
+      "category": "Premiums & general revenue"
     },
+    "medicare_hi_ma": { "label": "Medicare Advantage (Part C) capitation" },
+    "medicare_hospitals_ffs": { "label": "Hospital care (FFS inpatient + outpatient)" },
+    "medicare_providers_physician_ffs": { "label": "Physician & clinical services (FFS)" },
+    "medicare_providers_other_ffs": { "label": "Other professional services (FFS)" },
+    "medicare_pharma_partd": { "label": "Prescription drugs (Part D retail)" },
+    "medicare_ltc_nursing_snf": { "label": "Skilled nursing facility (SNF, FFS)" },
+    "medicare_ltc_homehealth": {
+      "label": "Home health & hospice (FFS)",
+      "note": "Home health ~$17B · hospice ~$24B"
+    }
+  },
+  "extraInflows": [
     {
-      "extra": true,
+      "id": "other_in",
+      "label": "Other (trust-fund interest, taxation of benefits, state)",
       "amount": 112,
-      "label": "Other (interest, taxation of benefits, state)",
-      "note": "Trust fund interest, benefit taxation",
-      "source": "CMS NHE 2023; Trustees Report; includes interest on trust fund assets + taxation of benefits"
+      "note": "Not a traced graph edge — closes to the CMS NHE total",
+      "source": "cms_nhe_trustees",
+      "category": "Premiums & general revenue"
     }
   ],
-  "outflows": [
+  "extraOutflows": [
     {
-      "edge": "medicare_hi_ma",
-      "label": "Medicare Advantage (Part C) → Health Insurance",
-      "note": "52% of Medicare via MA private plans",
-      "source": "MedPAC July 2025 Data Book Sec 1; KFF MA Spending Brief 2024; CMS NHE 2023"
-    },
-    {
-      "edge": "medicare_hospitals_ffs",
-      "label": "Hospital care (FFS inpatient + outpatient) → Hospitals",
-      "note": "Largest FFS category",
-      "source": "CMS NHE 2023 Table 7 (hospital by payer); MedPAC Data Book Sec 3"
-    },
-    {
-      "edge": "medicare_providers_ffs",
-      "id": "physician_ffs",
-      "label": "Physician & clinical services (FFS) → Physicians & Clinicians",
-      "note": "Includes Part B physician-administered drugs",
-      "source": "CMS NHE 2023 Table 8 (physician by payer); MedPAC Data Book Sec 4"
-    },
-    {
-      "edge": "medicare_ltc_ffs",
-      "split": [
-        {
-          "label": "Skilled nursing facilities → Long-Term Care",
-          "amount": 35,
-          "note": "Medicare FFS SNF (post-acute); full Medicare nursing incl. MA = $44B (see Long-Term Care)",
-          "source": "CMS NHE 2023 Table 10 (nursing by payer); MedPAC Data Book Sec 7"
-        },
-        {
-          "label": "Home health → Long-Term Care",
-          "amount": 17,
-          "note": "Medicare FFS home health; full Medicare home health incl. MA = $52B (see Long-Term Care)",
-          "source": "CMS NHE 2023 Table 11 (home health by payer); MedPAC Data Book Sec 8"
-        },
-        {
-          "label": "Hospice → Long-Term Care",
-          "amount": 24,
-          "note": "End-of-life care",
-          "source": "CMS NHE 2023; MedPAC Data Book Sec 9 (hospice)"
-        }
-      ]
-    },
-    {
-      "edge": "medicare_pharma_partd",
-      "label": "Prescription drugs (Part D retail) → Pharma & Rx",
-      "note": "Retail pharmacy; IRA price negotiation starting",
-      "source": "CMS NHE 2023 Table 16 (Rx by payer); MedPAC Data Book Sec 10; IRA price negotiation"
-    },
-    {
-      "extra": true,
-      "amount": 50,
       "id": "dme_other",
       "label": "DME, labs, other Part B services",
-      "note": "Durable medical equipment, diagnostics",
-      "source": "CMS NHE 2023; MedPAC Data Book (DME, lab, other Part B)"
+      "amount": 50,
+      "note": "Not a traced graph edge",
+      "source": "cms_nhe"
     },
     {
-      "extra": true,
-      "amount": 72,
       "id": "admin",
       "label": "Administration & program integrity",
-      "note": "Contractor admin, program integrity",
-      "source": "CMS NHE 2023 admin; CMS Budget Justification FY2024"
+      "amount": 72,
+      "note": "Not a traced graph edge",
+      "source": "cms_nhe"
     }
   ],
-  "validation": [
+  "checks": [
     {
       "metric": "Total Medicare spending (CMS NHE)",
       "independent": 1030,
-      "model": { "ref": "totalInflows" },
-      "note": "CMS NHE: $1,029.8B; our model $1,037B (Trustees/CBO basis)",
-      "emphasis": true
+      "model": { "sum": ["total:inflows"] },
+      "emphasis": true,
+      "note": "CMS NHE $1,029.8B; our $1,037B (Trustees/CBO basis)"
     },
     {
       "metric": "Medicare % of NHE",
       "independent": 0.212,
-      "independentFmt": "pct",
-      "model": { "ref": "totalInflows", "over": 4867 },
-      "modelFmt": "pct",
-      "note": "CMS NHE: 21.2%; NHE total $4,866.5B"
-    },
-    {
-      "metric": "MA federal spending net of premiums (KFF)",
-      "independent": 454,
-      "model": { "ref": "outflow", "edge": "medicare_hi_ma" },
-      "note": "KFF: $454B net; our $539B is gross capitation (includes premiums, rebates)"
+      "fmt": "pct",
+      "model": { "sum": ["total:inflows"], "over": 4867 },
+      "note": "CMS NHE 21.2%; NHE total $4,866.5B"
     },
     {
       "metric": "Part B spending total (MedPAC)",
       "independent": 493,
       "model": {
-        "terms": [
-          { "ref": "outflow", "edge": "medicare_providers_ffs" },
-          { "ref": "row", "id": "dme_other" },
-          { "ref": "row", "id": "admin" }
+        "sum": [
+          "edge:medicare_providers_physician_ffs",
+          "edge:medicare_providers_other_ffs",
+          "extra:dme_other",
+          "extra:admin"
         ]
       },
-      "note": "MedPAC: $493B for Part B; our FFS physician+DME+admin subset"
+      "note": "MedPAC $493B; our physician + other FFS + DME + admin subset"
     },
     {
       "metric": "Medicare personal health care (MedPAC)",
       "independent": 956,
-      "model": {
-        "terms": [{ "ref": "totalOutflows" }, { "ref": "row", "id": "admin", "sign": "-" }]
-      },
-      "note": "MedPAC: $956B personal HC (excl admin); 23% of NHE"
+      "model": { "sum": ["total:outflows"], "minus": ["extra:admin"] },
+      "note": "MedPAC $956B personal HC (excl admin)"
     }
   ]
 }

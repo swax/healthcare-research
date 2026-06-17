@@ -3,9 +3,3 @@ dist/
 node_modules/
 references/
 package-lock.json
-
-# data is emitted by extract.py (json.dump indent=2); keep prettier out so the
-# two don't fight over formatting on every regeneration
-data/
-test/expected.json
-test/fixtures/

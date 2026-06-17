@@ -1,36 +1,34 @@
-# data_v2 — observations-first flow model
+# data — observations-first flow model
 
-`data_v2/` is the **v2 source of truth**, built in parallel with `data/` (v1). It regenerates the
-flow-of-funds Excel workbook from a richer model. v1 is left untouched and keeps working; nothing in
-`src/` imports `data_v2/`. The core change: an edge no longer has a single `amount` — it carries a
-set of **observations**, one per source, because following the same flow across disparate sources
-_is_ the project.
+`data/` is the **source of truth** for the flow-of-funds Excel workbook. The core idea: an edge
+doesn't have a single `amount` — it carries a set of **observations**, one per source, because
+following the same flow across disparate sources _is_ the project.
 
-For the design narrative (why v2, the circular-flow story, roadmap) see
-[`../docs/v2.md`](../docs/v2.md). This file is the field-by-field schema + how-to.
+For the design narrative (the circular-flow story, roadmap, why it's built this way) see
+[`../docs/data-model.md`](../docs/data-model.md). This file is the field-by-field schema + how-to.
 
 ## Building & viewing
 
 ```
-npm run check:v2     # validate + list the multi-source edges (sources & value used)
-npm run build:v2     # write dist/2023_healthcare_spending_v2.xlsx
+npm run check     # validate + list the multi-source edges (sources & value used)
+npm run build     # write dist/2023_healthcare_spending.xlsx
 ```
 
-`build:v2` validates first (see [Validation](#validation-v2-owns-it--validategraphv2)), then writes
+`build` validates first (see [Validation](#validation-validategraph)), then writes
 one workbook. Sheets:
 
 - **Overview** (front page) — model-at-a-glance counts + total traced flow, a node summary linking
   to each node's sheet, and a multi-source snapshot (each multi-observation edge, the value used, and
   what else was reported). Doubles as a light coverage dashboard.
-- **`<node>` ledgers** — one per **top-level** node, in the v1 INFLOWS/OUTFLOWS/NET layout, via the
+- **`<node>` ledgers** — one per **top-level** node, in the INFLOWS/OUTFLOWS/NET layout, via the
   shared pour-in (`src/workbook.ts`). Built straight from the graph edges; a node with a
-  `data_v2/sheets/<node>.json` overlay also gets curated labels/notes/checks (see
-  [Editorial overlay](#editorial-overlay-data_v2sheetsnodejson)). **Sub-node children render nested
+  `data/sheets/<node>.json` overlay also gets curated labels/notes/checks (see
+  [Editorial overlay](#editorial-overlay-datasheetsnodejson)). **Sub-node children render nested
   inside their parent's sheet** — they get no separate tab.
 - **Nodes / Edges / Observations** — audit sheets: per-node inflow/outflow/throughput/net; one row
   per edge (canonical value, `# Obs`, other sources reported); one row per source
   measurement (★ = canonical).
-- **Glossary** — acronyms and the v2 model vocabulary (hand-authored), plus the data sources
+- **Glossary** — acronyms and the model vocabulary (hand-authored), plus the data sources
   (`sources{}`) and model structure (layers, groups) generated from the graph.
 
 Every flow amount is a **clickable cross-sheet link** to the same edge's other end (an outflow jumps
@@ -46,25 +44,13 @@ stacked child blocks + a roll-up for a [sub-node](#sub-nodes--a-node-made-of-sub
 parent.
 
 If Excel holds the workbook open (exclusive lock on Windows), build to a temp path:
-`XLSX_V2_OUT=dist/_v2tmp.xlsx npm run build:v2`.
+`XLSX_OUT=dist/_tmp.xlsx npm run build`.
 
-## What changed vs v1
+## The edge shape
 
-A v1 edge was:
-
-```jsonc
-{
-  "id": "medicare_hi_ma",
-  "from": "medicare",
-  "to": "health_insurance",
-  "amount": 539,
-  "channel": "MA Part C capitation",
-  "source": "medpac_kff",
-  "confidence": "reported",
-}
-```
-
-A v2 edge is:
+An edge carries `id`, `from`, `to`, `channel`, and an `observations[]` array. The dollar value,
+source, and confidence live **inside** each observation, so one edge can hold several sources'
+measurements of the same flow:
 
 ```jsonc
 {
@@ -92,10 +78,9 @@ A v2 edge is:
 }
 ```
 
-`id`, `from`, `to`, `channel` are unchanged. `amount` / `source` / `confidence` moved **into** each
-observation. `meta`, `layers`, `groups`, `sources` keep the v1 shape. Three things are genuinely new
-in v2 and have no v1 analogue: edge `split[]`, edge `category`, and `node.parent` (sub-nodes) — each
-documented below.
+`meta`, `layers`, `groups`, and `sources` are the small lookup tables at the top of `graph.json`.
+Three optional features add structure to an edge or node: edge `split[]`, edge `category`, and
+`node.parent` (sub-nodes) — each documented below.
 
 ## The `observations[]` model
 
@@ -112,8 +97,7 @@ Each observation is one source's measurement of the same flow:
 
 ### Canonical observation
 
-Every edge has exactly one canonical observation — the value the totals and balance checks use (the
-v1 `amount`).
+Every edge has exactly one canonical observation — the value the totals and balance checks use.
 
 - **One observation** → it is canonical implicitly (no flag needed). This is most edges.
 - **More than one** → exactly one must carry `"canonical": true`.
@@ -122,8 +106,8 @@ So a downstream `amount(edge)` is just "the canonical observation's `value`."
 
 ### `basis` — why two numbers can both be right
 
-`basis` carries forward the `modeled` vs `national` distinction that `reconcile.ts` _infers from
-sheet names_ in v1. Making it explicit is the whole point:
+`basis` makes the `modeled` vs `national` distinction explicit on each observation — that's the
+whole point:
 
 - Two observations with **different `basis`** describing the same flow measure **different things on
   purpose** — e.g. `medicare_hi_ma` gross capitation ($539B, modeled) vs MA spending net of premiums
@@ -135,7 +119,7 @@ sheet names_ in v1. Making it explicit is the whole point:
 
 ### Worked examples already in `graph.json`
 
-Four edges carry a second observation so the model is exercised, not just renamed:
+Four edges carry a second observation so the model is exercised, not just theoretical:
 
 | Edge                   | Value used            | Also reported                   | Reads as                                  |
 | ---------------------- | --------------------- | ------------------------------- | ----------------------------------------- |
@@ -148,12 +132,11 @@ The graph has **75 edges**; only these four carry a second source today. The mod
 every source per edge — adding more (and a one-line note on which value we use and why) is the main
 open work. It stays a notes-and-sources exercise; there's no discrepancy machinery to build.
 
-## Validation (v2 owns it — `validateGraphV2`)
+## Validation (`validateGraph`)
 
-v2 validates its **own** shape and is **fully independent of v1's model**: `data_v2/graph.ts` imports
-nothing from `src/graph.ts`. It defines its own node/layer/group types and flow arithmetic
-(`computeFlowsV2`), and `validateGraphV2` re-asserts every v1 rule that still matters plus the
-v2-specific ones:
+`src/graph.ts` defines its own node/layer/group types and flow arithmetic (`computeFlows`), and
+`validateGraph` asserts the structural / reference / accounting rules plus the
+observation- and split-level ones:
 
 1. Reference integrity — edge ids unique, `from`/`to` exist, no self-loop, no duplicate
    `(from, to, channel)`; every `observation.source` is a key in `sources{}`.
@@ -170,25 +153,23 @@ There is **no discrepancy / spread check**. Multiple sources are recorded on the
 observations and one is chosen canonical; differing values are surfaced as context, never gated.
 This is a big-picture flow model — see the `basis` section above. Don't add a tolerance/flag back.
 
-**Deliberately NOT enforced** (unlike v1): _forward-flow_ and _acyclicity_. Those were v1's
-**Sankey-only** constraints — a Sankey must be a layered DAG. v2 renders Excel, so an edge may point
-to any node, **including a feedback edge back to an earlier layer**. That freedom is what lets v2
-model the **circular flow of funds**.
+**Deliberately NOT enforced:** _forward-flow_ and _acyclicity_. Those are Sankey-only constraints — a
+Sankey must be a layered DAG. This model renders Excel, so an edge may point to any node, **including
+a feedback edge back to an earlier layer**. That freedom is what lets the model carry the **circular
+flow of funds**.
 
 > **Feedback edges (live).** Every taxable provider/insurer node routes **corporate income tax →
 > Federal Government** (channel `"Corporate income tax"`). Each is _carved out of_ that node's
 > `capital_margin` (the margin edge drops by the tax, a new edge to Government adds it back), so the
 > node's total outflow is **conserved** — money moves from Capital to Government, the grand total is
-> unchanged. These are backward edges (layer 3/2 → 1) that v1 would reject as "backward flow" /
-> "cycle"; v2 accepts them. The tax amounts are `confidence: estimate` first-pass figures (effective
-> rate on the for-profit / C-corp share) — easy to refine. (`toV1()` is **gone** — v2 no longer
-> projects to the v1 shape at all.)
+> unchanged. These are backward edges (layer 3/2 → 1) that a Sankey-style DAG would reject as
+> "backward flow" / "cycle"; this model accepts them. The tax amounts are `confidence: estimate`
+> first-pass figures (effective rate on the for-profit / C-corp share) — easy to refine.
 
-## Editorial overlay (`data_v2/sheets/<node>.json`)
+## Editorial overlay (`data/sheets/<node>.json`)
 
-The auto-ledger gives every top-level node a sheet; an overlay adds the curated detail v1's best
-sheets had, **on top of** the graph rather than restating it. It's how v1 data is ported into v2 —
-node by node.
+The auto-ledger gives every top-level node a sheet; an overlay adds curated detail **on top of** the
+graph rather than restating it — node by node.
 
 ```jsonc
 {
@@ -247,21 +228,21 @@ node by node.
 - **`checks`** — a VALIDATION row whose model value is a live Excel formula: a signed sum of refs
   (`total:inflows` · `total:outflows` · `edge:<id>` · `extra:<id>`), optionally `/over`.
 
-> **The v2 improvement:** a single-edge independent figure does **not** go in `checks` — it becomes
+> **The rule:** a single-edge independent figure does **not** go in `checks` — it becomes
 > that edge's second observation in `graph.json` (e.g. MA net $454B on `medicare_hi_ma`) and surfaces
 > automatically in the flow's Notes as neutral "also reported" context. Only genuinely composite/total
 > checks are hand-authored. So each number lives once.
 
-**Ported so far:** Medicare, Medicaid, Health Insurance, Hospitals, Pharma & Rx (full overlays with
+**Curated so far:** Medicare, Medicaid, Health Insurance, Hospitals, Pharma & Rx (full overlays with
 curated labels + checks); Individuals (section grouping). The remaining source/sink nodes are fine as
 auto-ledgers. Long-Term Care and Providers & Clinicians are modeled as
-[sub-nodes](#sub-nodes--a-node-made-of-sub-entities-nodeparent). Porting another node = add its
-`data_v2/sheets/<node>.json` — no code change.
+[sub-nodes](#sub-nodes--a-node-made-of-sub-entities-nodeparent). Curating another node = add its
+`data/sheets/<node>.json` — no code change.
 
 ## Edge splits — line-item breakdown (`edge.split[]`)
 
 A coarse outflow can carry a finer breakdown without changing the graph topology. An edge keeps its
-single flow to its sink, but `split[]` lists the line items that compose it — recovering v1's detail
+single flow to its sink, but `split[]` lists the line items that compose it — line-item detail
 (e.g. Pharma labor → R&D / manufacturing / SG&A) as structured, **validated** data:
 
 ```jsonc
@@ -285,7 +266,7 @@ single flow to its sink, but `split[]` lists the line items that compose it — 
 }
 ```
 
-- The parts **must sum to the canonical value within $1B** (a `validateGraphV2` rule) — so each
+- The parts **must sum to the canonical value within $1B** (a `validateGraph` rule) — so each
   number still lives once; the parent is the flow, the parts are its anatomy.
 - In the ledger the parent stays the real row (summed in the section total, cross-linked); the parts
   render as **indented sub-rows** showing "% of parent", deliberately left out of the section SUM so
@@ -352,7 +333,7 @@ outflow on Medicare's).
 Some nodes are really several little businesses (Long-Term Care = nursing facilities + home health;
 Providers = physician / dental / other). A **child** node sets `"parent": "<id>"`; **edges attach to
 the child**, and the **parent becomes a pure aggregate** — it carries no direct edges, and its
-inflow/outflow/net roll up from its children (`computeFlowsV2`).
+inflow/outflow/net roll up from its children (`computeFlows`).
 
 ```jsonc
 { "id": "ltc_nursing",    "label": "Nursing Facilities",    "parent": "long_term_care", ... }
@@ -369,7 +350,7 @@ only (`leafNodeIds`) so a parent and its children are never double-counted.
 
 **Live on:** Long-Term Care (nursing / home health) and Providers & Clinicians (physician / dental /
 other professional). The per-child splits are `confidence: estimate` (no source gives a clean
-payer×entity matrix) — LTC's outflow split reproduces v1's $205B nursing / $154B home-health cost
+payer×entity matrix) — LTC's outflow split reproduces the $205B nursing / $154B home-health cost
 totals as a sanity check, and the Providers split isolates the big physician imbalance (the
 hospital-employed-physician comp counted in both Hospital and Physician revenue) into the physician
 child, leaving dental nearly balanced.
@@ -385,5 +366,5 @@ Ideas from the design discussion left out so far, captured here so they aren't l
 - **Node-level observations** — independent _totals_ (Medicare $1,030B vs model $1,037B; Medicaid
   $900B vs $894B) are observations of a node's throughput, not of one edge. They need an observation
   slot on nodes (or on a derived total), which the edge-only model doesn't add.
-- **Per-node graph fragments** — sharding sub-node / observation detail into `data_v2/nodes/<id>.json`
+- **Per-node graph fragments** — sharding sub-node / observation detail into `data/nodes/<id>.json`
   files merged at load, so the canonical top-level graph stays small and reviewable.

@@ -1,9 +1,10 @@
 # Flow-of-Funds Data Audit
 
-_2026-06-15. A content audit of `data/workbook.json` against the project's actual
-goal: **modeling the flow of money through the U.S. healthcare system.** It came
-out of the sheet-generation work (see [architecture.md](architecture.md)), which
-turned out to be an unexpectedly good diagnostic — see "Method" below._
+_2026-06-15. A historical content audit (of the earlier hand-authored workbook) against
+the project's actual goal: **modeling the flow of money through the U.S. healthcare
+system.** It is the motivation for the current observations-first model — see
+[data-model.md](data-model.md). It came out of the sheet-generation work, which turned
+out to be an unexpectedly good diagnostic — see "Method" below._
 
 > **Decision (2026-06-15):** of the two model types this audit surfaces (see "The
 > structural finding"), the project is a **traced-flow model**, not closed national

@@ -7,7 +7,7 @@
 //
 // Run: node src/build.ts   (set XLSX_OUT to a temp path if Excel holds the
 // default file open — Excel takes an exclusive lock on Windows).
-import { mkdirSync, readdirSync } from 'node:fs';
+import { mkdirSync, readdirSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { loadGraph, validateGraph } from './graph.ts';
@@ -35,6 +35,24 @@ const problems = validateGraph(file);
 if (problems.length) {
   console.error('graph validation failed:\n - ' + problems.join('\n - '));
   throw new Error(problems.length + ' validation error(s) — fix data/graph.json');
+}
+
+// Refresh the BLS labor cross-check from the (git-ignored) OEWS source files when they
+// are present locally — so the workbook's "Labor Cross-Check (BLS)" sheet stays current
+// as part of the build. On a fresh clone without the files, the committed
+// data/labor_bls.json is rendered as-is. Non-fatal: a parse failure never breaks the build.
+if (existsSync(join(root, 'references', 'bls2023', 'oesm23in4'))) {
+  try {
+    const { computeReconciliation, writeDerived } = await import('../scripts/reconcile_labor.mjs');
+    writeDerived(root, await computeReconciliation(root));
+    console.log('bls   -> refreshed data/labor_bls.json from references/bls2023');
+  } catch (e) {
+    console.warn(
+      'bls   -> recompute skipped (' +
+        (e instanceof Error ? e.message : e) +
+        '); using committed data/labor_bls.json',
+    );
+  }
 }
 
 const dist = join(root, 'dist');

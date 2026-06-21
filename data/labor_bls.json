@@ -1,0 +1,406 @@
+{
+  "_generated": "by scripts/reconcile_labor.mjs — do not hand-edit. Regenerate when BLS publishes a new year.",
+  "source": "BLS OEWS May 2023",
+  "benefitLoad": 1.42,
+  "edges": [
+    {
+      "edgeId": "hospitals_workers_labor",
+      "naics": "622000",
+      "industry": "Hospitals",
+      "jobs": 6234730,
+      "meanWage": 82320,
+      "note": "",
+      "top": [
+        {
+          "title": "Registered Nurses",
+          "emp": 1854200,
+          "mean": 96820,
+          "capped": false
+        },
+        {
+          "title": "Nursing Assistants",
+          "emp": 447590,
+          "mean": 40910,
+          "capped": false
+        },
+        {
+          "title": "Medical Secretaries and Administrative Assistants",
+          "emp": 184230,
+          "mean": 44930,
+          "capped": false
+        },
+        {
+          "title": "Medical and Health Services Managers",
+          "emp": 162350,
+          "mean": 144600,
+          "capped": false
+        },
+        {
+          "title": "Clinical Laboratory Technologists and Technicians",
+          "emp": 148610,
+          "mean": 66820,
+          "capped": false
+        },
+        {
+          "title": "Radiologic Technologists and Technicians",
+          "emp": 132170,
+          "mean": 76310,
+          "capped": false
+        }
+      ]
+    },
+    {
+      "edgeId": "providers_physician_workers_labor",
+      "naics": "621100",
+      "industry": "Offices of Physicians",
+      "jobs": 2842350,
+      "meanWage": 100420,
+      "note": "edge also carries hospital-EMPLOYED physician comp, which BLS counts under Hospitals (622) — so headcount here is understated vs the dollars",
+      "top": [
+        {
+          "title": "Medical Assistants",
+          "emp": 430490,
+          "mean": 42200,
+          "capped": false
+        },
+        {
+          "title": "Medical Secretaries and Administrative Assistants",
+          "emp": 241900,
+          "mean": 41440,
+          "capped": false
+        },
+        {
+          "title": "Registered Nurses",
+          "emp": 220070,
+          "mean": 83110,
+          "capped": false
+        },
+        {
+          "title": "Receptionists and Information Clerks",
+          "emp": 174460,
+          "mean": 37860,
+          "capped": false
+        },
+        {
+          "title": "Nurse Practitioners",
+          "emp": 137030,
+          "mean": 122780,
+          "capped": false
+        },
+        {
+          "title": "Physicians, All Other",
+          "emp": 131460,
+          "mean": 294230,
+          "capped": false
+        }
+      ]
+    },
+    {
+      "edgeId": "providers_dental_workers_labor",
+      "naics": "621200",
+      "industry": "Offices of Dentists",
+      "jobs": 1022780,
+      "meanWage": 75660,
+      "note": "",
+      "top": [
+        {
+          "title": "Dental Assistants",
+          "emp": 339100,
+          "mean": 47280,
+          "capped": false
+        },
+        {
+          "title": "Dental Hygienists",
+          "emp": 200860,
+          "mean": 90160,
+          "capped": false
+        },
+        {
+          "title": "Dentists, General",
+          "emp": 109280,
+          "mean": 194400,
+          "capped": false
+        },
+        {
+          "title": "Medical Secretaries and Administrative Assistants",
+          "emp": 91570,
+          "mean": 46500,
+          "capped": false
+        },
+        {
+          "title": "Receptionists and Information Clerks",
+          "emp": 83950,
+          "mean": 42460,
+          "capped": false
+        },
+        {
+          "title": "First-Line Supervisors of Office and Administrative Support Workers",
+          "emp": 42510,
+          "mean": 62800,
+          "capped": false
+        }
+      ]
+    },
+    {
+      "edgeId": "providers_other_workers_labor",
+      "naics": "621300",
+      "industry": "Offices of Other Health Practitioners",
+      "jobs": 1141330,
+      "meanWage": 67180,
+      "note": "optometry/chiro/podiatry/PT-OT/behavioral — many are self-employed (income invisible to OEWS wages)",
+      "top": [
+        {
+          "title": "Physical Therapists",
+          "emp": 89680,
+          "mean": 92620,
+          "capped": false
+        },
+        {
+          "title": "Receptionists and Information Clerks",
+          "emp": 68100,
+          "mean": 35450,
+          "capped": false
+        },
+        {
+          "title": "Substance Abuse, Behavioral Disorder, and Mental Health Counselors",
+          "emp": 63370,
+          "mean": 66500,
+          "capped": false
+        },
+        {
+          "title": "Medical Assistants",
+          "emp": 60350,
+          "mean": 37460,
+          "capped": false
+        },
+        {
+          "title": "Medical Secretaries and Administrative Assistants",
+          "emp": 57540,
+          "mean": 38780,
+          "capped": false
+        },
+        {
+          "title": "Physical Therapist Assistants",
+          "emp": 49070,
+          "mean": 60340,
+          "capped": false
+        }
+      ]
+    },
+    {
+      "edgeId": "ltc_nursing_workers_labor",
+      "naics": "623100",
+      "industry": "Nursing Care Facilities (Skilled Nursing Facilities)",
+      "jobs": 1379430,
+      "meanWage": 50450,
+      "note": "primary = skilled nursing (6231); broad alt = all nursing+residential care (623)",
+      "top": [
+        {
+          "title": "Nursing Assistants",
+          "emp": 458590,
+          "mean": 38730,
+          "capped": false
+        },
+        {
+          "title": "Licensed Practical and Licensed Vocational Nurses",
+          "emp": 171290,
+          "mean": 63730,
+          "capped": false
+        },
+        {
+          "title": "Registered Nurses",
+          "emp": 124340,
+          "mean": 82930,
+          "capped": false
+        },
+        {
+          "title": "Maids and Housekeeping Cleaners",
+          "emp": 64760,
+          "mean": 30740,
+          "capped": false
+        },
+        {
+          "title": "Food Servers, Nonrestaurant",
+          "emp": 55440,
+          "mean": 32250,
+          "capped": false
+        },
+        {
+          "title": "Home Health and Personal Care Aides",
+          "emp": 49110,
+          "mean": 35120,
+          "capped": false
+        }
+      ]
+    },
+    {
+      "edgeId": "ltc_homehealth_workers_labor",
+      "naics": "621600",
+      "industry": "Home Health Care Services",
+      "jobs": 1601940,
+      "meanWage": 49140,
+      "note": "most personal-care aides sit in 624120 (social assistance), OUTSIDE this health-care edge",
+      "top": [
+        {
+          "title": "Home Health and Personal Care Aides",
+          "emp": 931330,
+          "mean": 32120,
+          "capped": false
+        },
+        {
+          "title": "Registered Nurses",
+          "emp": 179530,
+          "mean": 87430,
+          "capped": false
+        },
+        {
+          "title": "Nursing Assistants",
+          "emp": 81370,
+          "mean": 35640,
+          "capped": false
+        },
+        {
+          "title": "Licensed Practical and Licensed Vocational Nurses",
+          "emp": 78100,
+          "mean": 61050,
+          "capped": false
+        },
+        {
+          "title": "Physical Therapists",
+          "emp": 26360,
+          "mean": 116500,
+          "capped": false
+        },
+        {
+          "title": "Medical and Health Services Managers",
+          "emp": 25750,
+          "mean": 109300,
+          "capped": false
+        }
+      ]
+    },
+    {
+      "edgeId": "pharma_workers_labor",
+      "naics": "325400",
+      "industry": "Pharmaceutical and Medicine Manufacturing",
+      "jobs": 341770,
+      "meanWage": 87170,
+      "note": "pharma & medicine manufacturing",
+      "top": [
+        {
+          "title": "Packaging and Filling Machine Operators and Tenders",
+          "emp": 30600,
+          "mean": 43160,
+          "capped": false
+        },
+        {
+          "title": "Chemical Equipment Operators and Tenders",
+          "emp": 29580,
+          "mean": 50760,
+          "capped": false
+        },
+        {
+          "title": "Inspectors, Testers, Sorters, Samplers, and Weighers",
+          "emp": 15080,
+          "mean": 58070,
+          "capped": false
+        },
+        {
+          "title": "Chemists",
+          "emp": 13800,
+          "mean": 86740,
+          "capped": false
+        },
+        {
+          "title": "First-Line Supervisors of Production and Operating Workers",
+          "emp": 11380,
+          "mean": 80510,
+          "capped": false
+        },
+        {
+          "title": "Industrial Engineers",
+          "emp": 8770,
+          "mean": 109290,
+          "capped": false
+        }
+      ]
+    },
+    {
+      "edgeId": "hi_workers_labor",
+      "naics": "524114",
+      "industry": "Direct Health and Medical Insurance Carriers",
+      "jobs": 430460,
+      "meanWage": 88270,
+      "note": "direct health & medical insurance carriers (excludes PBMs, TPAs, brokers)",
+      "top": [
+        {
+          "title": "Customer Service Representatives",
+          "emp": 70860,
+          "mean": 48050,
+          "capped": false
+        },
+        {
+          "title": "Registered Nurses",
+          "emp": 29240,
+          "mean": 89410,
+          "capped": false
+        },
+        {
+          "title": "Insurance Claims and Policy Processing Clerks",
+          "emp": 26280,
+          "mean": 48150,
+          "capped": false
+        },
+        {
+          "title": "Management Analysts",
+          "emp": 19450,
+          "mean": 96990,
+          "capped": false
+        },
+        {
+          "title": "Claims Adjusters, Examiners, and Investigators",
+          "emp": 19070,
+          "mean": 63160,
+          "capped": false
+        },
+        {
+          "title": "Insurance Sales Agents",
+          "emp": 18480,
+          "mean": 92540,
+          "capped": false
+        }
+      ]
+    }
+  ],
+  "broadNursing": {
+    "forEdge": "ltc_nursing_workers_labor",
+    "naics": "623000",
+    "industry": "Nursing and Residential Care Facilities",
+    "jobs": 3079930,
+    "meanWage": 46650
+  },
+  "anchors": {
+    "practitioners": {
+      "code": "29-0000",
+      "title": "Healthcare Practitioners and Technical Occupations",
+      "emp": 9284210,
+      "mean": 102060
+    },
+    "support": {
+      "code": "31-0000",
+      "title": "Healthcare Support Occupations",
+      "emp": 7063530,
+      "mean": 38220
+    }
+  },
+  "government": [
+    {
+      "edgeId": "fed_workers_programs",
+      "note": "CMS admin, CDC/HRSA/IHS, NIH researchers — government ownership, no single NAICS in OEWS"
+    },
+    {
+      "edgeId": "state_workers_programs",
+      "note": "state/local public-health & Medicaid administration workforce"
+    }
+  ]
+}

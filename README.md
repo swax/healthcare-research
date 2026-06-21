@@ -81,22 +81,42 @@ What the tests guard:
 `npm run check` prints the total traced flow and lists each edge that carries more than one
 source (the value used and what else was reported) — context, not a discrepancy to resolve.
 
+## Labor cross-check (complementary)
+
+The workbook's **Labor Cross-Check (BLS)** sheet looks _inside_ the ten labor edges that feed
+the Healthcare Workers sink: headcount, wage bill and the top job functions per edge, from
+**BLS OEWS May 2023**. Each model dollar links back to its inflow row on the Healthcare Workers
+sheet. This is a traced-subset cross-check — divergences (self-employed income, BLS wage
+top-coding, contract labor, headcount scope, the pharma/insurer 50% labor split) are explained,
+not flagged. There is no gate.
+
+```bash
+npm run reconcile:labor   # rebuild data/labor_bls.json from references/bls2023 (BLS source files, git-ignored)
+```
+
+The numbers are derived offline into the committed `data/labor_bls.json` (the ~30 MB BLS source
+files stay git-ignored under `references/bls2023/`); `npm run build` renders that file, and also
+refreshes it automatically when the BLS files are present locally. The model dollars are read
+live from `data/graph.json`, so the sheet can never drift from the graph.
+
 ## Files
 
-| Path                           | Role                                                                       |
-| ------------------------------ | -------------------------------------------------------------------------- |
-| `data/graph.json`              | **source of truth you edit** (nodes + edges with observations)             |
-| `data/sheets/<node>.json`      | optional editorial overlays (curated labels, extras, checks)               |
-| `data/README.md`               | field-by-field schema + how-to                                             |
-| `src/build.ts`                 | generator → xlsx                                                           |
-| `src/check.ts`                 | console readout: total + multi-source edges                                |
-| `src/graph.ts`                 | loader, types, flow arithmetic, `validateGraph`                            |
-| `src/ledger.ts`                | per-node ledger renderer (auto + overlay)                                  |
-| `src/xlsx.ts`                  | assembles the workbook (ledgers + audit sheets + links)                    |
-| `src/workbook.ts`              | `Sheet → ExcelJS` pour-in + citation footnoting                            |
-| `src/sheet-model.ts`           | the `Sheet`/`Cell`/`Style` cell model                                      |
-| `scripts/derive_hi_claims.mjs` | offline helper: derive insurer→provider claim amounts from the CMS NHE CSV |
-| `docs/data-model.md`           | design narrative (why observations, the circular flow)                     |
-| `docs/data-audit.md`           | the historical audit that motivated the model                              |
-| `dist/`                        | generated output (git-ignored)                                             |
-| `tsconfig.json`                | editor/type-check config (`erasableSyntaxOnly`)                            |
+| Path                           | Role                                                                                 |
+| ------------------------------ | ------------------------------------------------------------------------------------ |
+| `data/graph.json`              | **source of truth you edit** (nodes + edges with observations)                       |
+| `data/sheets/<node>.json`      | optional editorial overlays (curated labels, extras, checks)                         |
+| `data/labor_bls.json`          | committed derived artifact (BLS headcount/wages by edge); built by `reconcile:labor` |
+| `data/README.md`               | field-by-field schema + how-to                                                       |
+| `src/build.ts`                 | generator → xlsx                                                                     |
+| `src/check.ts`                 | console readout: total + multi-source edges                                          |
+| `src/graph.ts`                 | loader, types, flow arithmetic, `validateGraph`                                      |
+| `src/ledger.ts`                | per-node ledger renderer (auto + overlay)                                            |
+| `src/xlsx.ts`                  | assembles the workbook (ledgers + audit sheets + links)                              |
+| `src/workbook.ts`              | `Sheet → ExcelJS` pour-in + citation footnoting                                      |
+| `src/sheet-model.ts`           | the `Sheet`/`Cell`/`Style` cell model                                                |
+| `scripts/derive_hi_claims.mjs` | offline helper: derive insurer→provider claim amounts from the CMS NHE CSV           |
+| `scripts/reconcile_labor.mjs`  | offline helper: cross-check labor edges vs BLS OEWS → `data/labor_bls.json`          |
+| `docs/data-model.md`           | design narrative (why observations, the circular flow)                               |
+| `docs/data-audit.md`           | the historical audit that motivated the model                                        |
+| `dist/`                        | generated output (git-ignored)                                                       |
+| `tsconfig.json`                | editor/type-check config (`erasableSyntaxOnly`)                                      |

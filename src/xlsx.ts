@@ -7,10 +7,15 @@
 //   Nodes           — inflow/outflow/throughput/net summary (audit)
 //   Edges           — one row per flow: canonical value + any other sources reported
 //   Observations    — one row per source measurement (★ = canonical)
+//   Labor Cross-Check (BLS) — labor edges × BLS OEWS May 2023; numbers link back to the
+//                   Healthcare Workers sheet. Complementary context, rendered from the
+//                   committed data/labor_bls.json (see scripts/reconcile_labor.mjs).
 //   Glossary        — acronyms, model terms, and sources/structure from the graph
 //
 // Pure construction: returns an ExcelJS.Workbook, no file IO. Erasable-syntax-only TS.
 import ExcelJS from 'exceljs';
+import { readFileSync, existsSync } from 'node:fs';
+import { join } from 'node:path';
 import { footnoteSources, addSheetsToWorkbook } from './workbook.ts';
 import { renderNodeLedger, loadOverlays } from './ledger.ts';
 import { computeFlows, canonicalObservation, type GraphFile } from './graph.ts';
@@ -475,6 +480,244 @@ export function buildWorkbook(file: GraphFile, root: string): ExcelJS.Workbook {
   [22, 34, 28, 12, 10, 16, 42, 8, 10, 52].forEach((w, i) => {
     os.getColumn(i + 1).width = w;
   });
+
+  // ---- Labor Cross-Check (BLS) ----
+  // Complementary context (NOT a gate): the labor edges into Healthcare Workers, seen
+  // through BLS OEWS May 2023 industry data. Numbers are derived offline into the
+  // committed data/labor_bls.json by scripts/reconcile_labor.mjs (the BLS source files
+  // are git-ignored), and rendered here. Model $ are read live from the graph so they
+  // never drift; the BLS file carries headcount/wages/occupations only. Each model $
+  // links back to that edge's inflow row on the Healthcare Workers sheet.
+  const blsPath = join(root, 'data', 'labor_bls.json');
+  if (existsSync(blsPath)) {
+    type BlsOcc = { title: string; emp: number; mean: number | null; capped: boolean };
+    type BlsEdge = {
+      edgeId: string;
+      naics: string;
+      industry: string;
+      jobs: number | null;
+      meanWage: number | null;
+      note: string;
+      top: BlsOcc[];
+    };
+    type BlsFile = {
+      source: string;
+      benefitLoad: number;
+      edges: BlsEdge[];
+      broadNursing: {
+        forEdge: string;
+        naics: string;
+        industry: string;
+        jobs: number;
+        meanWage: number;
+      } | null;
+      anchors: {
+        practitioners: { code: string; title: string; emp: number; mean: number };
+        support: { code: string; title: string; emp: number; mean: number };
+      };
+      government: { edgeId: string; note: string }[];
+    };
+    const bls = JSON.parse(readFileSync(blsPath, 'utf8')) as BlsFile;
+    const load = bls.benefitLoad;
+    const NC = 8;
+    const INT = '#,##0';
+    const USD0 = '$#,##0';
+    const edgeById = new Map(edges.map((e) => [e.id, e]));
+    const modelOf = (id: string): number => {
+      const e = edgeById.get(id);
+      return e ? canonicalObservation(e).value : 0;
+    };
+
+    const ws = wb.addWorksheet('Labor Cross-Check (BLS)', {
+      views: [{ state: 'frozen', ySplit: 2 }],
+    });
+    ws.mergeCells('A1:H1');
+    ws.mergeCells('A2:H2');
+    titleBar(ws, 'Labor Cross-Check — model labor edges × BLS OEWS May 2023', NC);
+    note(
+      ws.getCell('A2'),
+      `Complementary context, not a gate. Model $ = total comp (live from graph.json); BLS = wages of payroll employees, grossed to comp ×${load} (ECEC). Blue numbers link to the Healthcare Workers sheet.`,
+    );
+
+    // link an edge's model $ (or its label) back to that edge's inflow row on Healthcare Workers
+    const linkNum = (cell: ExcelJS.Cell, edgeId: string, v: number): void => {
+      const t = inLoc.get(edgeId);
+      const x = rnd(v);
+      if (t) {
+        cell.value = { formula: `HYPERLINK("#'${t.sheet}'!B${t.row}",${x})`, result: x };
+        cell.font = { color: { argb: 'FF0563C1' } };
+      } else cell.value = x;
+      cell.numFmt = CUR;
+    };
+    const linkLabel = (cell: ExcelJS.Cell, edgeId: string, text: string): void => {
+      const t = inLoc.get(edgeId);
+      if (t) {
+        cell.value = { formula: `HYPERLINK("#'${t.sheet}'!A${t.row}","${text}")`, result: text };
+        cell.font = { color: { argb: 'FF0563C1' } };
+      } else cell.value = text;
+    };
+    const plain = (cell: ExcelJS.Cell, v: number, fmt: string): void => {
+      cell.value = Math.round(v);
+      cell.numFmt = fmt;
+    };
+
+    let lr = 4;
+    sectionBar(
+      ws,
+      lr,
+      'RECONCILIATION  (model $ ÷ BLS jobs = what each edge pays per worker)',
+      '0D47A1',
+      NC,
+    );
+    lr++;
+    headerRow(
+      ws,
+      lr,
+      [
+        'Edge → BLS industry',
+        'Model $B',
+        'NAICS',
+        'BLS jobs',
+        'BLS wages $B',
+        `BLS comp $B (×${load})`,
+        'Model $/worker',
+        'BLS comp/worker',
+      ],
+      'BBDEFB',
+    );
+    lr++;
+    let mapJobs = 0;
+    let mapDollars = 0;
+    for (const e of bls.edges) {
+      const model = modelOf(e.edgeId);
+      const wages = e.jobs && e.meanWage ? (e.jobs * e.meanWage) / 1e9 : null;
+      mapJobs += e.jobs ?? 0;
+      mapDollars += model;
+      const row = ws.getRow(lr);
+      linkLabel(row.getCell(1), e.edgeId, e.edgeId.replace(/_workers_labor/, ''));
+      linkNum(row.getCell(2), e.edgeId, model);
+      row.getCell(3).value = `${e.industry} (${e.naics})`;
+      if (e.jobs) plain(row.getCell(4), e.jobs, INT);
+      if (wages != null) money(row.getCell(5), wages);
+      if (wages != null) money(row.getCell(6), wages * load);
+      if (e.jobs) plain(row.getCell(7), (model * 1e9) / e.jobs, USD0);
+      if (e.meanWage) plain(row.getCell(8), e.meanWage * load, USD0);
+      if (e.note) note(row.getCell(9), '⚠ ' + e.note);
+      lr++;
+    }
+    if (bls.broadNursing) {
+      const a = bls.broadNursing;
+      const row = ws.getRow(lr);
+      note(row.getCell(1), '  ↳ if counted as all nursing+residential care (623)');
+      plain(row.getCell(4), a.jobs, INT);
+      money(row.getCell(5), (a.jobs * a.meanWage) / 1e9);
+      money(row.getCell(6), (a.jobs * a.meanWage * load) / 1e9);
+      plain(row.getCell(7), (modelOf(a.forEdge) * 1e9) / a.jobs, USD0);
+      plain(row.getCell(8), a.meanWage * load, USD0);
+      lr++;
+    }
+    // subtotal + government + total
+    const subRow = ws.getRow(lr);
+    subRow.getCell(1).value = 'Mapped subtotal (8 edges)';
+    subRow.getCell(1).font = { bold: true };
+    money(subRow.getCell(2), mapDollars);
+    subRow.getCell(2).font = { bold: true };
+    plain(subRow.getCell(4), mapJobs, INT);
+    subRow.getCell(4).font = { bold: true };
+    lr++;
+    let govDollars = 0;
+    for (const g of bls.government) {
+      const model = modelOf(g.edgeId);
+      govDollars += model;
+      const row = ws.getRow(lr);
+      linkLabel(row.getCell(1), g.edgeId, g.edgeId);
+      linkNum(row.getCell(2), g.edgeId, model);
+      row.getCell(3).value = 'no OEWS NAICS (government)';
+      note(row.getCell(9), g.note);
+      lr++;
+    }
+    const totRow = ws.getRow(lr);
+    totRow.getCell(1).value = 'TOTAL → Healthcare Workers';
+    totRow.getCell(1).font = { bold: true };
+    money(totRow.getCell(2), mapDollars + govDollars);
+    totRow.getCell(2).font = { bold: true };
+    lr += 2;
+
+    // headcount anchors (occupation view)
+    sectionBar(
+      ws,
+      lr,
+      'HEADCOUNT ANCHORS  (occupation view — how many people, nationally)',
+      '00695C',
+      NC,
+    );
+    lr++;
+    headerRow(ws, lr, ['SOC', 'Occupation group', 'People', 'Mean wage'], 'B2DFDB');
+    lr++;
+    for (const a of [bls.anchors.practitioners, bls.anchors.support]) {
+      const row = ws.getRow(lr);
+      row.getCell(1).value = a.code;
+      row.getCell(2).value = a.title;
+      plain(row.getCell(3), a.emp, INT);
+      plain(row.getCell(4), a.mean, USD0);
+      lr++;
+    }
+    const clin = bls.anchors.practitioners.emp + bls.anchors.support.emp;
+    const cl = ws.getRow(lr);
+    cl.getCell(2).value = 'Clinical-occupation total (29+31)';
+    cl.getCell(2).font = { bold: true };
+    plain(cl.getCell(3), clin, INT);
+    cl.getCell(3).font = { bold: true };
+    lr++;
+    const mj = ws.getRow(lr);
+    mj.getCell(2).value = 'Mapped-industry headcount (8 edges above)';
+    plain(mj.getCell(3), mapJobs, INT);
+    note(
+      mj.getCell(5),
+      'node label says ~22M = the broader health care + social assistance sector',
+    );
+    lr += 2;
+
+    // job functions inside each edge
+    sectionBar(
+      ws,
+      lr,
+      'JOB FUNCTIONS INSIDE EACH EDGE  (top occupations by employment)',
+      '4E342E',
+      NC,
+    );
+    lr++;
+    headerRow(ws, lr, ['Edge / occupation', '', 'BLS jobs', 'Mean wage', 'Wage bill $B'], 'D7CCC8');
+    lr++;
+    for (const e of bls.edges) {
+      const head = ws.getRow(lr);
+      head.getCell(1).value = `${e.edgeId.replace(/_workers_labor/, '')} — ${e.industry}`;
+      head.getCell(1).font = { bold: true };
+      if (e.note) note(head.getCell(5), e.note);
+      lr++;
+      for (const o of e.top) {
+        const row = ws.getRow(lr);
+        row.getCell(1).value = '   ' + o.title;
+        plain(row.getCell(3), o.emp, INT);
+        if (o.mean) plain(row.getCell(4), o.mean, USD0);
+        else if (o.capped) note(row.getCell(4), '≥$239k (top-coded)');
+        if (o.mean) money(row.getCell(5), (o.emp * o.mean) / 1e9);
+        lr++;
+      }
+    }
+    lr++;
+    note(
+      ws.getRow(lr).getCell(1),
+      `Source: ${bls.source}. Derived by scripts/reconcile_labor.mjs → data/labor_bls.json. A traced-subset cross-check — divergences are explained by self-employed income, BLS wage top-coding, contract labor, headcount scope and the pharma/insurer 50% labor split, not flagged as errors.`,
+    );
+    [40, 12, 30, 12, 14, 16, 16, 16].forEach((w, i) => {
+      ws.getColumn(i + 1).width = w;
+    });
+  } else {
+    console.warn(
+      'bls   -> data/labor_bls.json absent; skipping Labor Cross-Check sheet (run: npm run reconcile:labor)',
+    );
+  }
 
   // ---- Glossary (acronyms + model terms by hand; sources + structure from the graph) ----
   const gl = wb.addWorksheet('Glossary', { views: [{ state: 'frozen', ySplit: 2 }] });

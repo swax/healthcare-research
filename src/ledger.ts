@@ -23,6 +23,15 @@ import { canonicalObservation, type GraphFile, type Edge } from './graph.ts';
 const CUR = '\\$#,##0;"($"#,##0\\);\\-';
 const CUR_TOTAL = '\\$#,##0';
 const PCT = '0.0%';
+
+/** Pick black or white text for legibility on a given 6-hex fill (no '#'). */
+function textOn(hex: string): string {
+  const h = hex.replace('#', '');
+  const r = parseInt(h.slice(0, 2), 16);
+  const g = parseInt(h.slice(2, 4), 16);
+  const b = parseInt(h.slice(4, 6), 16);
+  return (0.299 * r + 0.587 * g + 0.114 * b) / 255 > 0.62 ? '1A1A1A' : 'FFFFFF';
+}
 const THEME = {
   title: { b: true, sz: 13, color: 'FFFFFF', fill: '263238', h: 'left' } as Style,
   subtitle: { sz: 10, color: '666666', h: 'left' } as Style,
@@ -344,8 +353,12 @@ export function renderNodeLedger(
   // Auto-subtitle = group · layer · totals, plus the node's context line when present.
   // A curated overlay subtitle (medicare, hospitals, …) supersedes it.
   const autoParts = node.description ? [...subParts, node.description] : subParts;
-  put(1, 1, `${node.label} — FY ${year}`, THEME.title);
-  band(1, 5, 5, THEME.title);
+  // Title bar carries the node's rank (group) colour; text flips to dark on light fills.
+  const titleStyle: Style = group
+    ? { ...THEME.title, fill: group.color, color: textOn(group.color) }
+    : THEME.title;
+  put(1, 1, `${node.label} — FY ${year}`, titleStyle);
+  band(1, 5, 5, titleStyle);
   put(2, 1, overlay?.subtitle ?? autoParts.join('  ·  '), THEME.subtitle);
 
   const flows: FlowLoc[] = [];

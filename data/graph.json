@@ -15,11 +15,12 @@
     { "n": 4, "name": "Factors of Production", "x": 0.98, "annotation": "Factors" }
   ],
   "groups": [
-    { "id": "payers", "label": "Payers / Households", "color": "1565C0" },
-    { "id": "government", "label": "Government", "color": "0D47A1" },
-    { "id": "programs_insurers", "label": "Programs & Insurers", "color": "00838F" },
-    { "id": "providers", "label": "Providers", "color": "2E7D32" },
-    { "id": "factors", "label": "Factors of Production", "color": "6A1B9A" }
+    { "id": "payers", "label": "Payers / Households", "color": "D32F2F" },
+    { "id": "government", "label": "Government", "color": "F57C00" },
+    { "id": "public_programs", "label": "Public Programs", "color": "FBC02D" },
+    { "id": "insurers", "label": "Insurers", "color": "43A047" },
+    { "id": "providers", "label": "Providers", "color": "1E88E5" },
+    { "id": "factors", "label": "Factors of Production", "color": "8E24AA" }
   ],
   "sources": {
     "cms_nhe": "CMS NHE",
@@ -82,7 +83,7 @@
         "id": "medicare",
         "label": "Medicare",
         "layer": 2,
-        "group": "programs_insurers",
+        "group": "public_programs",
         "role": "intermediary",
         "description": "~67M beneficiaries (65+ & disabled) · ~21% of NHE"
       },
@@ -90,7 +91,7 @@
         "id": "medicaid",
         "label": "Medicaid",
         "layer": 2,
-        "group": "programs_insurers",
+        "group": "public_programs",
         "role": "intermediary",
         "description": "~91.7M enrollees · joint federal-state · ~18% of NHE"
       },
@@ -98,7 +99,7 @@
         "id": "health_insurance",
         "label": "Health Insurance",
         "layer": 2,
-        "group": "programs_insurers",
+        "group": "insurers",
         "role": "intermediary",
         "description": "Private insurers across public (MA, MCO) & commercial (ESI, individual) lines"
       },

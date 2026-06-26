@@ -55,6 +55,23 @@ if (existsSync(join(root, 'references', 'bls2023', 'oesm23in4'))) {
   }
 }
 
+// Likewise refresh the Finkelstein §5 aggregate cross-check from the (git-ignored) CMS NHE
+// CSV when it's present locally, so the "Insurance & Spending (Finkelstein S5)" sheet stays
+// current. On a fresh clone the committed data/finkelstein_s5.json is rendered as-is.
+if (existsSync(join(root, 'references', 'nhe2024', 'NHE2024.csv'))) {
+  try {
+    const { compute, writeDerived } = await import('../scripts/extend_finkelstein_s5.mjs');
+    writeDerived(root, compute(root));
+    console.log('nhe   -> refreshed data/finkelstein_s5.json from references/nhe2024');
+  } catch (e) {
+    console.warn(
+      'nhe   -> recompute skipped (' +
+        (e instanceof Error ? e.message : e) +
+        '); using committed data/finkelstein_s5.json',
+    );
+  }
+}
+
 const dist = join(root, 'dist');
 mkdirSync(dist, { recursive: true });
 

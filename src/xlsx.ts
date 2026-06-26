@@ -10,6 +10,10 @@
 //   Labor Cross-Check (BLS) — labor edges × BLS OEWS May 2023; numbers link back to the
 //                   Healthcare Workers sheet. Complementary context, rendered from the
 //                   committed data/labor_bls.json (see scripts/reconcile_labor.mjs).
+//   Insurance & Spending (S5) — extends Finkelstein 2005 (w11619) §5 to 2024: national
+//                   coinsurance series + back-of-the-envelope, from data/finkelstein_s5.json.
+//   Hospital Sector (Finkelstein) — the paper's actual subject: hospital coinsurance,
+//                   windows, and the 1966 Medicare payer-mix break (same data file).
 //   Glossary        — acronyms, model terms, and sources/structure from the graph
 //
 // Pure construction: returns an ExcelJS.Workbook, no file IO. Erasable-syntax-only TS.
@@ -716,6 +720,296 @@ export function buildWorkbook(file: GraphFile, root: string): ExcelJS.Workbook {
   } else {
     console.warn(
       'bls   -> data/labor_bls.json absent; skipping Labor Cross-Check sheet (run: npm run reconcile:labor)',
+    );
+  }
+
+  // ---- Insurance & Spending (Finkelstein S5) ----
+  // Complementary aggregate analysis (NOT the flow model, NOT a gate): extends Section 5
+  // of Finkelstein 2005 (NBER w11619) through 2024. The average coinsurance rate
+  // (out-of-pocket ÷ total NHE) is her proxy for the spread of insurance; applying her
+  // own 23%-per-7pp Medicare elasticity to its decline gives the share of real per-capita
+  // spending growth attributable to insurance spreading. Derived offline into the committed
+  // data/finkelstein_s5.json by scripts/extend_finkelstein_s5.mjs (the NHE CSV is
+  // git-ignored). Differing window results are context, not discrepancies.
+  const finkPath = join(root, 'data', 'finkelstein_s5.json');
+  if (existsSync(finkPath)) {
+    type FinkWindow = {
+      from: number;
+      to: number;
+      kind: string;
+      finkelstein?: string;
+      context?: string;
+      coinsuranceFromPct: number;
+      coinsuranceToPct: number;
+      dropPP: number;
+      predictedSpendingPct: number;
+      realPerCapitaGrowthPct: number;
+      explainedSharePct: number;
+    };
+    type FinkFile = {
+      paper: string;
+      method: string;
+      nheSource: string;
+      cpiSource: string;
+      pctPerPp: number;
+      caveats: string[];
+      coinsuranceSeries: {
+        year: number;
+        totalMillions: number;
+        oopMillions: number;
+        coinsurancePct: number;
+      }[];
+      windows: FinkWindow[];
+      hospital: {
+        coinsuranceSeries: { year: number; coinsurancePct: number }[];
+        windows: FinkWindow[];
+        payerMix: {
+          year: number;
+          oopPct: number;
+          privatePct: number;
+          medicarePct: number;
+          medicaidPct: number;
+          otherPct: number;
+        }[];
+      };
+    };
+    const fink = JSON.parse(readFileSync(finkPath, 'utf8')) as FinkFile;
+    const NC = 6;
+    const PP = '0.0"pp"';
+    const GROW = '"+"0"%"';
+    const SHARE = '0"%"';
+    const PCT1 = '0.0%';
+    const USD1 = '$#,##0.0';
+
+    const ws = wb.addWorksheet('Insurance & Spending (S5)', {
+      views: [{ state: 'frozen', ySplit: 2 }],
+    });
+    ws.mergeCells('A1:F1');
+    ws.mergeCells('A2:F2');
+    titleBar(ws, 'Insurance & Spending — extending Finkelstein (2005, NBER w11619) §5 to 2024', NC);
+    note(
+      ws.getCell('A2'),
+      `Aggregate cross-check, not a gate. Coinsurance = out-of-pocket ÷ total NHE; predicted spending rise = coinsurance drop × ${fink.pctPerPp.toFixed(2)}%/pp (her 23%-per-7pp Medicare estimate); "explains" = predicted ÷ actual real per-capita growth.`,
+    );
+
+    // back-of-the-envelope by window
+    let fr = 4;
+    sectionBar(
+      ws,
+      fr,
+      'BACK-OF-THE-ENVELOPE  (how much of the spending rise the spread of insurance explains)',
+      '0D47A1',
+      NC,
+    );
+    fr++;
+    headerRow(
+      ws,
+      fr,
+      [
+        'Window',
+        'Coinsurance drop',
+        'Predicted spending rise',
+        'Actual real per-capita rise',
+        'Insurance explains',
+        'Validation / extension',
+      ],
+      'BBDEFB',
+    );
+    fr++;
+    const fcell = (r: number, c: number, v: number, fmt: string, bold?: boolean): void => {
+      const cell = ws.getRow(r).getCell(c);
+      cell.value = v;
+      cell.numFmt = fmt;
+      if (bold) cell.font = { bold: true };
+    };
+    for (const w of fink.windows) {
+      const row = ws.getRow(fr);
+      row.getCell(1).value = `${w.from}–${w.to}`;
+      fcell(fr, 2, w.dropPP, PP);
+      fcell(fr, 3, w.predictedSpendingPct, GROW);
+      fcell(fr, 4, w.realPerCapitaGrowthPct, GROW);
+      fcell(fr, 5, w.explainedSharePct, SHARE, true);
+      if (w.kind === 'validation') {
+        row.getCell(6).value = `validation — Finkelstein ${w.finkelstein}`;
+        row.getCell(6).font = { italic: true, color: { argb: 'FF1B5E20' } };
+      } else {
+        note(row.getCell(6), 'extension (post-2005)');
+      }
+      fr++;
+    }
+    note(
+      ws.getRow(fr).getCell(1),
+      'The 1990–2000 validation lands near her "about half"; the post-2000 share shrinks as coinsurance nears its floor — the insurance-spread channel is largely spent, leaving the residual (technology, prices) to dominate.',
+    );
+    fr += 2;
+
+    // average coinsurance rate, full series
+    sectionBar(
+      ws,
+      fr,
+      'AVERAGE COINSURANCE RATE, 1960–2024  (out-of-pocket ÷ total NHE)',
+      '00695C',
+      NC,
+    );
+    fr++;
+    headerRow(
+      ws,
+      fr,
+      ['Year', 'Total NHE ($B)', 'Out-of-pocket ($B)', 'Coinsurance rate', 'Trend', ''],
+      'B2DFDB',
+    );
+    fr++;
+    for (const p of fink.coinsuranceSeries) {
+      const row = ws.getRow(fr);
+      row.getCell(1).value = p.year;
+      fcell(fr, 2, p.totalMillions / 1000, USD1);
+      fcell(fr, 3, p.oopMillions / 1000, USD1);
+      fcell(fr, 4, p.coinsurancePct / 100, PCT1);
+      // text bar (REPT) proportional to the rate — a chart-free sparkline that renders anywhere
+      row.getCell(5).value = { formula: `REPT("█",ROUND(D${fr}*50,0))`, result: '' };
+      row.getCell(5).font = { color: { argb: 'FF26A69A' } };
+      if (p.year === 1966) {
+        note(row.getCell(6), '◄ Medicare & Medicaid begin (1965 enacted, 1966 implemented)');
+      }
+      fr++;
+    }
+    fr++;
+    for (const line of [
+      `Source: ${fink.nheSource}. Deflator: ${fink.cpiSource}.`,
+      `Derived by scripts/extend_finkelstein_s5.mjs → data/finkelstein_s5.json. ${fink.paper}.`,
+      ...fink.caveats.map((c) => 'Caveat: ' + c),
+    ]) {
+      note(ws.getRow(fr).getCell(1), line);
+      fr++;
+    }
+    [14, 18, 22, 24, 24, 44].forEach((w, i) => {
+      ws.getColumn(i + 1).width = w;
+    });
+
+    // ---- Hospital Sector (Finkelstein's actual subject) ----
+    // Section 3 of the paper is hospital-specific, and her 23%-per-7pp estimate IS a hospital
+    // spending response — so applying it to hospital coinsurance is the most direct use. The
+    // payer-mix table makes Medicare's 1966 hospital takeover visible (out-of-pocket even
+    // falls in absolute dollars that year). Tied back to the model's Hospitals ledger.
+    const H = fink.hospital;
+    const hws = wb.addWorksheet('Hospital Sector (Finkelstein)', {
+      views: [{ state: 'frozen', ySplit: 2 }],
+    });
+    hws.mergeCells('A1:F1');
+    hws.mergeCells('A2:F2');
+    titleBar(
+      hws,
+      'Hospital Sector — the part of the system Finkelstein actually studied (w11619 §3)',
+      NC,
+    );
+    note(
+      hws.getCell('A2'),
+      "Hospitals were the largest component of spending and of its growth. Her 23%-per-7pp estimate is itself a hospital spending response, so this applies it to hospital coinsurance directly. See the model's Hospitals sheet for FY2023 hospital flows.",
+    );
+    const hcell = (r: number, c: number, v: number, fmt: string, bold?: boolean): void => {
+      const cell = hws.getRow(r).getCell(c);
+      cell.value = v;
+      cell.numFmt = fmt;
+      if (bold) cell.font = { bold: true };
+    };
+
+    let hr = 4;
+    sectionBar(
+      hws,
+      hr,
+      'HOSPITAL BACK-OF-THE-ENVELOPE  (her hospital elasticity × hospital coinsurance)',
+      '0D47A1',
+      NC,
+    );
+    hr++;
+    headerRow(
+      hws,
+      hr,
+      [
+        'Window',
+        'Coinsurance drop',
+        'Predicted spending rise',
+        'Actual real per-capita rise',
+        'Insurance explains',
+        'Context',
+      ],
+      'BBDEFB',
+    );
+    hr++;
+    for (const w of H.windows) {
+      const row = hws.getRow(hr);
+      row.getCell(1).value = `${w.from}–${w.to}`;
+      hcell(hr, 2, w.dropPP, PP);
+      hcell(hr, 3, w.predictedSpendingPct, GROW);
+      hcell(hr, 4, w.realPerCapitaGrowthPct, GROW);
+      hcell(hr, 5, w.explainedSharePct, SHARE, true);
+      if (w.kind === 'core') {
+        row.getCell(6).value = w.context ?? 'core expansion window';
+        row.getCell(6).font = { bold: true, color: { argb: 'FF1B5E20' } };
+      } else {
+        note(row.getCell(6), 'applies her hospital elasticity');
+      }
+      hr++;
+    }
+    note(
+      hws.getRow(hr).getCell(1),
+      'The 1965–1980 window — when hospital coinsurance was genuinely falling — is where the channel explains the most. By 1990 hospital out-of-pocket is near its floor, so later hospital growth is overwhelmingly the residual (technology, intensity, prices).',
+    );
+    hr += 2;
+
+    sectionBar(
+      hws,
+      hr,
+      'HOSPITAL PAYER MIX, 1960–2024  (share of hospital spending; Medicare arrives 1966)',
+      '4E342E',
+      NC,
+    );
+    hr++;
+    headerRow(
+      hws,
+      hr,
+      ['Year', 'Out-of-pocket', 'Private insurance', 'Medicare', 'Medicaid', 'Other payers'],
+      'D7CCC8',
+    );
+    hr++;
+    for (const m of H.payerMix) {
+      const row = hws.getRow(hr);
+      row.getCell(1).value = m.year;
+      hcell(hr, 2, m.oopPct / 100, PCT1);
+      hcell(hr, 3, m.privatePct / 100, PCT1);
+      hcell(hr, 4, m.medicarePct / 100, PCT1);
+      hcell(hr, 5, m.medicaidPct / 100, PCT1);
+      hcell(hr, 6, m.otherPct / 100, PCT1);
+      if (m.year === 1966) {
+        for (let c = 1; c <= NC; c++) solid(row.getCell(c), 'FFF9C4'); // highlight the break year
+        row.getCell(1).font = { bold: true };
+      }
+      hr++;
+    }
+    hr++;
+    // tie the research sheet back to the flow model's Hospitals ledger
+    const hospLink = hws.getRow(hr).getCell(1);
+    hospLink.value = {
+      formula: `HYPERLINK("#'Hospitals'!A1","→ Hospitals sheet: FY2023 hospital flows in the model")`,
+      result: '→ Hospitals sheet: FY2023 hospital flows in the model',
+    };
+    hospLink.font = { color: { argb: 'FF0563C1' } };
+    hr++;
+    const firstHosp = H.coinsuranceSeries[0];
+    const lastHosp = H.coinsuranceSeries[H.coinsuranceSeries.length - 1];
+    for (const line of [
+      `Hospital coinsurance fell ${firstHosp.coinsurancePct.toFixed(1)}% (${firstHosp.year}) → ${lastHosp.coinsurancePct.toFixed(1)}% (${lastHosp.year}) — steeper than the national rate, since Medicare hit hospitals first and hardest.`,
+      `Source: ${fink.nheSource}. Derived by scripts/extend_finkelstein_s5.mjs → data/finkelstein_s5.json.`,
+    ]) {
+      note(hws.getRow(hr).getCell(1), line);
+      hr++;
+    }
+    [14, 20, 22, 26, 18, 40].forEach((w, i) => {
+      hws.getColumn(i + 1).width = w;
+    });
+  } else {
+    console.warn(
+      'nhe   -> data/finkelstein_s5.json absent; skipping Insurance & Spending sheets (run: npm run derive:finkelstein)',
     );
   }
 

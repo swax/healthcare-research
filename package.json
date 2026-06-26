@@ -13,7 +13,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "derive:claims": "node scripts/derive_hi_claims.mjs",
-    "reconcile:labor": "node scripts/reconcile_labor.mjs"
+    "reconcile:labor": "node scripts/reconcile_labor.mjs",
+    "derive:finkelstein": "node scripts/extend_finkelstein_s5.mjs"
   },
   "engines": {
     "node": ">=22.6"

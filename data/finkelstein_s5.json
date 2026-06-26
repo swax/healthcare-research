@@ -1,0 +1,1000 @@
+{
+  "_generated": "by scripts/extend_finkelstein_s5.mjs - do not hand-edit. Re-run when CMS publishes a new NHE release.",
+  "paper": "Finkelstein 2005, NBER w11619, Section 5",
+  "method": "coinsurance = out-of-pocket / total spending; predicted spending rise = coinsurance drop (pp) x 3.286%/pp (Finkelstein's 23%-per-7pp Medicare estimate); explained share = predicted / actual real-per-capita growth.",
+  "nheSource": "CMS NHE 2024 release (CY1960-2024), by type of service & source of funds",
+  "cpiSource": "BLS CPI-U, U.S. city average, all items, annual average (1982-84=100)",
+  "pctPerPp": 3.2857,
+  "caveats": [
+    "Aggregate back-of-the-envelope, not a causal estimate; cannot reproduce the paper's hospital-panel identification.",
+    "NHE starts in 1960, so the 1950-1990 window (her ~40%) cannot be reached; the 1960-1990 result is lower by exactly the pre-1960 coinsurance decline.",
+    "Linear extrapolation of one elasticity far outside the Medicare experiment that produced it; less reliable as coinsurance approaches its floor.",
+    "Hospital windows apply her hospital-spending elasticity to hospital coinsurance — the paper's most direct use — but there is no published hospital \"share explained\" to validate against."
+  ],
+  "coinsuranceSeries": [
+    {
+      "year": 1960,
+      "totalMillions": 27122,
+      "oopMillions": 12778,
+      "coinsurancePct": 47.11
+    },
+    {
+      "year": 1961,
+      "totalMillions": 29060,
+      "oopMillions": 13193,
+      "coinsurancePct": 45.4
+    },
+    {
+      "year": 1962,
+      "totalMillions": 31765,
+      "oopMillions": 14085,
+      "coinsurancePct": 44.34
+    },
+    {
+      "year": 1963,
+      "totalMillions": 34558,
+      "oopMillions": 15171,
+      "coinsurancePct": 43.9
+    },
+    {
+      "year": 1964,
+      "totalMillions": 38245,
+      "oopMillions": 16669,
+      "coinsurancePct": 43.58
+    },
+    {
+      "year": 1965,
+      "totalMillions": 41627,
+      "oopMillions": 17863,
+      "coinsurancePct": 42.91
+    },
+    {
+      "year": 1966,
+      "totalMillions": 45752,
+      "oopMillions": 18132,
+      "coinsurancePct": 39.63
+    },
+    {
+      "year": 1967,
+      "totalMillions": 51186,
+      "oopMillions": 17985,
+      "coinsurancePct": 35.14
+    },
+    {
+      "year": 1968,
+      "totalMillions": 58015,
+      "oopMillions": 19951,
+      "coinsurancePct": 34.39
+    },
+    {
+      "year": 1969,
+      "totalMillions": 65417,
+      "oopMillions": 21911,
+      "coinsurancePct": 33.49
+    },
+    {
+      "year": 1970,
+      "totalMillions": 74077,
+      "oopMillions": 24208,
+      "coinsurancePct": 32.68
+    },
+    {
+      "year": 1971,
+      "totalMillions": 82380,
+      "oopMillions": 25515,
+      "coinsurancePct": 30.97
+    },
+    {
+      "year": 1972,
+      "totalMillions": 92385,
+      "oopMillions": 27805,
+      "coinsurancePct": 30.1
+    },
+    {
+      "year": 1973,
+      "totalMillions": 102654,
+      "oopMillions": 30737,
+      "coinsurancePct": 29.94
+    },
+    {
+      "year": 1974,
+      "totalMillions": 116313,
+      "oopMillions": 33295,
+      "coinsurancePct": 28.63
+    },
+    {
+      "year": 1975,
+      "totalMillions": 132656,
+      "oopMillions": 36031,
+      "coinsurancePct": 27.16
+    },
+    {
+      "year": 1976,
+      "totalMillions": 152022,
+      "oopMillions": 39278,
+      "coinsurancePct": 25.84
+    },
+    {
+      "year": 1977,
+      "totalMillions": 172642,
+      "oopMillions": 43133,
+      "coinsurancePct": 24.98
+    },
+    {
+      "year": 1978,
+      "totalMillions": 193947,
+      "oopMillions": 46035,
+      "coinsurancePct": 23.74
+    },
+    {
+      "year": 1979,
+      "totalMillions": 219655,
+      "oopMillions": 49915,
+      "coinsurancePct": 22.72
+    },
+    {
+      "year": 1980,
+      "totalMillions": 253217,
+      "oopMillions": 55251,
+      "coinsurancePct": 21.82
+    },
+    {
+      "year": 1981,
+      "totalMillions": 293578,
+      "oopMillions": 61935,
+      "coinsurancePct": 21.1
+    },
+    {
+      "year": 1982,
+      "totalMillions": 330940,
+      "oopMillions": 68608,
+      "coinsurancePct": 20.73
+    },
+    {
+      "year": 1983,
+      "totalMillions": 364789,
+      "oopMillions": 74653,
+      "coinsurancePct": 20.46
+    },
+    {
+      "year": 1984,
+      "totalMillions": 401880,
+      "oopMillions": 82410,
+      "coinsurancePct": 20.51
+    },
+    {
+      "year": 1985,
+      "totalMillions": 439871,
+      "oopMillions": 91564,
+      "coinsurancePct": 20.82
+    },
+    {
+      "year": 1986,
+      "totalMillions": 472263,
+      "oopMillions": 99649,
+      "coinsurancePct": 21.1
+    },
+    {
+      "year": 1987,
+      "totalMillions": 514458,
+      "oopMillions": 105838,
+      "coinsurancePct": 20.57
+    },
+    {
+      "year": 1988,
+      "totalMillions": 576651,
+      "oopMillions": 116237,
+      "coinsurancePct": 20.16
+    },
+    {
+      "year": 1989,
+      "totalMillions": 642135,
+      "oopMillions": 122585,
+      "coinsurancePct": 19.09
+    },
+    {
+      "year": 1990,
+      "totalMillions": 718689,
+      "oopMillions": 133752,
+      "coinsurancePct": 18.61
+    },
+    {
+      "year": 1991,
+      "totalMillions": 785935,
+      "oopMillions": 136761,
+      "coinsurancePct": 17.4
+    },
+    {
+      "year": 1992,
+      "totalMillions": 852198,
+      "oopMillions": 139127,
+      "coinsurancePct": 16.33
+    },
+    {
+      "year": 1993,
+      "totalMillions": 914869,
+      "oopMillions": 140230,
+      "coinsurancePct": 15.33
+    },
+    {
+      "year": 1994,
+      "totalMillions": 965586,
+      "oopMillions": 138447,
+      "coinsurancePct": 14.34
+    },
+    {
+      "year": 1995,
+      "totalMillions": 1019953,
+      "oopMillions": 141957,
+      "coinsurancePct": 13.92
+    },
+    {
+      "year": 1996,
+      "totalMillions": 1073087,
+      "oopMillions": 148260,
+      "coinsurancePct": 13.82
+    },
+    {
+      "year": 1997,
+      "totalMillions": 1132396,
+      "oopMillions": 158675,
+      "coinsurancePct": 14.01
+    },
+    {
+      "year": 1998,
+      "totalMillions": 1197785,
+      "oopMillions": 173880,
+      "coinsurancePct": 14.52
+    },
+    {
+      "year": 1999,
+      "totalMillions": 1272521,
+      "oopMillions": 184280,
+      "coinsurancePct": 14.48
+    },
+    {
+      "year": 2000,
+      "totalMillions": 1365184,
+      "oopMillions": 197580,
+      "coinsurancePct": 14.47
+    },
+    {
+      "year": 2001,
+      "totalMillions": 1482478,
+      "oopMillions": 205825,
+      "coinsurancePct": 13.88
+    },
+    {
+      "year": 2002,
+      "totalMillions": 1630533,
+      "oopMillions": 219435,
+      "coinsurancePct": 13.46
+    },
+    {
+      "year": 2003,
+      "totalMillions": 1770023,
+      "oopMillions": 235460,
+      "coinsurancePct": 13.3
+    },
+    {
+      "year": 2004,
+      "totalMillions": 1894161,
+      "oopMillions": 248765,
+      "coinsurancePct": 13.13
+    },
+    {
+      "year": 2005,
+      "totalMillions": 2026262,
+      "oopMillions": 264965,
+      "coinsurancePct": 13.08
+    },
+    {
+      "year": 2006,
+      "totalMillions": 2163806,
+      "oopMillions": 278349,
+      "coinsurancePct": 12.86
+    },
+    {
+      "year": 2007,
+      "totalMillions": 2304160,
+      "oopMillions": 294246,
+      "coinsurancePct": 12.77
+    },
+    {
+      "year": 2008,
+      "totalMillions": 2400950,
+      "oopMillions": 301151,
+      "coinsurancePct": 12.54
+    },
+    {
+      "year": 2009,
+      "totalMillions": 2491503,
+      "oopMillions": 298232,
+      "coinsurancePct": 11.97
+    },
+    {
+      "year": 2010,
+      "totalMillions": 2588734,
+      "oopMillions": 303421,
+      "coinsurancePct": 11.72
+    },
+    {
+      "year": 2011,
+      "totalMillions": 2676377,
+      "oopMillions": 312304,
+      "coinsurancePct": 11.67
+    },
+    {
+      "year": 2012,
+      "totalMillions": 2784281,
+      "oopMillions": 325074,
+      "coinsurancePct": 11.68
+    },
+    {
+      "year": 2013,
+      "totalMillions": 2859107,
+      "oopMillions": 333801,
+      "coinsurancePct": 11.68
+    },
+    {
+      "year": 2014,
+      "totalMillions": 3010322,
+      "oopMillions": 345400,
+      "coinsurancePct": 11.47
+    },
+    {
+      "year": 2015,
+      "totalMillions": 3177216,
+      "oopMillions": 360681,
+      "coinsurancePct": 11.35
+    },
+    {
+      "year": 2016,
+      "totalMillions": 3324095,
+      "oopMillions": 375394,
+      "coinsurancePct": 11.29
+    },
+    {
+      "year": 2017,
+      "totalMillions": 3464208,
+      "oopMillions": 385333,
+      "coinsurancePct": 11.12
+    },
+    {
+      "year": 2018,
+      "totalMillions": 3637678,
+      "oopMillions": 403033,
+      "coinsurancePct": 11.08
+    },
+    {
+      "year": 2019,
+      "totalMillions": 3805121,
+      "oopMillions": 420412,
+      "coinsurancePct": 11.05
+    },
+    {
+      "year": 2020,
+      "totalMillions": 4204311,
+      "oopMillions": 412276,
+      "coinsurancePct": 9.81
+    },
+    {
+      "year": 2021,
+      "totalMillions": 4376932,
+      "oopMillions": 457160,
+      "coinsurancePct": 10.44
+    },
+    {
+      "year": 2022,
+      "totalMillions": 4586625,
+      "oopMillions": 491924,
+      "coinsurancePct": 10.73
+    },
+    {
+      "year": 2023,
+      "totalMillions": 4925324,
+      "oopMillions": 525424,
+      "coinsurancePct": 10.67
+    },
+    {
+      "year": 2024,
+      "totalMillions": 5278588,
+      "oopMillions": 556554,
+      "coinsurancePct": 10.54
+    }
+  ],
+  "windows": [
+    {
+      "from": 1960,
+      "to": 1990,
+      "kind": "validation",
+      "finkelstein": "~40% for 1950-1990 (her window starts pre-NHE)",
+      "coinsuranceFromPct": 47.11,
+      "coinsuranceToPct": 18.61,
+      "dropPP": 28.5,
+      "predictedSpendingPct": 93.7,
+      "realPerCapitaGrowthPct": 339.5,
+      "explainedSharePct": 27.6
+    },
+    {
+      "from": 1990,
+      "to": 2000,
+      "kind": "validation",
+      "finkelstein": "~50% (\"about half\", footnote 27)",
+      "coinsuranceFromPct": 18.61,
+      "coinsuranceToPct": 14.47,
+      "dropPP": 4.14,
+      "predictedSpendingPct": 13.6,
+      "realPerCapitaGrowthPct": 29.9,
+      "explainedSharePct": 45.5
+    },
+    {
+      "from": 2000,
+      "to": 2024,
+      "kind": "extension",
+      "coinsuranceFromPct": 14.47,
+      "coinsuranceToPct": 10.54,
+      "dropPP": 3.93,
+      "predictedSpendingPct": 12.9,
+      "realPerCapitaGrowthPct": 75.5,
+      "explainedSharePct": 17.1
+    },
+    {
+      "from": 1990,
+      "to": 2024,
+      "kind": "extension",
+      "coinsuranceFromPct": 18.61,
+      "coinsuranceToPct": 10.54,
+      "dropPP": 8.07,
+      "predictedSpendingPct": 26.5,
+      "realPerCapitaGrowthPct": 127.9,
+      "explainedSharePct": 20.7
+    },
+    {
+      "from": 1960,
+      "to": 2024,
+      "kind": "extension",
+      "coinsuranceFromPct": 47.11,
+      "coinsuranceToPct": 10.54,
+      "dropPP": 36.57,
+      "predictedSpendingPct": 120.2,
+      "realPerCapitaGrowthPct": 901.7,
+      "explainedSharePct": 13.3
+    }
+  ],
+  "hospital": {
+    "coinsuranceSeries": [
+      {
+        "year": 1960,
+        "totalMillions": 8985,
+        "oopMillions": 1839,
+        "coinsurancePct": 20.47
+      },
+      {
+        "year": 1961,
+        "totalMillions": 9777,
+        "oopMillions": 1881,
+        "coinsurancePct": 19.24
+      },
+      {
+        "year": 1962,
+        "totalMillions": 10432,
+        "oopMillions": 1936,
+        "coinsurancePct": 18.56
+      },
+      {
+        "year": 1963,
+        "totalMillions": 11507,
+        "oopMillions": 2190,
+        "coinsurancePct": 19.03
+      },
+      {
+        "year": 1964,
+        "totalMillions": 12501,
+        "oopMillions": 2483,
+        "coinsurancePct": 19.86
+      },
+      {
+        "year": 1965,
+        "totalMillions": 13545,
+        "oopMillions": 2664,
+        "coinsurancePct": 19.67
+      },
+      {
+        "year": 1966,
+        "totalMillions": 15298,
+        "oopMillions": 2285,
+        "coinsurancePct": 14.94
+      },
+      {
+        "year": 1967,
+        "totalMillions": 17798,
+        "oopMillions": 1794,
+        "coinsurancePct": 10.08
+      },
+      {
+        "year": 1968,
+        "totalMillions": 20537,
+        "oopMillions": 2141,
+        "coinsurancePct": 10.43
+      },
+      {
+        "year": 1969,
+        "totalMillions": 23367,
+        "oopMillions": 2136,
+        "coinsurancePct": 9.14
+      },
+      {
+        "year": 1970,
+        "totalMillions": 27168,
+        "oopMillions": 2428,
+        "coinsurancePct": 8.94
+      },
+      {
+        "year": 1971,
+        "totalMillions": 30224,
+        "oopMillions": 2433,
+        "coinsurancePct": 8.05
+      },
+      {
+        "year": 1972,
+        "totalMillions": 33846,
+        "oopMillions": 2946,
+        "coinsurancePct": 8.7
+      },
+      {
+        "year": 1973,
+        "totalMillions": 37920,
+        "oopMillions": 3562,
+        "coinsurancePct": 9.39
+      },
+      {
+        "year": 1974,
+        "totalMillions": 44139,
+        "oopMillions": 3964,
+        "coinsurancePct": 8.98
+      },
+      {
+        "year": 1975,
+        "totalMillions": 51234,
+        "oopMillions": 4272,
+        "coinsurancePct": 8.34
+      },
+      {
+        "year": 1976,
+        "totalMillions": 59402,
+        "oopMillions": 4485,
+        "coinsurancePct": 7.55
+      },
+      {
+        "year": 1977,
+        "totalMillions": 67023,
+        "oopMillions": 4811,
+        "coinsurancePct": 7.18
+      },
+      {
+        "year": 1978,
+        "totalMillions": 75621,
+        "oopMillions": 4965,
+        "coinsurancePct": 6.57
+      },
+      {
+        "year": 1979,
+        "totalMillions": 86162,
+        "oopMillions": 5141,
+        "coinsurancePct": 5.97
+      },
+      {
+        "year": 1980,
+        "totalMillions": 100517,
+        "oopMillions": 5334,
+        "coinsurancePct": 5.31
+      },
+      {
+        "year": 1981,
+        "totalMillions": 117480,
+        "oopMillions": 6216,
+        "coinsurancePct": 5.29
+      },
+      {
+        "year": 1982,
+        "totalMillions": 133647,
+        "oopMillions": 7147,
+        "coinsurancePct": 5.35
+      },
+      {
+        "year": 1983,
+        "totalMillions": 144745,
+        "oopMillions": 7558,
+        "coinsurancePct": 5.22
+      },
+      {
+        "year": 1984,
+        "totalMillions": 154366,
+        "oopMillions": 8022,
+        "coinsurancePct": 5.2
+      },
+      {
+        "year": 1985,
+        "totalMillions": 164575,
+        "oopMillions": 8695,
+        "coinsurancePct": 5.28
+      },
+      {
+        "year": 1986,
+        "totalMillions": 175766,
+        "oopMillions": 8413,
+        "coinsurancePct": 4.79
+      },
+      {
+        "year": 1987,
+        "totalMillions": 189651,
+        "oopMillions": 8908,
+        "coinsurancePct": 4.7
+      },
+      {
+        "year": 1988,
+        "totalMillions": 206452,
+        "oopMillions": 9696,
+        "coinsurancePct": 4.7
+      },
+      {
+        "year": 1989,
+        "totalMillions": 225977,
+        "oopMillions": 10213,
+        "coinsurancePct": 4.52
+      },
+      {
+        "year": 1990,
+        "totalMillions": 250430,
+        "oopMillions": 11067,
+        "coinsurancePct": 4.42
+      },
+      {
+        "year": 1991,
+        "totalMillions": 275756,
+        "oopMillions": 11787,
+        "coinsurancePct": 4.27
+      },
+      {
+        "year": 1992,
+        "totalMillions": 298475,
+        "oopMillions": 12221,
+        "coinsurancePct": 4.09
+      },
+      {
+        "year": 1993,
+        "totalMillions": 315735,
+        "oopMillions": 12035,
+        "coinsurancePct": 3.81
+      },
+      {
+        "year": 1994,
+        "totalMillions": 328376,
+        "oopMillions": 10585,
+        "coinsurancePct": 3.22
+      },
+      {
+        "year": 1995,
+        "totalMillions": 339313,
+        "oopMillions": 10043,
+        "coinsurancePct": 2.96
+      },
+      {
+        "year": 1996,
+        "totalMillions": 350813,
+        "oopMillions": 10198,
+        "coinsurancePct": 2.91
+      },
+      {
+        "year": 1997,
+        "totalMillions": 363403,
+        "oopMillions": 10969,
+        "coinsurancePct": 3.02
+      },
+      {
+        "year": 1998,
+        "totalMillions": 374911,
+        "oopMillions": 11906,
+        "coinsurancePct": 3.18
+      },
+      {
+        "year": 1999,
+        "totalMillions": 393630,
+        "oopMillions": 12639,
+        "coinsurancePct": 3.21
+      },
+      {
+        "year": 2000,
+        "totalMillions": 415532,
+        "oopMillions": 13340,
+        "coinsurancePct": 3.21
+      },
+      {
+        "year": 2001,
+        "totalMillions": 449360,
+        "oopMillions": 13526,
+        "coinsurancePct": 3.01
+      },
+      {
+        "year": 2002,
+        "totalMillions": 486482,
+        "oopMillions": 15054,
+        "coinsurancePct": 3.09
+      },
+      {
+        "year": 2003,
+        "totalMillions": 525892,
+        "oopMillions": 16761,
+        "coinsurancePct": 3.19
+      },
+      {
+        "year": 2004,
+        "totalMillions": 565327,
+        "oopMillions": 18053,
+        "coinsurancePct": 3.19
+      },
+      {
+        "year": 2005,
+        "totalMillions": 608600,
+        "oopMillions": 19427,
+        "coinsurancePct": 3.19
+      },
+      {
+        "year": 2006,
+        "totalMillions": 651209,
+        "oopMillions": 20743,
+        "coinsurancePct": 3.19
+      },
+      {
+        "year": 2007,
+        "totalMillions": 691887,
+        "oopMillions": 21694,
+        "coinsurancePct": 3.14
+      },
+      {
+        "year": 2008,
+        "totalMillions": 721630,
+        "oopMillions": 22736,
+        "coinsurancePct": 3.15
+      },
+      {
+        "year": 2009,
+        "totalMillions": 771040,
+        "oopMillions": 24634,
+        "coinsurancePct": 3.19
+      },
+      {
+        "year": 2010,
+        "totalMillions": 808795,
+        "oopMillions": 26596,
+        "coinsurancePct": 3.29
+      },
+      {
+        "year": 2011,
+        "totalMillions": 833246,
+        "oopMillions": 27936,
+        "coinsurancePct": 3.35
+      },
+      {
+        "year": 2012,
+        "totalMillions": 877968,
+        "oopMillions": 30549,
+        "coinsurancePct": 3.48
+      },
+      {
+        "year": 2013,
+        "totalMillions": 906804,
+        "oopMillions": 32751,
+        "coinsurancePct": 3.61
+      },
+      {
+        "year": 2014,
+        "totalMillions": 940526,
+        "oopMillions": 32067,
+        "coinsurancePct": 3.41
+      },
+      {
+        "year": 2015,
+        "totalMillions": 988971,
+        "oopMillions": 30245,
+        "coinsurancePct": 3.06
+      },
+      {
+        "year": 2016,
+        "totalMillions": 1035398,
+        "oopMillions": 31143,
+        "coinsurancePct": 3.01
+      },
+      {
+        "year": 2017,
+        "totalMillions": 1077580,
+        "oopMillions": 32260,
+        "coinsurancePct": 2.99
+      },
+      {
+        "year": 2018,
+        "totalMillions": 1120614,
+        "oopMillions": 33623,
+        "coinsurancePct": 3
+      },
+      {
+        "year": 2019,
+        "totalMillions": 1189276,
+        "oopMillions": 35594,
+        "coinsurancePct": 2.99
+      },
+      {
+        "year": 2020,
+        "totalMillions": 1259476,
+        "oopMillions": 30865,
+        "coinsurancePct": 2.45
+      },
+      {
+        "year": 2021,
+        "totalMillions": 1319072,
+        "oopMillions": 32490,
+        "coinsurancePct": 2.46
+      },
+      {
+        "year": 2022,
+        "totalMillions": 1357453,
+        "oopMillions": 33450,
+        "coinsurancePct": 2.46
+      },
+      {
+        "year": 2023,
+        "totalMillions": 1501149,
+        "oopMillions": 36824,
+        "coinsurancePct": 2.45
+      },
+      {
+        "year": 2024,
+        "totalMillions": 1634738,
+        "oopMillions": 40609,
+        "coinsurancePct": 2.48
+      }
+    ],
+    "windows": [
+      {
+        "from": 1965,
+        "to": 1980,
+        "kind": "core",
+        "context": "Medicare's hospital takeover — coinsurance actually falling",
+        "coinsuranceFromPct": 19.67,
+        "coinsuranceToPct": 5.31,
+        "dropPP": 14.36,
+        "predictedSpendingPct": 47.2,
+        "realPerCapitaGrowthPct": 146.7,
+        "explainedSharePct": 32.2
+      },
+      {
+        "from": 1960,
+        "to": 1990,
+        "kind": "application",
+        "coinsuranceFromPct": 20.47,
+        "coinsuranceToPct": 4.42,
+        "dropPP": 16.05,
+        "predictedSpendingPct": 52.7,
+        "realPerCapitaGrowthPct": 362.2,
+        "explainedSharePct": 14.6
+      },
+      {
+        "from": 1990,
+        "to": 2024,
+        "kind": "application",
+        "coinsuranceFromPct": 4.42,
+        "coinsuranceToPct": 2.48,
+        "dropPP": 1.94,
+        "predictedSpendingPct": 6.4,
+        "realPerCapitaGrowthPct": 102.6,
+        "explainedSharePct": 6.2
+      },
+      {
+        "from": 2000,
+        "to": 2024,
+        "kind": "application",
+        "coinsuranceFromPct": 3.21,
+        "coinsuranceToPct": 2.48,
+        "dropPP": 0.73,
+        "predictedSpendingPct": 2.4,
+        "realPerCapitaGrowthPct": 78.6,
+        "explainedSharePct": 3
+      },
+      {
+        "from": 1960,
+        "to": 2024,
+        "kind": "application",
+        "coinsuranceFromPct": 20.47,
+        "coinsuranceToPct": 2.48,
+        "dropPP": 17.98,
+        "predictedSpendingPct": 59.1,
+        "realPerCapitaGrowthPct": 836.4,
+        "explainedSharePct": 7.1
+      }
+    ],
+    "payerMix": [
+      {
+        "year": 1960,
+        "totalMillions": 8985,
+        "oopPct": 20.5,
+        "privatePct": 34.9,
+        "medicarePct": 0,
+        "medicaidPct": 0,
+        "otherPct": 44.6
+      },
+      {
+        "year": 1965,
+        "totalMillions": 13545,
+        "oopPct": 19.7,
+        "privatePct": 40.6,
+        "medicarePct": 0,
+        "medicaidPct": 0,
+        "otherPct": 39.7
+      },
+      {
+        "year": 1966,
+        "totalMillions": 15298,
+        "oopPct": 14.9,
+        "privatePct": 35.8,
+        "medicarePct": 8.2,
+        "medicaidPct": 4.7,
+        "otherPct": 36.4
+      },
+      {
+        "year": 1970,
+        "totalMillions": 27168,
+        "oopPct": 8.9,
+        "privatePct": 31.9,
+        "medicarePct": 19.7,
+        "medicaidPct": 9.7,
+        "otherPct": 29.8
+      },
+      {
+        "year": 1980,
+        "totalMillions": 100517,
+        "oopPct": 5.3,
+        "privatePct": 35.9,
+        "medicarePct": 26.1,
+        "medicaidPct": 9.2,
+        "otherPct": 23.5
+      },
+      {
+        "year": 1990,
+        "totalMillions": 250430,
+        "oopPct": 4.4,
+        "privatePct": 37.8,
+        "medicarePct": 26.9,
+        "medicaidPct": 10.6,
+        "otherPct": 20.3
+      },
+      {
+        "year": 2000,
+        "totalMillions": 415532,
+        "oopPct": 3.2,
+        "privatePct": 33.3,
+        "medicarePct": 29.6,
+        "medicaidPct": 17.1,
+        "otherPct": 16.8
+      },
+      {
+        "year": 2010,
+        "totalMillions": 808795,
+        "oopPct": 3.3,
+        "privatePct": 34.6,
+        "medicarePct": 27.9,
+        "medicaidPct": 17.7,
+        "otherPct": 16.5
+      },
+      {
+        "year": 2024,
+        "totalMillions": 1634738,
+        "oopPct": 2.5,
+        "privatePct": 34.2,
+        "medicarePct": 26.9,
+        "medicaidPct": 19.5,
+        "otherPct": 16.9
+      }
+    ]
+  }
+}

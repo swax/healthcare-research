@@ -99,6 +99,20 @@ files stay git-ignored under `references/bls2023/`); `npm run build` renders tha
 refreshes it automatically when the BLS files are present locally. The model dollars are read
 live from `data/graph.json`, so the sheet can never drift from the graph.
 
+## Flow diagram (Sankey)
+
+A separate generator renders the same graph as a Sankey-style flow diagram:
+
+```bash
+node scripts/build_sankey.mjs   # → diagrams/healthcare-flows-sankey.jg
+```
+
+The `.jg` opens in the [Jumpgate](https://github.com/swax/jumpgate) VS Code extension. Node
+heights and ribbon widths share one honest `$/pixel` scale; the layout places nodes and routes
+ribbons to minimize **ribbon overlap area** (the muddy stretches that hurt readability), not
+crossing count. The algorithm — lanes for long flows, overlap-driven ordering, spacing knobs —
+is written up in [docs/sankey-layout.md](docs/sankey-layout.md).
+
 ## Files
 
 | Path                           | Role                                                                                 |
@@ -116,7 +130,10 @@ live from `data/graph.json`, so the sheet can never drift from the graph.
 | `src/sheet-model.ts`           | the `Sheet`/`Cell`/`Style` cell model                                                |
 | `scripts/derive_hi_claims.mjs` | offline helper: derive insurer→provider claim amounts from the CMS NHE CSV           |
 | `scripts/reconcile_labor.mjs`  | offline helper: cross-check labor edges vs BLS OEWS → `data/labor_bls.json`          |
+| `scripts/build_sankey.mjs`     | offline helper: render the graph as a Sankey `.jg` flow diagram                      |
+| `diagrams/*.jg`                | generated Jumpgate flow diagrams (open in the Jumpgate VS Code extension)            |
 | `docs/data-model.md`           | design narrative (why observations, the circular flow)                               |
 | `docs/data-audit.md`           | the historical audit that motivated the model                                        |
+| `docs/sankey-layout.md`        | design narrative (the Sankey overlap-minimizing layout algorithm)                    |
 | `dist/`                        | generated output (git-ignored)                                                       |
 | `tsconfig.json`                | editor/type-check config (`erasableSyntaxOnly`)                                      |

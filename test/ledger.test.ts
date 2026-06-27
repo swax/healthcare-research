@@ -221,26 +221,37 @@ test('validateGraph rejects a split that does not sum to the canonical value', (
 });
 
 test('a section with 2+ edge categories renders grouped sub-headers + subtotals', () => {
-  // Federal Government inflows carry two categories: "General revenue" and
-  // "Corporate income tax" — so the INFLOWS section groups, each with a subtotal.
-  const { sheet } = renderNodeLedger(file, 'federal_government');
+  // The grouping path needs a node whose edges carry 2+ intrinsic categories. Corporate
+  // income tax now terminates at the single-category Taxes sink, so we exercise the path on
+  // a clone: split Federal Government's General-revenue inflows into two categories.
+  const clone = JSON.parse(JSON.stringify(file)) as typeof file;
+  const transfers = new Set([
+    'ind_fed_medicare_genrev',
+    'ind_fed_medicaid_genrev',
+    'ind_fed_aca_genrev',
+  ]);
+  for (const e of clone.graph.edges)
+    if (e.to === 'federal_government' && e.category === 'General revenue')
+      e.category = transfers.has(e.id) ? 'Program transfers' : 'Direct federal health';
+
+  const { sheet } = renderNodeLedger(clone, 'federal_government');
   const t = sheet.cells.filter((c) => typeof c.v === 'string').map((c) => c.v as string);
-  assert.ok(t.includes('General revenue'), 'expected a General revenue sub-header');
-  assert.ok(t.includes('Corporate income tax'), 'expected a Corporate income tax sub-header');
-  assert.ok(t.includes('Subtotal — General revenue'), 'expected a General revenue subtotal');
-  assert.ok(t.includes('Subtotal — Corporate income tax'), 'expected a tax subtotal');
+  assert.ok(t.includes('Program transfers'), 'expected a Program transfers sub-header');
+  assert.ok(t.includes('Direct federal health'), 'expected a Direct federal health sub-header');
+  assert.ok(t.includes('Subtotal — Program transfers'), 'expected the transfers subtotal');
+  assert.ok(t.includes('Subtotal — Direct federal health'), 'expected the direct subtotal');
   assert.ok(!t.includes('Subtotal — Other'), 'every inflow is categorised — no Other bucket');
 
   const formulas = sheet.cells.filter((c) => c.f).map((c) => c.f as string);
-  // the General revenue subtotal sums its two member rows...
+  // the 3-edge bucket subtotal sums its three member rows...
+  assert.ok(
+    formulas.some((f) => /^=B\d+\+B\d+\+B\d+$/.test(f)),
+    'expected a 3-row subtotal sum',
+  );
+  // ...the 2-edge bucket subtotal sums its two member rows...
   assert.ok(
     formulas.some((f) => /^=B\d+\+B\d+$/.test(f)),
     'expected a 2-row subtotal sum',
-  );
-  // ...the corporate-tax subtotal sums its member rows (one per taxable entity)...
-  assert.ok(
-    formulas.some((f) => /^=B\d+(\+B\d+){4,}$/.test(f)),
-    'expected a 5+-row subtotal sum',
   );
   // ...and TOTAL INFLOWS sums the two subtotals, not the leaf rows.
   assert.ok(

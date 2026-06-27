@@ -39,7 +39,7 @@ test('computeFlows conserves the grand total (sum inflows == sum outflows == all
   // every edge lands in exactly one inflow and one outflow, so the two sides match...
   assert.ok(Math.abs(totalIn - totalOut) < 1e-6, `in ${totalIn} != out ${totalOut}`);
   // ...and the grand total is unchanged — splitting a node into sub-nodes (or routing tax
-  // out of margin into a feedback edge) moves value between edges but conserves the whole.
+  // out of margin into the terminal Taxes sink) moves value between edges but conserves the whole.
   assert.ok(Math.abs(totalOut - 13268.9337) < 1e-6, `got ${totalOut}`);
 });
 
@@ -69,9 +69,9 @@ test('multi-source edges keep every source; canonical is the value used (no flag
   assert.equal(canonicalAmount(edge('emp_medicare_payroll_er')), 163);
 });
 
-test('corporate-tax feedback edges flow to Government and validate (no DAG constraint)', () => {
+test('corporate income tax flows to the terminal Taxes sink and validates', () => {
   const taxEdges = file.graph.edges.filter((e) => e.channel === 'Corporate income tax');
-  // every taxable provider/insurer node routes tax back to Federal Government (Long-Term
+  // every taxable provider/insurer node routes tax to the terminal Taxes factor (Long-Term
   // Care now does so through its nursing / home-health sub-nodes)...
   const froms = taxEdges.map((e) => e.from).sort();
   assert.deepStrictEqual(froms, [
@@ -84,15 +84,14 @@ test('corporate-tax feedback edges flow to Government and validate (no DAG const
     'providers_other',
     'providers_physician',
   ]);
-  assert.ok(taxEdges.every((e) => e.to === 'federal_government'));
-  // ...these are backward (layer 3/2 -> 1) feedback edges that a Sankey-style DAG
-  // model would reject as "backward flow"/"cycle"; this model accepts them.
+  assert.ok(taxEdges.every((e) => e.to === 'taxes'));
   assert.deepStrictEqual(validateGraph(file), []);
-  // and Government's inflow now includes the corporate tax it collects
-  const { inflow } = computeFlows(file);
+  // Taxes is a pure sink: its inflow equals the corporate tax, and it has no outflow.
+  const { inflow, outflow } = computeFlows(file);
   const taxTotal = taxEdges.reduce((s, e) => s + canonicalAmount(e), 0);
   assert.equal(taxTotal, 39.5);
-  assert.ok(inflow['federal_government'] >= taxTotal);
+  assert.equal(inflow['taxes'], taxTotal);
+  assert.equal(outflow['taxes'] ?? 0, 0);
 });
 
 test('validateGraph catches a multi-observation edge with no canonical flag', () => {

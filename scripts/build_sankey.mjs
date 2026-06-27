@@ -50,7 +50,7 @@ const COLUMNS = [
   ["medicare", "medicaid"],
   ["health_insurance"],
   ["pharma_rx", "hospitals", "providers_clinicians", "long_term_care"],
-  ["suppliers_vendors", "healthcare_workers", "capital_markets"],
+  ["suppliers_vendors", "healthcare_workers", "capital_markets", "taxes"],
 ];
 const NCOL = COLUMNS.length;
 const colOf = {};
@@ -58,7 +58,7 @@ COLUMNS.forEach((col, ci) => col.forEach((id) => { colOf[id] = ci; }));
 
 const isForward = (e) => colOf[e.to] > colOf[e.from];
 const fwd = aggEdges.filter(isForward);
-const back = aggEdges.filter((e) => !isForward(e)); // corporate-tax feedback
+const back = aggEdges.filter((e) => !isForward(e)); // any backward feedback edge (none today: tax now terminates at the Taxes factor)
 
 // ---- node "flow handled" from forward edges only ----
 const inF = {}, outF = {};
@@ -77,6 +77,10 @@ const SPREAD_FRAC = process.env.SANKEY_SPREAD != null ? +process.env.SANKEY_SPRE
                          // pure-node columns (e.g. terminal Factors) spread their nodes to fill this
                          // fraction of the band, so fan-in/out flattens and crosses less
 const MAXSPREAD = 220;   // cap on the spread gap so a 2-3 node column doesn't fly fully apart
+const LABEL_OFFSET = process.env.SANKEY_LABEL_OFFSET != null ? +process.env.SANKEY_LABEL_OFFSET : 5;
+                         // $ label's left edge sits this UNIFORM distance (px) out from where the
+                         // ribbon leaves its source — same for every flow, not a fraction of length.
+                         // jumpgate left-justifies it (labelPos < 0.5) so it reads into the edge.
 const LANE_MIN = process.env.SANKEY_LANE_MIN != null ? +process.env.SANKEY_LANE_MIN : 6;
                          // only route long flows wider than this (px) through lanes; thinner
                          // capillaries cross directly — keeps the middle columns uncluttered
@@ -361,7 +365,7 @@ const textOn = (hex) => {
 const nodes = [];
 nodes.push({ id: "title", bounds: { x: 60, y: -150, width: 1400, height: 46 }, label: "U.S. Healthcare Flow of Funds — 2023 (Sankey)", shape: "text" });
 nodes.push({ id: "subtitle", bounds: { x: 60, y: -104, width: 2000, height: 30 },
-  label: "Node height ∝ dollars handled · band width ∝ dollars (same scale) · long flows routed through lanes · flow left→right, corporate tax loops back along the bottom.",
+  label: "Node height ∝ dollars handled · band width ∝ dollars (same scale) · long flows routed through lanes · flow left→right · corporate income tax shown as a terminal factor (Taxes), not a loop.",
   shape: "text" });
 for (const id of Object.keys(colOf)) {
   const p = pos[id], x = COLX[colOf[id]];
@@ -388,6 +392,12 @@ for (const e of fwd) {
   const wps = [];
   for (let s = 1; s < chain.length - 1; s++) wps.push({ x: Math.round(COLX[itemCol[chain[s]]] + W / 2), y: Math.round(cY(chain[s])) });
   if (wps.length === 0) wps.push({ x: Math.round((p0.x + pN.x) / 2), y: Math.round((p0.y + pN.y) / 2) });
+  // Uniform distance from the source: convert the fixed px offset to this edge's path fraction
+  // (jumpgate walks the polyline through these same points), capped at the midpoint.
+  const poly = [p0, ...wps, pN];
+  let plen = 0;
+  for (let s = 1; s < poly.length; s++) plen += Math.hypot(poly[s].x - poly[s - 1].x, poly[s].y - poly[s - 1].y);
+  const labelPos = Math.max(0, Math.min(0.5, LABEL_OFFSET / Math.max(plen, 1)));
   edges.push({
     id: `e-${key.replace("|", "-")}`,
     from: { nodeId: srcNode, anchor: [W, Math.round(y0 - pos[srcNode].y)] },
@@ -395,7 +405,7 @@ for (const e of fwd) {
     waypoints: wps, curve: "smooth",
     color: NODE_COLOR(srcNode), arrow: "none", opacity: 0.8,
     width: Math.max(1, Math.round(e.v * SCALE * 10) / 10),
-    label: e.v >= 250 ? `$${Math.round(e.v)}B` : undefined, labelColor: NODE_COLOR(srcNode),
+    label: e.v >= 250 ? `$${Math.round(e.v)}B` : undefined, labelColor: "#ffffff", labelPos,
   });
 }
 // ---- backward (corporate tax) edges along the bottom ----
@@ -408,7 +418,7 @@ for (const e of back) {
     waypoints: [{ x: COLX[colOf[e.from]] + W / 2, y: LANE }, { x: COLX[colOf[e.to]] + W / 2, y: LANE }],
     color: "#B0641E", style: "dashed", arrow: "none", opacity: 0.9,
     width: Math.max(1.2, Math.round(e.v * SCALE * 10) / 10),
-    label: e.v >= 12 ? `$${Math.round(e.v)}B tax` : undefined, labelColor: "#8a4d12",
+    label: e.v >= 12 ? `$${Math.round(e.v)}B tax` : undefined, labelColor: "#ffffff",
   });
 }
 edges.sort((a, b) => (b.width || 0) - (a.width || 0)); // widest first; thin flows stay visible on top

@@ -31,8 +31,8 @@
       "note": "Retained earnings, dividends, buybacks; ~13-14% of net revenue after corporate income tax"
     },
     "pharma_fed_tax": {
-      "label": "Corporate income tax → Federal Government",
-      "note": "Feedback edge: ~23% effective on pre-tax surplus; carved from the margin so the node total is conserved"
+      "label": "Corporate income tax → Taxes",
+      "note": "~23% effective on pre-tax surplus; carved from the margin so the node total is conserved"
     }
   },
   "checks": [

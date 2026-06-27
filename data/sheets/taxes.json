@@ -1,0 +1,25 @@
+{
+  "node": "taxes",
+  "subtitle": "Corporate income tax paid by for-profit health firms → U.S. Treasury  ·  $40B traced (FY2023)  ·  modeled from effective rates (GAO / Tax Foundation) × for-profit C-corp share, cross-checked to company 10-Ks",
+  "checks": [
+    {
+      "metric": "Health insurers — FY2023 income-tax provisions (7 public 10-Ks)",
+      "independent": 12.75,
+      "model": { "sum": ["edge:hi_fed_tax"] },
+      "note": "UNH/ELV/CI/CVS-Aetna/CNC/HUM/MOH; range $12.5–14.5B (SEC EDGAR)",
+      "emphasis": true
+    },
+    {
+      "metric": "For-profit hospitals — FY2023 income-tax provisions (big-4 10-Ks)",
+      "independent": 2.33,
+      "model": { "sum": ["edge:hospitals_fed_tax"] },
+      "note": "HCA $1.6B + Tenet + UHS + CHS; leveraged private/PE add little → ~$2.5–3.5B"
+    }
+  ],
+  "notes": [
+    "A terminal sink, like Healthcare Workers and Capital & Shareholders: it is where dollars leave the traced health-spending circuit — here, as federal corporate income tax on for-profit operators, rather than looping back to Government.",
+    "Each amount is carved out of that node's after-tax capital margin (e.g. pharma_fed_tax from pharma_capital_margin), so adding the Taxes sink does not change any node's total outflow — it re-labels part of the surplus as tax rather than retained capital.",
+    "Method: effective corporate rate (GAO-23-105384 — large profitable corps paid ~9–16% federal; Tax Foundation — 21% federal / 25.8% combined fed+state) × the for-profit C-corp share of each subsector. Pass-through income (most physician, dental & nursing practices — S-corps, partnerships, LLCs, REITs) is taxed at the OWNER level and is NOT corporate income tax, so those figures are small by design.",
+    "Where firms are publicly traded the figures cross-check well: insurers ≈ $12.8B vs $13B modeled; for-profit hospitals ≈ $2.3B vs $3B modeled. The shakiest line is pharma ($17.5B) — it is the statutory tax U.S.-source retail-Rx profit would bear (~23%), but pharma's actual booked rate is ~12–16% and its actual U.S. federal tax is near zero due to offshore profit-shifting (Senate Finance 2022–24); see the edge's second observation. Nursing may also be high given its pass-through / REIT structures."
+  ]
+}

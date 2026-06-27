@@ -43,7 +43,9 @@
     "nhe2024": "CMS NHE 2024 release (CY2023), by service & source of funds",
     "estimate": "Author estimate",
     "agency_budgets": "Agency budgets (VA, DoD, NIH, CDC, OMB) + author allocation",
-    "employer_benefits": "KFF / BLS / NASI / EBRI (employer benefits) + author allocation"
+    "employer_benefits": "KFF / BLS / NASI / EBRI (employer benefits) + author allocation",
+    "corp_tax_10k": "FY2023 income-tax provisions from company 10-Ks (SEC EDGAR) — health insurers UNH/ELV/CI/CVS/CNC/HUM/MOH ≈ $12.8B · for-profit hospitals HCA/THC/UHS/CYH ≈ $2.3B · pharma manufacturers' booked effective rate ~12–16%",
+    "corp_tax_method": "Modeled corporate income tax — effective rate (GAO-23-105384 ~9–16% federal · Tax Foundation 21% federal / 25.8% combined fed+state) × the for-profit C-corp share of the subsector (AMA 2024 · ADA HPI · KFF · MedPAC). Pass-through / REIT income is taxed at the owner level, not as corporate income tax."
   },
   "graph": {
     "nodes": [
@@ -203,6 +205,14 @@
         "group": "factors",
         "role": "sink",
         "description": "Margins, dividends, buybacks & retained earnings from for-profit health firms"
+      },
+      {
+        "id": "taxes",
+        "label": "Taxes",
+        "layer": 4,
+        "group": "factors",
+        "role": "sink",
+        "description": "Corporate income tax on for-profit health firms → U.S. Treasury — the one flow that leaves the sector as government revenue rather than a factor payment"
       }
     ],
     "edges": [
@@ -942,7 +952,7 @@
             "source": "estimate",
             "basis": "modeled",
             "confidence": "estimate",
-            "note": "Retained earnings, dividends, buybacks. Net of ~$17.5B corporate income tax routed to Government via pharma_fed_tax"
+            "note": "Retained earnings, dividends, buybacks. Net of ~$17.5B corporate income tax routed to the Taxes sink via pharma_fed_tax"
           }
         ]
       },
@@ -994,128 +1004,152 @@
       {
         "id": "pharma_fed_tax",
         "from": "pharma_rx",
-        "to": "federal_government",
+        "to": "taxes",
         "channel": "Corporate income tax",
         "category": "Corporate income tax",
         "observations": [
           {
             "value": 17.5,
-            "source": "estimate",
+            "source": "corp_tax_method",
             "basis": "modeled",
             "confidence": "estimate",
-            "note": "Feedback edge: ~23% effective on pre-tax surplus. Carved from pharma_capital_margin so the node total is conserved"
+            "canonical": true,
+            "note": "Statutory incidence: ~23% (21% federal + state) on the ~$75B U.S.-source retail-Rx pre-tax surplus. Carved from pharma_capital_margin so the node total is conserved"
+          },
+          {
+            "value": 12,
+            "source": "corp_tax_10k",
+            "basis": "national",
+            "confidence": "reported",
+            "note": "Pharma's actual booked effective rate was ~16% FY2023 / ~12% FY2022 (major-manufacturer 10-Ks), implying ~$9–13B; actual U.S. federal tax is far lower (~$0) because most profit is booked offshore (Senate Finance 2022–24; CFR). The $17.5B is what U.S.-source profit would bear at prevailing rates, not what is currently remitted"
           }
         ]
       },
       {
         "id": "hi_fed_tax",
         "from": "health_insurance",
-        "to": "federal_government",
+        "to": "taxes",
         "channel": "Corporate income tax",
         "category": "Corporate income tax",
         "observations": [
           {
             "value": 13,
-            "source": "estimate",
+            "source": "corp_tax_method",
             "basis": "modeled",
             "confidence": "estimate",
-            "note": "Feedback edge: insurer corporate income tax (~20% effective). Carved from hi_capital_margin"
+            "canonical": true,
+            "note": "~20% effective on insurer pre-tax surplus (insurers are taxable C-corps). Carved from hi_capital_margin"
+          },
+          {
+            "value": 12.75,
+            "source": "corp_tax_10k",
+            "basis": "national",
+            "confidence": "reported",
+            "note": "Sum of FY2023 income-tax provisions, 7 major public health insurers (UNH/ELV/CI/CVS-Aetna/CNC/HUM/MOH) — close concurring match; range $12.5–14.5B (Cigna's one-time deferred benefit is the main swing)"
           }
         ]
       },
       {
         "id": "hospitals_fed_tax",
         "from": "hospitals",
-        "to": "federal_government",
+        "to": "taxes",
         "channel": "Corporate income tax",
         "category": "Corporate income tax",
         "observations": [
           {
             "value": 3,
-            "source": "estimate",
+            "source": "corp_tax_method",
             "basis": "modeled",
             "confidence": "estimate",
-            "note": "Feedback edge: for-profit hospital share only (most hospitals are tax-exempt). Carved from hospitals_capital_margin"
+            "canonical": true,
+            "note": "For-profit hospital share only (~24% of hospitals; most are tax-exempt). Carved from hospitals_capital_margin"
+          },
+          {
+            "value": 2.33,
+            "source": "corp_tax_10k",
+            "basis": "national",
+            "confidence": "reported",
+            "note": "FY2023 provisions: HCA $1.6B + Tenet $0.3B + UHS $0.2B + CHS $0.2B = $2.3B (big-4 public); leveraged private/PE operators add little → ~$2.5–3.5B"
           }
         ]
       },
       {
         "id": "providers_physician_fed_tax",
         "from": "providers_physician",
-        "to": "federal_government",
+        "to": "taxes",
         "channel": "Corporate income tax",
         "category": "Corporate income tax",
         "observations": [
           {
             "value": 2.4,
-            "source": "estimate",
+            "source": "corp_tax_method",
             "basis": "modeled",
             "confidence": "estimate",
-            "note": "Feedback edge: PE/corporate-owned physician share. Carved from providers_physician_capital_margin"
+            "note": "C-corp share only (PE / corporate-owned ~6.5% of practices, ~4% of physicians — AMA 2024, Health Affairs 2024); most physician income is pass-through, taxed at the owner level. Carved from providers_physician_capital_margin"
           }
         ]
       },
       {
         "id": "providers_dental_fed_tax",
         "from": "providers_dental",
-        "to": "federal_government",
+        "to": "taxes",
         "channel": "Corporate income tax",
         "category": "Corporate income tax",
         "observations": [
           {
             "value": 1.1,
-            "source": "estimate",
+            "source": "corp_tax_method",
             "basis": "modeled",
             "confidence": "estimate",
-            "note": "Feedback edge: for-profit dental practice share. Carved from providers_dental_capital_margin"
+            "note": "C-corp / DSO share only (~14% of dentists DSO-affiliated — ADA HPI 2023); most dental is small pass-through practices. Upper-end estimate. Carved from providers_dental_capital_margin"
           }
         ]
       },
       {
         "id": "providers_other_fed_tax",
         "from": "providers_other",
-        "to": "federal_government",
+        "to": "taxes",
         "channel": "Corporate income tax",
         "category": "Corporate income tax",
         "observations": [
           {
             "value": 0.5,
-            "source": "estimate",
+            "source": "corp_tax_method",
             "basis": "modeled",
             "confidence": "estimate",
-            "note": "Feedback edge: for-profit share. Carved from providers_other_capital_margin"
+            "note": "C-corp share only; mostly small pass-through practices. Carved from providers_other_capital_margin"
           }
         ]
       },
       {
         "id": "ltc_nursing_fed_tax",
         "from": "ltc_nursing",
-        "to": "federal_government",
+        "to": "taxes",
         "channel": "Corporate income tax",
         "category": "Corporate income tax",
         "observations": [
           {
             "value": 1.14,
-            "source": "estimate",
+            "source": "corp_tax_method",
             "basis": "modeled",
             "confidence": "estimate",
-            "note": "Feedback edge: for-profit nursing-facility share. Carved from ltc_nursing_capital_margin"
+            "note": "~73% of nursing facilities are for-profit (KFF 2025), but most use pass-through / REIT (OpCo–PropCo) structures whose income is taxed at the owner level — so this likely overstates the true corporate-tax slice (plausibly ~$0.3–0.6B). Carved from ltc_nursing_capital_margin"
           }
         ]
       },
       {
         "id": "ltc_homehealth_fed_tax",
         "from": "ltc_homehealth",
-        "to": "federal_government",
+        "to": "taxes",
         "channel": "Corporate income tax",
         "category": "Corporate income tax",
         "observations": [
           {
             "value": 0.86,
-            "source": "estimate",
+            "source": "corp_tax_method",
             "basis": "modeled",
             "confidence": "estimate",
-            "note": "Feedback edge: for-profit home-health share. Carved from ltc_homehealth_capital_margin"
+            "note": "Largely for-profit & more C-corp than peers (home health ~92% / hospice ~77% for-profit — MedPAC 2024; several large public C-corps). Carved from ltc_homehealth_capital_margin"
           }
         ]
       },

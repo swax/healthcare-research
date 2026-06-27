@@ -57,17 +57,21 @@ two numbers differ when they do — gross vs net, traced vs all-payer — so a g
 amounts, role/balance sanity) plus the observation- and split-level rules — but it
 deliberately has **no Sankey-only constraints**: there is no _forward-flow_ rule and no
 _acyclicity_ rule. A Sankey must be a layered DAG; the Excel output needs neither. Dropping
-them is what lets the model carry **feedback edges** — a flow back to an earlier layer.
+them keeps the door open for **feedback edges** — a flow back to an earlier layer — should
+the model ever need one.
 
-**The circular flow of funds.** Every taxable provider/insurer node routes **corporate
-income tax → Federal Government** (`pharma_fed_tax`, `hi_fed_tax`, `hospitals_fed_tax`,
-`providers_fed_tax`, `ltc_fed_tax`). Each is _carved out of_ that node's `capital_margin` —
-the margin edge drops by the tax and a new edge to Government adds it back — so each node's
-total outflow is **conserved**: money simply moves from Capital to Government, and the grand
+**Corporate income tax as a terminal sink.** Every taxable provider/insurer node routes
+**corporate income tax → Taxes** (`pharma_fed_tax`, `hi_fed_tax`, `hospitals_fed_tax`,
+`providers_*_fed_tax`, `ltc_*_fed_tax`) — a terminal `factors`-group sink (`role: sink`)
+that sits alongside Healthcare Workers and Capital & Shareholders and holds the dollars that
+leave the traced circuit as government revenue. Each is _carved out of_ that node's
+`capital_margin` — the margin edge drops by the tax and the tax edge adds it back — so each
+node's total outflow is **conserved**: money simply moves from Capital to Taxes, and the grand
 total is unchanged (a property the conservation test locks in). The tax figures are
 `confidence: estimate` first-pass values (effective rate on the for-profit / C-corp share),
-meant to be refined. This makes the model a true circular flow rather than a one-way
-layered tree.
+meant to be refined. Modeling tax as a terminal factor rather than a loop back to Government
+keeps the flow a clean one-way layered tree — the same reason Healthcare-Workers wages are a
+terminal sink rather than a loop back to Households.
 
 ## File map
 
@@ -188,18 +192,20 @@ breakdown. See
 - **Done so far:**
   - `edge.split[]` — line-item breakdown of a single edge, validated to sum to its canonical value
     (live on Pharma).
-  - **Feedback edges / circular flow** — corporate income tax → Government across all taxable nodes,
-    carved from each margin so totals are conserved (first-pass `estimate` values to refine).
+  - **Terminal Taxes sink** — corporate income tax across all taxable nodes routed to a terminal
+    `Taxes` factor (`role: sink`), carved from each margin so totals are conserved (first-pass
+    `estimate` values to refine). Modeled as a terminal leakage, not a loop back to Government.
   - **Row categories** — `edge.category` groups a section into labeled sub-headers + subtotals when
-    2+ categories are present (e.g. Government inflows → "General revenue" vs "Corporate income tax").
+    2+ categories are present (e.g. Individuals outflows → "Taxes & payroll" / "Insurance premiums" /
+    "Out-of-pocket").
   - **Sub-nodes (`node.parent`)** — a node renders each child as a nested in/out/net block + a
     combined roll-up. Edges attach to children; the parent is a pure aggregate; totals conserved via
     leaf-summing. Live on Long-Term Care (nursing / home health) and Providers & Clinicians
     (physician / dental / other professional).
   - **Framing sheets** — a front-page **Overview** (counts, total, linked node summary, cross-source
     snapshot) and a **Glossary** (acronyms, model terms, generated sources + structure).
-- **Deferred concepts** (captured in `data/README.md`): more feedback categories (e.g.
-  payroll/income tax on wages → Government, investment returns); named leakage edges (turn `extra`
+- **Deferred concepts** (captured in `data/README.md`): more flows into the Taxes sink (e.g.
+  payroll/income tax on wages, investment returns); named leakage edges (turn `extra`
   rows into edges to a sink so conservation is explicit); and node-level observations (independent
   _totals_ like Medicare $1,030B as observations of a node, not an edge).
 

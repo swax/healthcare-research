@@ -155,16 +155,17 @@ This is a big-picture flow model — see the `basis` section above. Don't add a 
 
 **Deliberately NOT enforced:** _forward-flow_ and _acyclicity_. Those are Sankey-only constraints — a
 Sankey must be a layered DAG. This model renders Excel, so an edge may point to any node, **including
-a feedback edge back to an earlier layer**. That freedom is what lets the model carry the **circular
-flow of funds**.
+a feedback edge back to an earlier layer** should the model ever need one.
 
-> **Feedback edges (live).** Every taxable provider/insurer node routes **corporate income tax →
-> Federal Government** (channel `"Corporate income tax"`). Each is _carved out of_ that node's
-> `capital_margin` (the margin edge drops by the tax, a new edge to Government adds it back), so the
-> node's total outflow is **conserved** — money moves from Capital to Government, the grand total is
-> unchanged. These are backward edges (layer 3/2 → 1) that a Sankey-style DAG would reject as
-> "backward flow" / "cycle"; this model accepts them. The tax amounts are `confidence: estimate`
-> first-pass figures (effective rate on the for-profit / C-corp share) — easy to refine.
+> **Corporate income tax → terminal Taxes sink (live).** Every taxable provider/insurer node routes
+> **corporate income tax → Taxes** (channel `"Corporate income tax"`), a terminal `factors`-group sink
+> (`role: sink`) alongside Healthcare Workers and Capital & Shareholders. Each is _carved out of_ that
+> node's `capital_margin` (the margin edge drops by the tax, the tax edge adds it back), so the node's
+> total outflow is **conserved** — money moves from Capital to Taxes, the grand total is unchanged.
+> Tax is modeled as a terminal leakage to the U.S. Treasury, not a loop back to Government — the same
+> way Healthcare-Workers wages are a terminal sink rather than a loop back to Households, which keeps
+> the flow a clean one-way layered tree. The tax amounts are `confidence: estimate` first-pass figures
+> (effective rate on the for-profit / C-corp share) — easy to refine.
 
 ## Editorial overlay (`data/sheets/<node>.json`)
 
@@ -285,25 +286,26 @@ and a subtotal, and the section TOTAL sums the subtotals. With fewer than two ca
 stays flat, so adding a category only changes the sheets where it actually creates structure.
 
 ```jsonc
-// Federal Government inflows split into two groups:
-{ "id": "ind_fed_medicare_genrev", "category": "General revenue", ... } // + medicaid, aca
-{ "id": "pharma_fed_tax",          "category": "Corporate income tax", ... } // + the other taxes
+// A node whose inflows carry 2+ categories renders grouped. For example, splitting Federal
+// Government's general revenue into program transfers vs direct federal health:
+{ "id": "ind_fed_medicare_genrev", "category": "Program transfers", ... }     // + medicaid, aca
+{ "id": "ind_fed_genrev_vadod",    "category": "Direct federal health", ... } // + admin/PH/NIH
 ```
 
 renders as:
 
 ```
 INFLOWS (Funding Sources)
-  General revenue
-     Individuals — General revenue (Medicare)        437
-     Individuals — General revenue (Medicaid)        614
-     Individuals — General revenue (ACA subsidies)    80
-  Subtotal — General revenue                        1,131
-  Corporate income tax
-     Pharma & Rx — Corporate income tax              17.5
-     … (one per taxable entity)
-  Subtotal — Corporate income tax                    39.5
-  TOTAL INFLOWS                                     1,171   (= sum of subtotals)
+  Program transfers
+     Individuals — General revenue (Medicare)         437
+     Individuals — General revenue (Medicaid)         614
+     Individuals — General revenue (ACA subsidies)     80
+  Subtotal — Program transfers                       1,131
+  Direct federal health
+     Individuals — General revenue (VA, DoD/TRICARE)  181
+     … (+ admin, public health, NIH)
+  Subtotal — Direct federal health                     334
+  TOTAL INFLOWS                                      1,465   (= sum of subtotals)
 ```
 
 - The category is **intrinsic to the edge** (a corporate income tax is a tax wherever it appears), so
@@ -317,7 +319,6 @@ provider sheets and single-type sinks read better flat):
 
 | Sheet              | Section  | Groups                                                         |
 | ------------------ | -------- | -------------------------------------------------------------- |
-| Federal Government | inflows  | General revenue · Corporate income tax                         |
 | Individuals        | outflows | Taxes & payroll · Insurance premiums · Out-of-pocket           |
 | Medicare           | inflows  | Payroll taxes (HI trust fund) · Premiums & general revenue     |
 | Health Insurance   | inflows  | Commercial / private · Public managed care                     |
@@ -359,8 +360,8 @@ child, leaving dental nearly balanced.
 
 Ideas from the design discussion left out so far, captured here so they aren't lost:
 
-- **More feedback categories** — payroll / income tax on wages (Healthcare Workers → Government),
-  investment returns, etc., extending the circular flow beyond corporate income tax.
+- **More flows into the Taxes sink** — payroll / income tax on wages, investment returns, etc.,
+  extending the terminal Taxes factor beyond corporate income tax.
 - **Named leakage** — turning `extra` sheet rows (admin, DME) into explicit edges to a named sink, so
   conservation is honest while keeping the documented traced-subset decision intact.
 - **Node-level observations** — independent _totals_ (Medicare $1,030B vs model $1,037B; Medicaid

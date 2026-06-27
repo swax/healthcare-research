@@ -27,9 +27,8 @@ data/sheets/*.json ─┘
 ```
 
 The model is a **traced subset**, not closed national accounting: it follows specific
-payer → provider → worker / supplier / capital flows (and feedback edges like corporate tax
-back to Government), so a node's inflow need not equal its outflow. That's intentional —
-see [docs/data-model.md](docs/data-model.md).
+payer → provider → worker / supplier / capital / tax flows, so a node's inflow need not equal
+its outflow. That's intentional — see [docs/data-model.md](docs/data-model.md).
 
 ## Use
 
@@ -74,7 +73,7 @@ What the tests guard:
 - **Observations** — every edge has at least one observation and exactly one canonical; a
   `split[]` sums to its canonical value within $1B.
 - **Conservation** — summing leaf nodes, total inflow == total outflow == the grand total, so
-  splitting a node or routing a feedback edge moves value without changing the whole.
+  splitting a node or carving tax out of a margin into the Taxes sink moves value without changing the whole.
 - **Rendering** — every node renders a ledger; section grouping, splits, sub-node roll-ups,
   cross-sheet hyperlinks, and the Overview/Glossary all produce the expected cells.
 
@@ -132,7 +131,7 @@ is written up in [docs/sankey-layout.md](docs/sankey-layout.md).
 | `scripts/reconcile_labor.mjs`  | offline helper: cross-check labor edges vs BLS OEWS → `data/labor_bls.json`          |
 | `scripts/build_sankey.mjs`     | offline helper: render the graph as a Sankey `.jg` flow diagram                      |
 | `diagrams/*.jg`                | generated Jumpgate flow diagrams (open in the Jumpgate VS Code extension)            |
-| `docs/data-model.md`           | design narrative (why observations, the circular flow)                               |
+| `docs/data-model.md`           | design narrative (why observations, the traced-subset flow model)                    |
 | `docs/data-audit.md`           | the historical audit that motivated the model                                        |
 | `docs/sankey-layout.md`        | design narrative (the Sankey overlap-minimizing layout algorithm)                    |
 | `dist/`                        | generated output (git-ignored)                                                       |

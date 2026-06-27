@@ -156,6 +156,7 @@ export function buildWorkbook(file: GraphFile, root: string): ExcelJS.Workbook {
     healthcare_workers: 'labor — wages, salaries, benefits',
     suppliers_vendors: 'non-labor — drugs, devices, supplies, IT, facilities',
     capital_markets: 'margins, dividends, buybacks, retained earnings',
+    taxes: 'corporate income tax → U.S. Treasury',
   };
   sectionBar(ov, ovr, 'WHERE THE MONEY ENDS UP  (the traced flow’s final layer)', '4E342E', 6);
   ovr++;
@@ -195,7 +196,7 @@ export function buildWorkbook(file: GraphFile, root: string): ExcelJS.Workbook {
   ovr++;
   note(
     ov.getRow(ovr).getCell(1),
-    `Plus $${rnd(taxToGov)}B corporate income tax routed back to Government — a feedback edge, not a terminal destination.`,
+    `Of that, $${rnd(taxToGov)}B is corporate income tax on for-profit health firms — the only terminal dollar that leaves as government revenue rather than a factor payment (see the Taxes sheet).`,
   );
   ovr += 2;
 
@@ -1096,7 +1097,7 @@ export function buildWorkbook(file: GraphFile, root: string): ExcelJS.Workbook {
     ],
     [
       'Feedback edge',
-      'A flow back to an earlier layer (e.g. corporate income tax → Government). Makes the model a circular flow, not a one-way tree.',
+      'A flow back to an earlier layer. The model permits cycles, but currently has none: corporate income tax is modeled as a terminal Taxes sink (a factor-like leakage to the U.S. Treasury) rather than a loop back to Government.',
     ],
     [
       'Sub-node (node.parent)',

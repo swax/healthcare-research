@@ -111,8 +111,10 @@ of the flow's other end** (the first/last lane waypoint, or the other node). Sor
 neighbour's position is what stops ribbons from re-crossing right at the node face, and the
 stack fills the node height exactly (honest geometry).
 
-Backward flows (corporate tax → Government) run as dashed ribbons along a lane beneath the
-diagram, so the only leftward arrows don't tangle the main left-to-right flow.
+Corporate income tax flows forward to a terminal **Taxes** factor (a `factors`-group sink
+beside Capital & Shareholders), so it reads as a normal left-to-right ribbon into the last
+column rather than a dashed loop back to Government. (The backward-lane path below the diagram
+remains in the builder for any future feedback edge, but is unused today.)
 
 ## Why each lever lowers the score
 
@@ -149,11 +151,12 @@ The build prints the overlap area it achieved — a regression indicator, so a f
 layout change that muddies the picture shows up as a rising number:
 
 ```
-overlap area (readability guard) — diff-color 66k px² · over-node 21k px² · combined 108k px²
+overlap area (readability guard) — diff-color 83k px² · over-node 22k px² · combined 126k px²
 ```
 
-(This is the forward-flow measure the optimizer uses. An independent dense rasterization that
-also counts the dashed tax edges reads a bit higher; both move together.)
+(The printed guard is a dense, fine-grid rasterization for an accurate absolute area; the
+optimizer searches on a coarser, faster grid. Both count the same forward ribbons — including
+the corporate-tax flows into the terminal Taxes factor — so they move together.)
 
 ## Results
 

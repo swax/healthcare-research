@@ -74,7 +74,7 @@ const LANE_MAXGAP = process.env.SANKEY_LANE_MAXGAP != null ? +process.env.SANKEY
                          // cap on gap between stacked lanes — parallel non-crossing lanes pack tight
                          // instead of drifting apart and leaving big empty bands up top
 const SPREAD_FRAC = process.env.SANKEY_SPREAD != null ? +process.env.SANKEY_SPREAD : 0.85;
-                         // pure-node columns (e.g. terminal Factors) spread their nodes to fill this
+                         // pure-node columns (e.g. terminal Claimants) spread their nodes to fill this
                          // fraction of the band, so fan-in/out flattens and crosses less
 const MAXSPREAD = 220;   // cap on the spread gap so a 2-3 node column doesn't fly fully apart
 const LABEL_OFFSET = process.env.SANKEY_LABEL_OFFSET != null ? +process.env.SANKEY_LABEL_OFFSET : 5;
@@ -144,7 +144,7 @@ const baseOccupancy = (ci) => {
 const BAND = Math.max(...order.map((_, ci) => baseOccupancy(ci)), 700);
 const Y1 = Y0 + BAND;
 
-// Pure-node columns (no lanes passing through, e.g. terminal Factors) spread their nodes to fill
+// Pure-node columns (no lanes passing through, e.g. terminal Claimants) spread their nodes to fill
 // SPREAD_FRAC of the band so the fan flattens; columns with lanes keep nodes at the base gap.
 const colNodeGap = (ci) => {
   const col = order[ci];
@@ -377,7 +377,7 @@ for (const id of Object.keys(colOf)) {
   });
 }
 const bandLabelY = Math.round(Y1 + 60);
-const bands = [["Payers", 0], ["Government", 1], ["Public Programs", 2], ["Insurers", 3], ["Providers", 4], ["Factors", 5]];
+const bands = [["Payers", 0], ["Government", 1], ["Public Programs", 2], ["Insurers", 3], ["Providers", 4], ["Claimants", 5]];
 for (const [txt, c] of bands) nodes.push({ id: `band-${c}`, bounds: { x: COLX[c], y: bandLabelY, width: W + 30, height: 26 }, label: txt, shape: "text" });
 
 // ---- edges (forward, routed through dummy lanes) ----
@@ -405,7 +405,7 @@ for (const e of fwd) {
     waypoints: wps, curve: "smooth",
     color: NODE_COLOR(srcNode), arrow: "none", opacity: 0.8,
     width: Math.max(1, Math.round(e.v * SCALE * 10) / 10),
-    label: e.v >= 250 ? `$${Math.round(e.v)}B` : undefined, labelColor: "#ffffff", labelPos,
+    label: e.v >= 250 ? `$${Math.round(e.v).toLocaleString()}B` : undefined, labelColor: "#ffffff", labelPos,
   });
 }
 // ---- backward (corporate tax) edges along the bottom ----
@@ -418,7 +418,7 @@ for (const e of back) {
     waypoints: [{ x: COLX[colOf[e.from]] + W / 2, y: LANE }, { x: COLX[colOf[e.to]] + W / 2, y: LANE }],
     color: "#B0641E", style: "dashed", arrow: "none", opacity: 0.9,
     width: Math.max(1.2, Math.round(e.v * SCALE * 10) / 10),
-    label: e.v >= 12 ? `$${Math.round(e.v)}B tax` : undefined, labelColor: "#ffffff",
+    label: e.v >= 12 ? `$${Math.round(e.v).toLocaleString()}B tax` : undefined, labelColor: "#ffffff",
   });
 }
 edges.sort((a, b) => (b.width || 0) - (a.width || 0)); // widest first; thin flows stay visible on top

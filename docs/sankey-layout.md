@@ -58,7 +58,7 @@ A layered layout in five stages.
 ### 1. Layering — fixed semantic columns
 
 Six columns, left → right: **Payers → Government → Public Programs → Insurers → Providers →
-Factors**. These are domain-meaningful, so column assignment is fixed (not computed). Node
+Claimants**. These are domain-meaningful, so column assignment is fixed (not computed). Node
 height ∝ dollars handled = `max(inflow, outflow) × SCALE`.
 
 ### 2. Dummies — route long flows through lanes
@@ -99,7 +99,7 @@ that, three shaping rules:
   as separate ribbons.
 - **Cap lane gaps** (`LANE_MAXGAP`) — parallel, non-crossing lanes pack tight instead of drifting
   apart and leaving big empty bands up top.
-- **Spread pure-node columns** (`SPREAD`) — a terminal column like Factors (no lanes pass
+- **Spread pure-node columns** (`SPREAD`) — a terminal column like Claimants (no lanes pass
   through) spreads its few nodes to fill the band, so the fan-in flattens and crosses less.
 
 Finally the whole figure is recentred so the real-node mass sits centered in the band.

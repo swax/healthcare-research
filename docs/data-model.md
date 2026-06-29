@@ -2,7 +2,8 @@
 
 _Design narrative for the engine under `src/`, driven by `data/graph.json`. For the
 field-by-field schema and build commands, see [`data/README.md`](../data/README.md). For the
-audit that motivated the design, see [data-audit.md](data-audit.md)._
+audit that motivated the design, see [data-audit.md](data-audit.md). For how much of national
+health spending the model traces (the deliberate subset boundary), see [coverage.md](coverage.md)._
 
 ## The premise
 

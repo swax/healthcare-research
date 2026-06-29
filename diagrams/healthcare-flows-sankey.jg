@@ -281,7 +281,7 @@
         "width": 200,
         "height": 26
       },
-      "label": "Factors",
+      "label": "Claimants",
       "shape": "text"
     }
   ],
@@ -313,7 +313,7 @@
       "arrow": "none",
       "opacity": 0.8,
       "width": 263.7,
-      "label": "$1465B",
+      "label": "$1,465B",
       "labelColor": "#ffffff",
       "labelPos": 0.03844334473371745
     },
@@ -344,7 +344,7 @@
       "arrow": "none",
       "opacity": 0.8,
       "width": 186.3,
-      "label": "$1035B",
+      "label": "$1,035B",
       "labelColor": "#ffffff",
       "labelPos": 0.0379223417483882
     },

@@ -12,7 +12,7 @@
     { "n": 1, "name": "Government", "x": 0.26, "annotation": "Government" },
     { "n": 2, "name": "Programs & Insurers", "x": 0.5, "annotation": "Programs & Insurers" },
     { "n": 3, "name": "Providers", "x": 0.74, "annotation": "Providers" },
-    { "n": 4, "name": "Factors of Production", "x": 0.98, "annotation": "Factors" }
+    { "n": 4, "name": "Claimants", "x": 0.98, "annotation": "Claimants" }
   ],
   "groups": [
     { "id": "payers", "label": "Payers / Households", "color": "D32F2F" },
@@ -20,7 +20,7 @@
     { "id": "public_programs", "label": "Public Programs", "color": "FBC02D" },
     { "id": "insurers", "label": "Insurers", "color": "43A047" },
     { "id": "providers", "label": "Providers", "color": "1E88E5" },
-    { "id": "factors", "label": "Factors of Production", "color": "8E24AA" }
+    { "id": "factors", "label": "Claimants", "color": "8E24AA" }
   ],
   "sources": {
     "cms_nhe": "CMS NHE",

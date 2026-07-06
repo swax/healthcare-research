@@ -134,11 +134,11 @@ export function buildWorkbook(file: GraphFile, root: string): ExcelJS.Workbook {
   ovr++;
   for (const line of [
     'A traced-subset model: it follows specific payer → provider → worker / supplier / capital flows,',
-    'not every dollar in the national accounts. For reference, CMS NHE 2023 = $4,866.5B.',
+    'not every dollar in the national accounts. For reference, CMS NHE 2023 = $4,866.5B ($4,541.5B less investment).',
     'Traced: hospitals · physician & clinical · dental · other professional · retail Rx · nursing & home health · plus',
-    'government direct spending (administration · public health · NIH research · VA / DoD) and employer retiree, workers-comp & HSA/HRA.',
-    'Not modeled (by design): DME & non-durable products · residential care · construction · the remaining other-payer residual.',
-    'Each provider sheet’s VALIDATION section shows how much of its NHE national total the model traces.',
+    'government direct spending (administration · public health · NIH research · VA / DoD), employer retiree / workers-comp / HSA-HRA,',
+    'and, on the inflow side, Other Third-Party Payers + an Unattributed-Insurer-Claims reconciliation closing hospitals / physician / other-professional (~$3.86T traced).',
+    'Not modeled (by design): DME & non-durable products · government administration · construction. See docs/coverage.md for the full source-of-funds breakdown.',
   ]) {
     note(ov.getRow(ovr).getCell(1), line);
     ovr++;

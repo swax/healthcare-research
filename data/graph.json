@@ -45,7 +45,9 @@
     "agency_budgets": "Agency budgets (VA, DoD, NIH, CDC, OMB) + author allocation",
     "employer_benefits": "KFF / BLS / NASI / EBRI (employer benefits) + author allocation",
     "corp_tax_10k": "FY2023 income-tax provisions from company 10-Ks (SEC EDGAR) — health insurers UNH/ELV/CI/CVS/CNC/HUM/MOH ≈ $12.8B · for-profit hospitals HCA/THC/UHS/CYH ≈ $2.3B · pharma manufacturers' booked effective rate ~12–16%",
-    "corp_tax_method": "Modeled corporate income tax — effective rate (GAO-23-105384 ~9–16% federal · Tax Foundation 21% federal / 25.8% combined fed+state) × the for-profit C-corp share of the subsector (AMA 2024 · ADA HPI · KFF · MedPAC). Pass-through / REIT income is taxed at the owner level, not as corporate income tax."
+    "corp_tax_method": "Modeled corporate income tax — effective rate (GAO-23-105384 ~9–16% federal · Tax Foundation 21% federal / 25.8% combined fed+state) × the for-profit C-corp share of the subsector (AMA 2024 · ADA HPI · KFF · MedPAC). Pass-through / REIT income is taxed at the owner level, not as corporate income tax.",
+    "nhe_other_third_party": "CMS NHE 2024 release (CY2023), 'Other Third Party Payers and Programs' by type of service — other private revenues (philanthropy / non-patient provider income), other state & local programs, Indian Health Service, general assistance, other federal — net of the workers' comp already traced via Employers (references/nhe2024/NHE2024.csv)",
+    "nhe_mco_recon": "Reconciliation to CMS NHE 2024 (CY2023): insurer/program receipts (private health insurance + Medicare + Medicaid + CHIP) for a service, less the model's traced insurer/program chain to it — the managed-care / commercial claims the coarse bundled insurer edge undercounts. A model-reconciliation line, not a distinct payer. Each edge's split[] attributes the residual by program, allocated pro-rata to that program's NHE receipts net of the traced direct-FFS edges (proportional-undercount assumption, since the bundled claims edge is not itself split by line of business) (references/nhe2024/NHE2024.csv)"
   },
   "graph": {
     "nodes": [
@@ -64,6 +66,22 @@
         "group": "payers",
         "role": "source",
         "description": "~165M covered by employer-sponsored insurance — the largest single source of coverage"
+      },
+      {
+        "id": "other_third_party",
+        "label": "Other Third-Party Payers",
+        "layer": 0,
+        "group": "payers",
+        "role": "source",
+        "description": "NHE 'Other Third Party Payers and Programs' — other private revenues (philanthropy, non-patient provider income), other state/local programs, IHS, general assistance, other federal — the real payers the main traced edges don't itemize"
+      },
+      {
+        "id": "untraced_managed_care",
+        "label": "Unattributed Insurer Claims",
+        "layer": 2,
+        "group": "insurers",
+        "role": "source",
+        "description": "Reconciliation, not a distinct payer: insurer-paid claims (Medicare Advantage, Medicaid/CHIP managed care, commercial) that NHE records providers receiving but the model's sourced premium→claims chain undercounts — each edge's split[] attributes the residual by program. Seated beside Health Insurance because that is whose flows it supplements; kept as a separate inflow because the insurer chain is sourced and balanced and can't absorb it. The other-professional edge also carries a household out-of-pocket undercount (see its split)"
       },
       {
         "id": "federal_government",
@@ -1374,6 +1392,131 @@
             "basis": "modeled",
             "confidence": "estimate"
           }
+        ]
+      },
+      {
+        "id": "otp_hospitals",
+        "from": "other_third_party",
+        "to": "hospitals",
+        "channel": "Other third-party payers & programs",
+        "observations": [
+          {
+            "value": 136,
+            "source": "nhe_other_third_party",
+            "basis": "national",
+            "confidence": "estimate",
+            "note": "NHE 2023 hospital 'Other Third Party Payers and Programs' $151.0B less workers' comp $14.8B (traced via Employers) = $136B"
+          }
+        ],
+        "split": [
+          { "label": "Other private revenues (philanthropy, non-patient income)", "value": 107.3, "confidence": "estimate" },
+          { "label": "Other state & local programs", "value": 19.5, "confidence": "estimate" },
+          { "label": "Indian Health Service", "value": 3.4, "confidence": "estimate" },
+          { "label": "General assistance", "value": 3.1, "confidence": "estimate" },
+          { "label": "Other federal (SAMHSA, MCH, voc-rehab)", "value": 2.7, "confidence": "estimate" }
+        ]
+      },
+      {
+        "id": "otp_providers_physician",
+        "from": "other_third_party",
+        "to": "providers_physician",
+        "channel": "Other third-party payers & programs",
+        "observations": [
+          {
+            "value": 79.5,
+            "source": "nhe_other_third_party",
+            "basis": "national",
+            "confidence": "estimate",
+            "note": "NHE 2023 physician & clinical 'Other Third Party Payers and Programs' $91.4B less workers' comp $11.9B (traced via Employers) = $79.5B"
+          }
+        ],
+        "split": [
+          { "label": "Other private revenues (philanthropy, non-patient income)", "value": 66.7, "confidence": "estimate" },
+          { "label": "Other federal programs", "value": 8.2, "confidence": "estimate" },
+          { "label": "Indian Health Service", "value": 1.8, "confidence": "estimate" },
+          { "label": "SAMHSA", "value": 1.4, "confidence": "estimate" },
+          { "label": "General assistance, MCH, voc-rehab, state/local", "value": 1.4, "confidence": "estimate" }
+        ]
+      },
+      {
+        "id": "otp_providers_other",
+        "from": "other_third_party",
+        "to": "providers_other",
+        "channel": "Other third-party payers & programs",
+        "observations": [
+          {
+            "value": 16,
+            "source": "nhe_other_third_party",
+            "basis": "national",
+            "confidence": "estimate",
+            "note": "NHE 2023 other-professional 'Other Third Party Payers and Programs' $16.1B (workers' comp not separately traced for this node, so retained here)"
+          }
+        ],
+        "split": [
+          { "label": "Other private revenues (philanthropy, non-patient income)", "value": 13.7, "confidence": "estimate" },
+          { "label": "Workers' compensation", "value": 1.6, "confidence": "estimate" },
+          { "label": "Maternal/child health, general assistance, other", "value": 0.7, "confidence": "estimate" }
+        ]
+      },
+      {
+        "id": "umc_hospitals",
+        "from": "untraced_managed_care",
+        "to": "hospitals",
+        "channel": "Unattributed insurer claims (NHE receipts − traced chain)",
+        "observations": [
+          {
+            "value": 202,
+            "source": "nhe_mco_recon",
+            "basis": "national",
+            "confidence": "estimate",
+            "note": "NHE 2023 hospital insurer/program receipts (PHI $506B + Medicare $411B + Medicaid $294B + CHIP $6B = $1,217B) less the model's traced insurer/program chain (HI claims $820.5B + Medicare FFS $150B + Medicaid FFS+DSH $45B = $1,015.5B) ≈ $202B. The coarse bundled insurer edge undercounts managed-care/commercial hospital claims. Split pro-rata to per-program NHE receipts net of traced FFS: PHI $506.1B · Medicare $411.4B − $150B FFS = $261.4B · Medicaid+CHIP $299.7B − $45B FFS+DSH = $254.7B (total $1,022.2B), assuming the bundle undercounts each program proportionally."
+          }
+        ],
+        "split": [
+          { "label": "Commercial / private HI claims", "value": 100, "confidence": "estimate" },
+          { "label": "Medicare Advantage claims", "value": 51.7, "confidence": "estimate" },
+          { "label": "Medicaid & CHIP managed-care claims", "value": 50.3, "confidence": "estimate" }
+        ]
+      },
+      {
+        "id": "umc_providers_physician",
+        "from": "untraced_managed_care",
+        "to": "providers_physician",
+        "channel": "Unattributed insurer claims (NHE receipts − traced chain)",
+        "observations": [
+          {
+            "value": 119.5,
+            "source": "nhe_mco_recon",
+            "basis": "national",
+            "confidence": "estimate",
+            "note": "Managed-care/commercial physician claims beyond the traced insurer/program chain. Sized to the node's traced cost base ($984B); NHE physician & clinical is $1,027B, so ~$43B remains unmodeled on the outflow (cost-structure) side — see docs/coverage.md. Identity: NHE insurer/program receipts net of traced FFS = PHI $461.0B + Medicare ($232.9B − $85B) + Medicaid+CHIP ($113.0B − $28B) = $693.9B; modeled claims bundle $533.3B → gross gap $160.6B. The non-insurer categories roughly cancel (OOP incl. HSA +$33B, VA/DoD −$19B, workers' comp −$13B ≈ +$1.5B net), and the ~$43B cost-side remainder absorbs the rest, leaving $119.5B — split pro-rata to per-program receipts."
+          }
+        ],
+        "split": [
+          { "label": "Commercial / private HI claims", "value": 79.4, "confidence": "estimate" },
+          { "label": "Medicare Advantage claims", "value": 25.5, "confidence": "estimate" },
+          { "label": "Medicaid & CHIP managed-care claims", "value": 14.6, "confidence": "estimate" }
+        ]
+      },
+      {
+        "id": "umc_providers_other",
+        "from": "untraced_managed_care",
+        "to": "providers_other",
+        "channel": "Unattributed insurer claims & household OOP (NHE − traced chain)",
+        "observations": [
+          {
+            "value": 50,
+            "source": "nhe_mco_recon",
+            "basis": "national",
+            "confidence": "estimate",
+            "note": "Two distinct undercounts, per the NHE 2023 identity. (1) Household out-of-pocket: NHE other-professional OOP is $40.5B vs the $13.3B traced OOP edge (gap ~$27.2B — part of the deliberately-traced OOP subset, see data/sheets/individuals.json). (2) Insurer chain: NHE insurer/program receipts net of traced FFS = PHI $51.7B + Medicare ($42.6B − $10B) + Medicaid+CHIP ($16.0B − $4B) = $96.3B vs the $74.1B modeled bundle (gap ~$22.2B). Over half this edge is household OOP, not managed care — a candidate to re-route from this reconciliation node to Individuals."
+          }
+        ],
+        "split": [
+          { "label": "Household out-of-pocket beyond the traced OOP edge", "value": 27.5, "confidence": "estimate" },
+          { "label": "Commercial / private HI claims", "value": 12.1, "confidence": "estimate" },
+          { "label": "Medicare Advantage claims", "value": 7.6, "confidence": "estimate" },
+          { "label": "Medicaid & CHIP managed-care claims", "value": 2.8, "confidence": "estimate" }
         ]
       }
     ]

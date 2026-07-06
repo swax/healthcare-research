@@ -27,7 +27,7 @@
       "id": "individuals",
       "bounds": {
         "x": 60,
-        "y": 521,
+        "y": 497,
         "width": 170,
         "height": 495.1845
       },
@@ -40,7 +40,7 @@
       "id": "employers",
       "bounds": {
         "x": 60,
-        "y": 204,
+        "y": 246,
         "width": 170,
         "height": 201.23999999999998
       },
@@ -50,10 +50,23 @@
       "shape": "rounded-rectangle"
     },
     {
+      "id": "other_third_party",
+      "bounds": {
+        "x": 60,
+        "y": 154,
+        "width": 170,
+        "height": 41.67
+      },
+      "label": "Other Third-Party Payers\n$232B",
+      "nodeColor": "#D32F2F",
+      "labelColor": "#ffffff",
+      "shape": "rounded-rectangle"
+    },
+    {
       "id": "federal_government",
       "bounds": {
         "x": 360,
-        "y": 742,
+        "y": 592,
         "width": 170,
         "height": 263.7
       },
@@ -66,7 +79,7 @@
       "id": "state_governments",
       "bounds": {
         "x": 360,
-        "y": 629,
+        "y": 896,
         "width": 170,
         "height": 63.36
       },
@@ -79,7 +92,7 @@
       "id": "medicare",
       "bounds": {
         "x": 660,
-        "y": 286,
+        "y": 488,
         "width": 170,
         "height": 166.59
       },
@@ -92,7 +105,7 @@
       "id": "medicaid",
       "bounds": {
         "x": 660,
-        "y": 717,
+        "y": 705,
         "width": 170,
         "height": 160.92
       },
@@ -105,7 +118,7 @@
       "id": "health_insurance",
       "bounds": {
         "x": 960,
-        "y": 378,
+        "y": 231,
         "width": 170,
         "height": 427.68517499999996
       },
@@ -115,10 +128,23 @@
       "shape": "rounded-rectangle"
     },
     {
+      "id": "untraced_managed_care",
+      "bounds": {
+        "x": 960,
+        "y": 709,
+        "width": 170,
+        "height": 66.87
+      },
+      "label": "Unattributed Insurer Claims\n$372B",
+      "nodeColor": "#43A047",
+      "labelColor": "#ffffff",
+      "shape": "rounded-rectangle"
+    },
+    {
       "id": "pharma_rx",
       "bounds": {
         "x": 1260,
-        "y": 80,
+        "y": 104,
         "width": 170,
         "height": 75.31631999999999
       },
@@ -131,9 +157,9 @@
       "id": "hospitals",
       "bounds": {
         "x": 1260,
-        "y": 654,
+        "y": 229,
         "width": 170,
-        "height": 270.18
+        "height": 270.1845
       },
       "label": "Hospitals\n$1,501B",
       "nodeColor": "#1E88E5",
@@ -144,7 +170,7 @@
       "id": "providers_clinicians",
       "bounds": {
         "x": 1260,
-        "y": 364,
+        "y": 550,
         "width": 170,
         "height": 240.06981599999997
       },
@@ -157,7 +183,7 @@
       "id": "long_term_care",
       "bounds": {
         "x": 1260,
-        "y": 205,
+        "y": 840,
         "width": 170,
         "height": 109.50858000000001
       },
@@ -170,7 +196,7 @@
       "id": "suppliers_vendors",
       "bounds": {
         "x": 1560,
-        "y": 781,
+        "y": 104,
         "width": 170,
         "height": 235.37583
       },
@@ -183,7 +209,7 @@
       "id": "healthcare_workers",
       "bounds": {
         "x": 1560,
-        "y": 283,
+        "y": 544,
         "width": 170,
         "height": 447.689736
       },
@@ -196,7 +222,7 @@
       "id": "capital_markets",
       "bounds": {
         "x": 1560,
-        "y": 128,
+        "y": 461,
         "width": 170,
         "height": 32.99399999999999
       },
@@ -209,7 +235,7 @@
       "id": "taxes",
       "bounds": {
         "x": 1560,
-        "y": 211,
+        "y": 389,
         "width": 170,
         "height": 22
       },
@@ -292,7 +318,7 @@
         "nodeId": "individuals",
         "anchor": [
           170,
-          357
+          271
         ]
       },
       "to": {
@@ -305,7 +331,7 @@
       "waypoints": [
         {
           "x": 295,
-          "y": 876
+          "y": 746
         }
       ],
       "curve": "smooth",
@@ -315,7 +341,7 @@
       "width": 263.7,
       "label": "$1,465B",
       "labelColor": "#ffffff",
-      "labelPos": 0.03844334473371745
+      "labelPos": 0.036431383445100364
     },
     {
       "id": "e-providers_clinicians-healthcare_workers",
@@ -323,20 +349,20 @@
         "nodeId": "providers_clinicians",
         "anchor": [
           170,
-          101
+          147
         ]
       },
       "to": {
         "nodeId": "healthcare_workers",
         "anchor": [
           0,
-          160
+          260
         ]
       },
       "waypoints": [
         {
           "x": 1495,
-          "y": 454
+          "y": 751
         }
       ],
       "curve": "smooth",
@@ -346,7 +372,7 @@
       "width": 186.3,
       "label": "$1,035B",
       "labelColor": "#ffffff",
-      "labelPos": 0.0379223417483882
+      "labelPos": 0.029695905058175955
     },
     {
       "id": "e-employers-health_insurance",
@@ -354,24 +380,24 @@
         "nodeId": "employers",
         "anchor": [
           170,
-          118
+          86
         ]
       },
       "to": {
         "nodeId": "health_insurance",
         "anchor": [
           0,
-          177
+          159
         ]
       },
       "waypoints": [
         {
           "x": 445,
-          "y": 539
+          "y": 407
         },
         {
           "x": 745,
-          "y": 541
+          "y": 405
         }
       ],
       "curve": "smooth",
@@ -381,7 +407,7 @@
       "width": 158.4,
       "label": "$880B",
       "labelColor": "#ffffff",
-      "labelPos": 0.00609061320895518
+      "labelPos": 0.006727345185882458
     },
     {
       "id": "e-health_insurance-hospitals",
@@ -389,20 +415,20 @@
         "nodeId": "health_insurance",
         "anchor": [
           170,
-          312
+          147
         ]
       },
       "to": {
         "nodeId": "hospitals",
         "anchor": [
           0,
-          108
+          160
         ]
       },
       "waypoints": [
         {
           "x": 1195,
-          "y": 726
+          "y": 384
         }
       ],
       "curve": "smooth",
@@ -412,7 +438,7 @@
       "width": 147.7,
       "label": "$821B",
       "labelColor": "#ffffff",
-      "labelPos": 0.03364582138790061
+      "labelPos": 0.038323467929031414
     },
     {
       "id": "e-hospitals-healthcare_workers",
@@ -420,20 +446,20 @@
         "nodeId": "hospitals",
         "anchor": [
           170,
-          78
+          197
         ]
       },
       "to": {
         "nodeId": "healthcare_workers",
         "anchor": [
           0,
-          326
+          94
         ]
       },
       "waypoints": [
         {
           "x": 1495,
-          "y": 671
+          "y": 532
         }
       ],
       "curve": "smooth",
@@ -443,7 +469,7 @@
       "width": 145.8,
       "label": "$810B",
       "labelColor": "#ffffff",
-      "labelPos": 0.027937962963954878
+      "labelPos": 0.020105793539015482
     },
     {
       "id": "e-health_insurance-providers_clinicians",
@@ -451,20 +477,20 @@
         "nodeId": "health_insurance",
         "anchor": [
           170,
-          172
+          290
         ]
       },
       "to": {
         "nodeId": "providers_clinicians",
         "anchor": [
           0,
-          149
+          67
         ]
       },
       "waypoints": [
         {
           "x": 1195,
-          "y": 532
+          "y": 569
         }
       ],
       "curve": "smooth",
@@ -474,7 +500,7 @@
       "width": 133.3,
       "label": "$741B",
       "labelColor": "#ffffff",
-      "labelPos": 0.03699147265933301
+      "labelPos": 0.030939741036936374
     },
     {
       "id": "e-hospitals-suppliers_vendors",
@@ -482,20 +508,20 @@
         "nodeId": "hospitals",
         "anchor": [
           170,
-          211
+          59
         ]
       },
       "to": {
         "nodeId": "suppliers_vendors",
         "anchor": [
           0,
-          147
+          109
         ]
       },
       "waypoints": [
         {
           "x": 1495,
-          "y": 897
+          "y": 251
         }
       ],
       "curve": "smooth",
@@ -505,7 +531,7 @@
       "width": 118.8,
       "label": "$660B",
       "labelColor": "#ffffff",
-      "labelPos": 0.03461072993369
+      "labelPos": 0.033314275404243164
     },
     {
       "id": "e-federal_government-medicaid",
@@ -513,20 +539,20 @@
         "nodeId": "federal_government",
         "anchor": [
           170,
-          165
+          177
         ]
       },
       "to": {
         "nodeId": "medicaid",
         "anchor": [
           0,
-          106
+          55
         ]
       },
       "waypoints": [
         {
           "x": 595,
-          "y": 865
+          "y": 765
         }
       ],
       "curve": "smooth",
@@ -536,7 +562,7 @@
       "width": 110.5,
       "label": "$614B",
       "labelColor": "#ffffff",
-      "labelPos": 0.03230448724986785
+      "labelPos": 0.038368572981522894
     },
     {
       "id": "e-medicare-health_insurance",
@@ -544,20 +570,20 @@
         "nodeId": "medicare",
         "anchor": [
           170,
-          90
+          86
         ]
       },
       "to": {
         "nodeId": "health_insurance",
         "anchor": [
           0,
-          50
+          286
         ]
       },
       "waypoints": [
         {
           "x": 895,
-          "y": 402
+          "y": 546
         }
       ],
       "curve": "smooth",
@@ -567,7 +593,7 @@
       "width": 97,
       "label": "$539B",
       "labelColor": "#ffffff",
-      "labelPos": 0.03571064195712536
+      "labelPos": 0.03522363861535018
     },
     {
       "id": "e-medicaid-health_insurance",
@@ -575,7 +601,7 @@
         "nodeId": "medicaid",
         "anchor": [
           170,
-          98
+          68
         ]
       },
       "to": {
@@ -588,7 +614,7 @@
       "waypoints": [
         {
           "x": 895,
-          "y": 787
+          "y": 693
         }
       ],
       "curve": "smooth",
@@ -598,7 +624,7 @@
       "width": 91.4,
       "label": "$508B",
       "labelColor": "#ffffff",
-      "labelPos": 0.035323562146577156
+      "labelPos": 0.024162373891188096
     },
     {
       "id": "e-federal_government-medicare",
@@ -606,7 +632,7 @@
         "nodeId": "federal_government",
         "anchor": [
           170,
-          56
+          82
         ]
       },
       "to": {
@@ -619,7 +645,7 @@
       "waypoints": [
         {
           "x": 595,
-          "y": 606
+          "y": 645
         }
       ],
       "curve": "smooth",
@@ -629,7 +655,7 @@
       "width": 78.7,
       "label": "$437B",
       "labelColor": "#ffffff",
-      "labelPos": 0.012304485375701928
+      "labelPos": 0.03502260332921924
     },
     {
       "id": "e-individuals-health_insurance",
@@ -637,24 +663,24 @@
         "nodeId": "individuals",
         "anchor": [
           170,
-          71
+          107
         ]
       },
       "to": {
         "nodeId": "health_insurance",
         "anchor": [
           0,
-          303
+          48
         ]
       },
       "waypoints": [
         {
           "x": 445,
-          "y": 356
+          "y": 523
         },
         {
           "x": 745,
-          "y": 681
+          "y": 284
         }
       ],
       "curve": "smooth",
@@ -664,7 +690,7 @@
       "width": 63.9,
       "label": "$355B",
       "labelColor": "#ffffff",
-      "labelPos": 0.005120087371345139
+      "labelPos": 0.00603592296950297
     },
     {
       "id": "e-individuals-state_governments",
@@ -672,7 +698,7 @@
         "nodeId": "individuals",
         "anchor": [
           170,
-          193
+          464
         ]
       },
       "to": {
@@ -685,7 +711,7 @@
       "waypoints": [
         {
           "x": 295,
-          "y": 688
+          "y": 945
         }
       ],
       "curve": "smooth",
@@ -695,7 +721,7 @@
       "width": 63.4,
       "label": "$352B",
       "labelColor": "#ffffff",
-      "labelPos": 0.03561461569080608
+      "labelPos": 0.03727821882500826
     },
     {
       "id": "e-individuals-medicare",
@@ -703,20 +729,20 @@
         "nodeId": "individuals",
         "anchor": [
           170,
-          132
+          46
         ]
       },
       "to": {
         "nodeId": "medicare",
         "anchor": [
           0,
-          59
+          29
         ]
       },
       "waypoints": [
         {
           "x": 445,
-          "y": 427
+          "y": 295
         }
       ],
       "curve": "smooth",
@@ -726,7 +752,7 @@
       "width": 58.6,
       "label": "$326B",
       "labelColor": "#ffffff",
-      "labelPos": 0.00922445267953185
+      "labelPos": 0.007846013926305044
     },
     {
       "id": "e-state_governments-medicaid",
@@ -734,20 +760,20 @@
         "nodeId": "state_governments",
         "anchor": [
           170,
-          25
+          29
         ]
       },
       "to": {
         "nodeId": "medicaid",
         "anchor": [
           0,
-          25
+          136
         ]
       },
       "waypoints": [
         {
           "x": 595,
-          "y": 698
+          "y": 883
         }
       ],
       "curve": "smooth",
@@ -757,7 +783,7 @@
       "width": 50.4,
       "label": "$280B",
       "labelColor": "#ffffff",
-      "labelPos": 0.03185036431292064
+      "labelPos": 0.03230448724986785
     },
     {
       "id": "e-health_insurance-long_term_care",
@@ -765,20 +791,20 @@
         "nodeId": "health_insurance",
         "anchor": [
           170,
-          80
+          382
         ]
       },
       "to": {
         "nodeId": "long_term_care",
         "anchor": [
           0,
-          82
+          25
         ]
       },
       "waypoints": [
         {
           "x": 1195,
-          "y": 373
+          "y": 739
         }
       ],
       "curve": "smooth",
@@ -788,7 +814,7 @@
       "width": 50.1,
       "label": "$278B",
       "labelColor": "#ffffff",
-      "labelPos": 0.02327688062309754
+      "labelPos": 0.01763320176506068
     },
     {
       "id": "e-providers_clinicians-suppliers_vendors",
@@ -796,20 +822,20 @@
         "nodeId": "providers_clinicians",
         "anchor": [
           170,
-          217
+          23
         ]
       },
       "to": {
         "nodeId": "suppliers_vendors",
         "anchor": [
           0,
-          61
+          191
         ]
       },
       "waypoints": [
         {
           "x": 1495,
-          "y": 712
+          "y": 434
         }
       ],
       "curve": "smooth",
@@ -819,7 +845,7 @@
       "width": 46.3,
       "label": "$257B",
       "labelColor": "#ffffff",
-      "labelPos": 0.017147720349393197
+      "labelPos": 0.016292264001797157
     },
     {
       "id": "e-long_term_care-healthcare_workers",
@@ -827,20 +853,20 @@
         "nodeId": "long_term_care",
         "anchor": [
           170,
-          47
+          64
         ]
       },
       "to": {
         "nodeId": "healthcare_workers",
         "anchor": [
           0,
-          44
+          376
         ]
       },
       "waypoints": [
         {
           "x": 1495,
-          "y": 290
+          "y": 912
         }
       ],
       "curve": "smooth",
@@ -850,7 +876,7 @@
       "width": 45.6,
       "label": "$253B",
       "labelColor": "#ffffff",
-      "labelPos": 0.033314275404243164
+      "labelPos": 0.03817350041975505
     },
     {
       "id": "e-health_insurance-pharma_rx",
@@ -858,7 +884,7 @@
         "nodeId": "health_insurance",
         "anchor": [
           170,
-          31
+          51
         ]
       },
       "to": {
@@ -871,7 +897,7 @@
       "waypoints": [
         {
           "x": 1195,
-          "y": 267
+          "y": 215
         }
       ],
       "curve": "smooth",
@@ -880,7 +906,37 @@
       "opacity": 0.8,
       "width": 43.7,
       "labelColor": "#ffffff",
-      "labelPos": 0.01596172368120737
+      "labelPos": 0.026781273881374718
+    },
+    {
+      "id": "e-untraced_managed_care-hospitals",
+      "from": {
+        "nodeId": "untraced_managed_care",
+        "anchor": [
+          170,
+          18
+        ]
+      },
+      "to": {
+        "nodeId": "hospitals",
+        "anchor": [
+          0,
+          252
+        ]
+      },
+      "waypoints": [
+        {
+          "x": 1195,
+          "y": 604
+        }
+      ],
+      "curve": "smooth",
+      "color": "#43A047",
+      "arrow": "none",
+      "opacity": 0.8,
+      "width": 36.4,
+      "labelColor": "#ffffff",
+      "labelPos": 0.017970271570808664
     },
     {
       "id": "e-medicaid-long_term_care",
@@ -888,20 +944,20 @@
         "nodeId": "medicaid",
         "anchor": [
           170,
-          37
+          129
         ]
       },
       "to": {
         "nodeId": "long_term_care",
         "anchor": [
           0,
-          28
+          67
         ]
       },
       "waypoints": [
         {
           "x": 1045,
-          "y": 340
+          "y": 800
         }
       ],
       "curve": "smooth",
@@ -910,7 +966,37 @@
       "opacity": 0.8,
       "width": 30.6,
       "labelColor": "#ffffff",
-      "labelPos": 0.007075610766402697
+      "labelPos": 0.010921182323459249
+    },
+    {
+      "id": "e-untraced_managed_care-providers_clinicians",
+      "from": {
+        "nodeId": "untraced_managed_care",
+        "anchor": [
+          170,
+          52
+        ]
+      },
+      "to": {
+        "nodeId": "providers_clinicians",
+        "anchor": [
+          0,
+          149
+        ]
+      },
+      "waypoints": [
+        {
+          "x": 1195,
+          "y": 730
+        }
+      ],
+      "curve": "smooth",
+      "color": "#43A047",
+      "arrow": "none",
+      "opacity": 0.8,
+      "width": 30.5,
+      "labelColor": "#ffffff",
+      "labelPos": 0.03471552620013273
     },
     {
       "id": "e-employers-medicare",
@@ -918,20 +1004,20 @@
         "nodeId": "employers",
         "anchor": [
           170,
-          25
+          179
         ]
       },
       "to": {
         "nodeId": "medicare",
         "anchor": [
           0,
-          15
+          73
         ]
       },
       "waypoints": [
         {
           "x": 445,
-          "y": 300
+          "y": 573
         }
       ],
       "curve": "smooth",
@@ -940,7 +1026,7 @@
       "opacity": 0.8,
       "width": 29.3,
       "labelColor": "#ffffff",
-      "labelPos": 0.011327022038985255
+      "labelPos": 0.010496484811907318
     },
     {
       "id": "e-medicare-hospitals",
@@ -948,20 +1034,20 @@
         "nodeId": "medicare",
         "anchor": [
           170,
-          152
+          14
         ]
       },
       "to": {
         "nodeId": "hospitals",
         "anchor": [
           0,
-          220
+          28
         ]
       },
       "waypoints": [
         {
           "x": 1045,
-          "y": 862
+          "y": 113
         }
       ],
       "curve": "smooth",
@@ -970,7 +1056,45 @@
       "opacity": 0.8,
       "width": 27,
       "labelColor": "#ffffff",
-      "labelPos": 0.007238715857914525
+      "labelPos": 0.007110052296346731
+    },
+    {
+      "id": "e-other_third_party-hospitals",
+      "from": {
+        "nodeId": "other_third_party",
+        "anchor": [
+          170,
+          12
+        ]
+      },
+      "to": {
+        "nodeId": "hospitals",
+        "anchor": [
+          0,
+          70
+        ]
+      },
+      "waypoints": [
+        {
+          "x": 445,
+          "y": 229
+        },
+        {
+          "x": 745,
+          "y": 205
+        },
+        {
+          "x": 1045,
+          "y": 175
+        }
+      ],
+      "curve": "smooth",
+      "color": "#D32F2F",
+      "arrow": "none",
+      "opacity": 0.8,
+      "width": 24.5,
+      "labelColor": "#ffffff",
+      "labelPos": 0.004652502711621476
     },
     {
       "id": "e-pharma_rx-healthcare_workers",
@@ -978,7 +1102,7 @@
         "nodeId": "pharma_rx",
         "anchor": [
           170,
-          34
+          55
         ]
       },
       "to": {
@@ -991,7 +1115,7 @@
       "waypoints": [
         {
           "x": 1495,
-          "y": 204
+          "y": 357
         }
       ],
       "curve": "smooth",
@@ -1000,7 +1124,7 @@
       "opacity": 0.8,
       "width": 21,
       "labelColor": "#ffffff",
-      "labelPos": 0.022601228846485067
+      "labelPos": 0.012023779116939965
     },
     {
       "id": "e-health_insurance-healthcare_workers",
@@ -1021,7 +1145,7 @@
       "waypoints": [
         {
           "x": 1345,
-          "y": 1012
+          "y": 999
         }
       ],
       "curve": "smooth",
@@ -1030,7 +1154,7 @@
       "opacity": 0.8,
       "width": 21,
       "labelColor": "#ffffff",
-      "labelPos": 0.0074840493608666365
+      "labelPos": 0.007969828532197859
     },
     {
       "id": "e-pharma_rx-suppliers_vendors",
@@ -1038,20 +1162,20 @@
         "nodeId": "pharma_rx",
         "anchor": [
           170,
-          55
+          20
         ]
       },
       "to": {
         "nodeId": "suppliers_vendors",
         "anchor": [
           0,
-          10
+          39
         ]
       },
       "waypoints": [
         {
           "x": 1495,
-          "y": 463
+          "y": 134
         }
       ],
       "curve": "smooth",
@@ -1060,7 +1184,7 @@
       "opacity": 0.8,
       "width": 20.4,
       "labelColor": "#ffffff",
-      "labelPos": 0.007476556628240369
+      "labelPos": 0.038056137825751735
     },
     {
       "id": "e-health_insurance-suppliers_vendors",
@@ -1068,20 +1192,20 @@
         "nodeId": "health_insurance",
         "anchor": [
           170,
-          397
+          10
         ]
       },
       "to": {
         "nodeId": "suppliers_vendors",
         "anchor": [
           0,
-          217
+          19
         ]
       },
       "waypoints": [
         {
           "x": 1345,
-          "y": 939
+          "y": 64
         }
       ],
       "curve": "smooth",
@@ -1090,7 +1214,7 @@
       "opacity": 0.8,
       "width": 20.4,
       "labelColor": "#ffffff",
-      "labelPos": 0.01013464126136145
+      "labelPos": 0.009971409721867006
     },
     {
       "id": "e-federal_government-healthcare_workers",
@@ -1105,21 +1229,21 @@
         "nodeId": "healthcare_workers",
         "anchor": [
           0,
-          408
+          417
         ]
       },
       "waypoints": [
         {
           "x": 745,
-          "y": 941
+          "y": 970
         },
         {
           "x": 1045,
-          "y": 924
+          "y": 970
         },
         {
           "x": 1345,
-          "y": 963
+          "y": 976
         }
       ],
       "curve": "smooth",
@@ -1128,7 +1252,45 @@
       "opacity": 0.8,
       "width": 19.1,
       "labelColor": "#ffffff",
-      "labelPos": 0.0042675196578474284
+      "labelPos": 0.004700228356048582
+    },
+    {
+      "id": "e-other_third_party-providers_clinicians",
+      "from": {
+        "nodeId": "other_third_party",
+        "anchor": [
+          170,
+          33
+        ]
+      },
+      "to": {
+        "nodeId": "providers_clinicians",
+        "anchor": [
+          0,
+          208
+        ]
+      },
+      "waypoints": [
+        {
+          "x": 445,
+          "y": 973
+        },
+        {
+          "x": 745,
+          "y": 931
+        },
+        {
+          "x": 1045,
+          "y": 917
+        }
+      ],
+      "curve": "smooth",
+      "color": "#D32F2F",
+      "arrow": "none",
+      "opacity": 0.8,
+      "width": 17.2,
+      "labelColor": "#ffffff",
+      "labelPos": 0.002966420503576184
     },
     {
       "id": "e-medicare-providers_clinicians",
@@ -1136,20 +1298,20 @@
         "nodeId": "medicare",
         "anchor": [
           170,
-          19
+          157
         ]
       },
       "to": {
         "nodeId": "providers_clinicians",
         "anchor": [
           0,
-          67
+          184
         ]
       },
       "waypoints": [
         {
           "x": 1045,
-          "y": 290
+          "y": 885
         }
       ],
       "curve": "smooth",
@@ -1158,7 +1320,7 @@
       "opacity": 0.8,
       "width": 17.1,
       "labelColor": "#ffffff",
-      "labelPos": 0.01057902177553068
+      "labelPos": 0.00854778492056217
     },
     {
       "id": "e-long_term_care-suppliers_vendors",
@@ -1166,20 +1328,20 @@
         "nodeId": "long_term_care",
         "anchor": [
           170,
-          79
+          31
         ]
       },
       "to": {
         "nodeId": "suppliers_vendors",
         "anchor": [
           0,
-          29
+          223
         ]
       },
       "waypoints": [
         {
           "x": 1495,
-          "y": 547
+          "y": 599
         }
       ],
       "curve": "smooth",
@@ -1188,7 +1350,7 @@
       "opacity": 0.8,
       "width": 17.1,
       "labelColor": "#ffffff",
-      "labelPos": 0.009228045557352188
+      "labelPos": 0.008939467343475829
     },
     {
       "id": "e-federal_government-hospitals",
@@ -1196,24 +1358,24 @@
         "nodeId": "federal_government",
         "anchor": [
           170,
-          228
+          20
         ]
       },
       "to": {
         "nodeId": "hospitals",
         "anchor": [
           0,
-          190
+          50
         ]
       },
       "waypoints": [
         {
           "x": 745,
-          "y": 890
+          "y": 161
         },
         {
           "x": 1045,
-          "y": 823
+          "y": 144
         }
       ],
       "curve": "smooth",
@@ -1222,7 +1384,7 @@
       "opacity": 0.8,
       "width": 16.2,
       "labelColor": "#ffffff",
-      "labelPos": 0.006641736485435147
+      "labelPos": 0.004743935699746297
     },
     {
       "id": "e-individuals-providers_clinicians",
@@ -1230,28 +1392,28 @@
         "nodeId": "individuals",
         "anchor": [
           170,
-          18
+          411
         ]
       },
       "to": {
         "nodeId": "providers_clinicians",
         "anchor": [
           0,
-          39
+          224
         ]
       },
       "waypoints": [
         {
           "x": 445,
-          "y": 250
+          "y": 867
         },
         {
           "x": 745,
-          "y": 230
+          "y": 895
         },
         {
           "x": 1045,
-          "y": 222
+          "y": 937
         }
       ],
       "curve": "smooth",
@@ -1260,7 +1422,7 @@
       "opacity": 0.8,
       "width": 15.7,
       "labelColor": "#ffffff",
-      "labelPos": 0.0040257007938447695
+      "labelPos": 0.004574952205532453
     },
     {
       "id": "e-federal_government-health_insurance",
@@ -1268,20 +1430,20 @@
         "nodeId": "federal_government",
         "anchor": [
           170,
-          102
+          35
         ]
       },
       "to": {
         "nodeId": "health_insurance",
         "anchor": [
           0,
-          264
+          8
         ]
       },
       "waypoints": [
         {
           "x": 745,
-          "y": 638
+          "y": 235
         }
       ],
       "curve": "smooth",
@@ -1290,7 +1452,7 @@
       "opacity": 0.8,
       "width": 14.4,
       "labelColor": "#ffffff",
-      "labelPos": 0.009750443701432684
+      "labelPos": 0.007551425024089653
     },
     {
       "id": "e-medicare-long_term_care",
@@ -1298,20 +1460,20 @@
         "nodeId": "medicare",
         "anchor": [
           170,
-          35
+          142
         ]
       },
       "to": {
         "nodeId": "long_term_care",
         "anchor": [
           0,
-          51
+          103
         ]
       },
       "waypoints": [
         {
           "x": 1045,
-          "y": 367
+          "y": 850
         }
       ],
       "curve": "smooth",
@@ -1320,7 +1482,7 @@
       "opacity": 0.8,
       "width": 13.7,
       "labelColor": "#ffffff",
-      "labelPos": 0.010826525652996289
+      "labelPos": 0.009227411542697234
     },
     {
       "id": "e-individuals-long_term_care",
@@ -1328,28 +1490,28 @@
         "nodeId": "individuals",
         "anchor": [
           170,
-          32
+          425
         ]
       },
       "to": {
         "nodeId": "long_term_care",
         "anchor": [
           0,
-          7
+          89
         ]
       },
       "waypoints": [
         {
           "x": 445,
-          "y": 274
+          "y": 886
         },
         {
           "x": 745,
-          "y": 270
+          "y": 877
         },
         {
           "x": 1045,
-          "y": 265
+          "y": 833
         }
       ],
       "curve": "smooth",
@@ -1358,7 +1520,7 @@
       "opacity": 0.8,
       "width": 13.2,
       "labelColor": "#ffffff",
-      "labelPos": 0.004259906837331125
+      "labelPos": 0.004731278908335689
     },
     {
       "id": "e-federal_government-providers_clinicians",
@@ -1366,24 +1528,24 @@
         "nodeId": "federal_government",
         "anchor": [
           170,
-          9
+          239
         ]
       },
       "to": {
         "nodeId": "providers_clinicians",
         "anchor": [
           0,
-          53
+          170
         ]
       },
       "waypoints": [
         {
           "x": 745,
-          "y": 253
+          "y": 912
         },
         {
           "x": 1045,
-          "y": 245
+          "y": 866
         }
       ],
       "curve": "smooth",
@@ -1392,7 +1554,7 @@
       "opacity": 0.8,
       "width": 10.8,
       "labelColor": "#ffffff",
-      "labelPos": 0.004472792858113345
+      "labelPos": 0.006304019682014598
     },
     {
       "id": "e-pharma_rx-capital_markets",
@@ -1400,7 +1562,7 @@
         "nodeId": "pharma_rx",
         "anchor": [
           170,
-          15
+          39
         ]
       },
       "to": {
@@ -1413,7 +1575,7 @@
       "waypoints": [
         {
           "x": 1495,
-          "y": 119
+          "y": 309
         }
       ],
       "curve": "smooth",
@@ -1422,7 +1584,7 @@
       "opacity": 0.8,
       "width": 10.4,
       "labelColor": "#ffffff",
-      "labelPos": 0.03616937250289709
+      "labelPos": 0.01402349388681565
     },
     {
       "id": "e-individuals-pharma_rx",
@@ -1430,45 +1592,7 @@
         "nodeId": "individuals",
         "anchor": [
           170,
-          5
-        ]
-      },
-      "to": {
-        "nodeId": "pharma_rx",
-        "anchor": [
-          0,
-          5
-        ]
-      },
-      "waypoints": [
-        {
-          "x": 445,
-          "y": 227
-        },
-        {
-          "x": 745,
-          "y": 207
-        },
-        {
-          "x": 1045,
-          "y": 162
-        }
-      ],
-      "curve": "smooth",
-      "color": "#D32F2F",
-      "arrow": "none",
-      "opacity": 0.8,
-      "width": 10,
-      "labelColor": "#ffffff",
-      "labelPos": 0.004164345006897399
-    },
-    {
-      "id": "e-medicare-pharma_rx",
-      "from": {
-        "nodeId": "medicare",
-        "anchor": [
-          170,
-          6
+          12
         ]
       },
       "to": {
@@ -1480,8 +1604,46 @@
       },
       "waypoints": [
         {
+          "x": 445,
+          "y": 251
+        },
+        {
+          "x": 745,
+          "y": 184
+        },
+        {
           "x": 1045,
-          "y": 199
+          "y": 216
+        }
+      ],
+      "curve": "smooth",
+      "color": "#D32F2F",
+      "arrow": "none",
+      "opacity": 0.8,
+      "width": 10,
+      "labelColor": "#ffffff",
+      "labelPos": 0.004234410838778546
+    },
+    {
+      "id": "e-medicare-pharma_rx",
+      "from": {
+        "nodeId": "medicare",
+        "anchor": [
+          170,
+          33
+        ]
+      },
+      "to": {
+        "nodeId": "pharma_rx",
+        "anchor": [
+          0,
+          5
+        ]
+      },
+      "waypoints": [
+        {
+          "x": 1045,
+          "y": 202
         }
       ],
       "curve": "smooth",
@@ -1490,7 +1652,7 @@
       "opacity": 0.8,
       "width": 9.9,
       "labelColor": "#ffffff",
-      "labelPos": 0.010568934664704321
+      "labelPos": 0.008078308065063773
     },
     {
       "id": "e-health_insurance-capital_markets",
@@ -1498,7 +1660,7 @@
         "nodeId": "health_insurance",
         "anchor": [
           170,
-          5
+          25
         ]
       },
       "to": {
@@ -1511,7 +1673,7 @@
       "waypoints": [
         {
           "x": 1345,
-          "y": 65
+          "y": 90
         }
       ],
       "curve": "smooth",
@@ -1520,7 +1682,7 @@
       "opacity": 0.8,
       "width": 9.2,
       "labelColor": "#ffffff",
-      "labelPos": 0.008205358727214536
+      "labelPos": 0.00709465511489895
     },
     {
       "id": "e-state_governments-healthcare_workers",
@@ -1535,21 +1697,21 @@
         "nodeId": "healthcare_workers",
         "anchor": [
           0,
-          422
+          403
         ]
       },
       "waypoints": [
         {
           "x": 745,
-          "y": 959
+          "y": 988
         },
         {
           "x": 1045,
-          "y": 948
+          "y": 988
         },
         {
           "x": 1345,
-          "y": 994
+          "y": 958
         }
       ],
       "curve": "smooth",
@@ -1558,7 +1720,7 @@
       "opacity": 0.8,
       "width": 9,
       "labelColor": "#ffffff",
-      "labelPos": 0.0038172652653325565
+      "labelPos": 0.004834209361729819
     },
     {
       "id": "e-federal_government-suppliers_vendors",
@@ -1566,28 +1728,28 @@
         "nodeId": "federal_government",
         "anchor": [
           170,
-          240
+          4
         ]
       },
       "to": {
         "nodeId": "suppliers_vendors",
         "anchor": [
           0,
-          231
+          4
         ]
       },
       "waypoints": [
         {
           "x": 745,
-          "y": 923
+          "y": 139
         },
         {
           "x": 1045,
-          "y": 899
+          "y": 50
         },
         {
           "x": 1345,
-          "y": 980
+          "y": 40
         }
       ],
       "curve": "smooth",
@@ -1596,7 +1758,7 @@
       "opacity": 0.8,
       "width": 8.5,
       "labelColor": "#ffffff",
-      "labelPos": 0.004752770827225519
+      "labelPos": 0.0037212468339648712
     },
     {
       "id": "e-medicaid-hospitals",
@@ -1604,20 +1766,20 @@
         "nodeId": "medicaid",
         "anchor": [
           170,
-          148
+          13
         ]
       },
       "to": {
         "nodeId": "hospitals",
         "anchor": [
           0,
-          202
+          11
         ]
       },
       "waypoints": [
         {
           "x": 1045,
-          "y": 839
+          "y": 85
         }
       ],
       "curve": "smooth",
@@ -1626,7 +1788,7 @@
       "opacity": 0.8,
       "width": 8.1,
       "labelColor": "#ffffff",
-      "labelPos": 0.011567716305675562
+      "labelPos": 0.005355822456509616
     },
     {
       "id": "e-medicaid-providers_clinicians",
@@ -1634,20 +1796,20 @@
         "nodeId": "medicaid",
         "anchor": [
           170,
-          18
+          148
         ]
       },
       "to": {
         "nodeId": "providers_clinicians",
         "anchor": [
           0,
-          79
+          196
         ]
       },
       "waypoints": [
         {
           "x": 1045,
-          "y": 312
+          "y": 901
         }
       ],
       "curve": "smooth",
@@ -1656,7 +1818,7 @@
       "opacity": 0.8,
       "width": 7.2,
       "labelColor": "#ffffff",
-      "labelPos": 0.0068844946886147135
+      "labelPos": 0.010302053056828207
     },
     {
       "id": "e-employers-providers_clinicians",
@@ -1664,49 +1826,11 @@
         "nodeId": "employers",
         "anchor": [
           170,
-          6
+          198
         ]
       },
       "to": {
         "nodeId": "providers_clinicians",
-        "anchor": [
-          0,
-          28
-        ]
-      },
-      "waypoints": [
-        {
-          "x": 445,
-          "y": 208
-        },
-        {
-          "x": 745,
-          "y": 195
-        },
-        {
-          "x": 1045,
-          "y": 181
-        }
-      ],
-      "curve": "smooth",
-      "color": "#D32F2F",
-      "arrow": "none",
-      "opacity": 0.8,
-      "width": 7.2,
-      "labelColor": "#ffffff",
-      "labelPos": 0.004476844489455194
-    },
-    {
-      "id": "e-individuals-hospitals",
-      "from": {
-        "nodeId": "individuals",
-        "anchor": [
-          170,
-          492
-        ]
-      },
-      "to": {
-        "nodeId": "hospitals",
         "anchor": [
           0,
           236
@@ -1715,15 +1839,53 @@
       "waypoints": [
         {
           "x": 445,
-          "y": 1013
+          "y": 989
         },
         {
           "x": 745,
-          "y": 911
+          "y": 953
         },
         {
           "x": 1045,
-          "y": 882
+          "y": 953
+        }
+      ],
+      "curve": "smooth",
+      "color": "#D32F2F",
+      "arrow": "none",
+      "opacity": 0.8,
+      "width": 7.2,
+      "labelColor": "#ffffff",
+      "labelPos": 0.0034240323937133844
+    },
+    {
+      "id": "e-individuals-hospitals",
+      "from": {
+        "nodeId": "individuals",
+        "anchor": [
+          170,
+          3
+        ]
+      },
+      "to": {
+        "nodeId": "hospitals",
+        "anchor": [
+          0,
+          3
+        ]
+      },
+      "waypoints": [
+        {
+          "x": 445,
+          "y": 209
+        },
+        {
+          "x": 745,
+          "y": 121
+        },
+        {
+          "x": 1045,
+          "y": 68
         }
       ],
       "curve": "smooth",
@@ -1732,7 +1894,7 @@
       "opacity": 0.8,
       "width": 6.8,
       "labelColor": "#ffffff",
-      "labelPos": 0.004769112501530618
+      "labelPos": 0.004001586690144452
     },
     {
       "id": "e-providers_clinicians-capital_markets",
@@ -1740,20 +1902,20 @@
         "nodeId": "providers_clinicians",
         "anchor": [
           170,
-          3
+          50
         ]
       },
       "to": {
         "nodeId": "capital_markets",
         "anchor": [
           0,
-          25
+          28
         ]
       },
       "waypoints": [
         {
           "x": 1495,
-          "y": 260
+          "y": 545
         }
       ],
       "curve": "smooth",
@@ -1762,7 +1924,7 @@
       "opacity": 0.8,
       "width": 6.8,
       "labelColor": "#ffffff",
-      "labelPos": 0.019968713566491315
+      "labelPos": 0.029249481332188604
     },
     {
       "id": "e-medicaid-pharma_rx",
@@ -1770,20 +1932,20 @@
         "nodeId": "medicaid",
         "anchor": [
           170,
-          12
+          20
         ]
       },
       "to": {
         "nodeId": "pharma_rx",
         "anchor": [
           0,
-          69
+          73
         ]
       },
       "waypoints": [
         {
           "x": 1045,
-          "y": 439
+          "y": 451
         }
       ],
       "curve": "smooth",
@@ -1792,7 +1954,7 @@
       "opacity": 0.8,
       "width": 5.4,
       "labelColor": "#ffffff",
-      "labelPos": 0.006925101479449337
+      "labelPos": 0.007178072129717495
     },
     {
       "id": "e-hospitals-capital_markets",
@@ -1800,20 +1962,20 @@
         "nodeId": "hospitals",
         "anchor": [
           170,
-          3
+          122
         ]
       },
       "to": {
         "nodeId": "capital_markets",
         "anchor": [
           0,
-          30
+          22
         ]
       },
       "waypoints": [
         {
           "x": 1495,
-          "y": 408
+          "y": 417
         }
       ],
       "curve": "smooth",
@@ -1822,7 +1984,7 @@
       "opacity": 0.8,
       "width": 5,
       "labelColor": "#ffffff",
-      "labelPos": 0.00969638759135764
+      "labelPos": 0.02698802213523075
     },
     {
       "id": "e-state_governments-suppliers_vendors",
@@ -1830,20 +1992,20 @@
         "nodeId": "state_governments",
         "anchor": [
           170,
-          52
+          2
         ]
       },
       "to": {
         "nodeId": "suppliers_vendors",
         "anchor": [
           0,
-          86
+          233
         ]
       },
       "waypoints": [
         {
           "x": 1045,
-          "y": 774
+          "y": 618
         }
       ],
       "curve": "smooth",
@@ -1852,7 +2014,7 @@
       "opacity": 0.8,
       "width": 4,
       "labelColor": "#ffffff",
-      "labelPos": 0.004777103010682474
+      "labelPos": 0.004263050566186191
     },
     {
       "id": "e-federal_government-pharma_rx",
@@ -1860,20 +2022,20 @@
         "nodeId": "federal_government",
         "anchor": [
           170,
-          2
+          10
         ]
       },
       "to": {
         "nodeId": "pharma_rx",
         "anchor": [
           0,
-          74
+          68
         ]
       },
       "waypoints": [
         {
           "x": 895,
-          "y": 449
+          "y": 387
         }
       ],
       "curve": "smooth",
@@ -1882,7 +2044,7 @@
       "opacity": 0.8,
       "width": 3.6,
       "labelColor": "#ffffff",
-      "labelPos": 0.005326992068221256
+      "labelPos": 0.005901579710218761
     },
     {
       "id": "e-employers-hospitals",
@@ -1890,20 +2052,20 @@
         "nodeId": "employers",
         "anchor": [
           170,
-          199
+          5
         ]
       },
       "to": {
         "nodeId": "hospitals",
         "anchor": [
           0,
-          32
+          84
         ]
       },
       "waypoints": [
         {
           "x": 745,
-          "y": 545
+          "y": 282
         }
       ],
       "curve": "smooth",
@@ -1912,7 +2074,7 @@
       "opacity": 0.8,
       "width": 3.6,
       "labelColor": "#ffffff",
-      "labelPos": 0.004680897148212486
+      "labelPos": 0.004845598247878136
     },
     {
       "id": "e-pharma_rx-taxes",
@@ -1920,7 +2082,7 @@
         "nodeId": "pharma_rx",
         "anchor": [
           170,
-          22
+          32
         ]
       },
       "to": {
@@ -1933,7 +2095,7 @@
       "waypoints": [
         {
           "x": 1495,
-          "y": 161
+          "y": 267
         }
       ],
       "curve": "smooth",
@@ -1942,7 +2104,7 @@
       "opacity": 0.8,
       "width": 3.2,
       "labelColor": "#ffffff",
-      "labelPos": 0.028479050541597124
+      "labelPos": 0.01709524099173813
     },
     {
       "id": "e-employers-pharma_rx",
@@ -1963,7 +2125,7 @@
       "waypoints": [
         {
           "x": 745,
-          "y": 153
+          "y": 186
         }
       ],
       "curve": "smooth",
@@ -1972,7 +2134,7 @@
       "opacity": 0.8,
       "width": 2.7,
       "labelColor": "#ffffff",
-      "labelPos": 0.0048298111201741135
+      "labelPos": 0.004820670678922227
     },
     {
       "id": "e-health_insurance-taxes",
@@ -1980,20 +2142,20 @@
         "nodeId": "health_insurance",
         "anchor": [
           170,
-          54
+          222
         ]
       },
       "to": {
         "nodeId": "taxes",
         "anchor": [
           0,
-          13
+          12
         ]
       },
       "waypoints": [
         {
           "x": 1345,
-          "y": 328
+          "y": 427
         }
       ],
       "curve": "smooth",
@@ -2002,7 +2164,7 @@
       "opacity": 0.8,
       "width": 2.3,
       "labelColor": "#ffffff",
-      "labelPos": 0.010467583726721647
+      "labelPos": 0.011543804345869652
     },
     {
       "id": "e-federal_government-long_term_care",
@@ -2010,20 +2172,20 @@
         "nodeId": "federal_government",
         "anchor": [
           170,
-          15
+          233
         ]
       },
       "to": {
         "nodeId": "long_term_care",
         "anchor": [
           0,
-          109
+          51
         ]
       },
       "waypoints": [
         {
           "x": 895,
-          "y": 536
+          "y": 858
         }
       ],
       "curve": "smooth",
@@ -2032,7 +2194,7 @@
       "opacity": 0.8,
       "width": 2,
       "labelColor": "#ffffff",
-      "labelPos": 0.0058554684384015164
+      "labelPos": 0.006821491890480741
     },
     {
       "id": "e-long_term_care-capital_markets",
@@ -2040,20 +2202,20 @@
         "nodeId": "long_term_care",
         "anchor": [
           170,
-          23
+          41
         ]
       },
       "to": {
         "nodeId": "capital_markets",
         "anchor": [
           0,
-          20
+          32
         ]
       },
       "waypoints": [
         {
           "x": 1495,
-          "y": 188
+          "y": 687
         }
       ],
       "curve": "smooth",
@@ -2062,7 +2224,7 @@
       "opacity": 0.8,
       "width": 1.6,
       "labelColor": "#ffffff",
-      "labelPos": 0.03275608910402091
+      "labelPos": 0.012218987183343908
     },
     {
       "id": "e-hospitals-taxes",
@@ -2070,7 +2232,37 @@
         "nodeId": "hospitals",
         "anchor": [
           170,
-          5
+          119
+        ]
+      },
+      "to": {
+        "nodeId": "taxes",
+        "anchor": [
+          0,
+          11
+        ]
+      },
+      "waypoints": [
+        {
+          "x": 1495,
+          "y": 374
+        }
+      ],
+      "curve": "smooth",
+      "color": "#1E88E5",
+      "arrow": "none",
+      "opacity": 0.8,
+      "width": 1,
+      "labelColor": "#ffffff",
+      "labelPos": 0.03571064195712536
+    },
+    {
+      "id": "e-providers_clinicians-taxes",
+      "from": {
+        "nodeId": "providers_clinicians",
+        "anchor": [
+          170,
+          47
         ]
       },
       "to": {
@@ -2083,7 +2275,7 @@
       "waypoints": [
         {
           "x": 1495,
-          "y": 442
+          "y": 500
         }
       ],
       "curve": "smooth",
@@ -2092,37 +2284,7 @@
       "opacity": 0.8,
       "width": 1,
       "labelColor": "#ffffff",
-      "labelPos": 0.011036263821999287
-    },
-    {
-      "id": "e-providers_clinicians-taxes",
-      "from": {
-        "nodeId": "providers_clinicians",
-        "anchor": [
-          170,
-          7
-        ]
-      },
-      "to": {
-        "nodeId": "taxes",
-        "anchor": [
-          0,
-          11
-        ]
-      },
-      "waypoints": [
-        {
-          "x": 1495,
-          "y": 297
-        }
-      ],
-      "curve": "smooth",
-      "color": "#1E88E5",
-      "arrow": "none",
-      "opacity": 0.8,
-      "width": 1,
-      "labelColor": "#ffffff",
-      "labelPos": 0.025285623773361004
+      "labelPos": 0.021410576628165236
     },
     {
       "id": "e-long_term_care-taxes",
@@ -2130,20 +2292,20 @@
         "nodeId": "long_term_care",
         "anchor": [
           170,
-          24
+          40
         ]
       },
       "to": {
         "nodeId": "taxes",
         "anchor": [
           0,
-          11
+          14
         ]
       },
       "waypoints": [
         {
           "x": 1495,
-          "y": 226
+          "y": 642
         }
       ],
       "curve": "smooth",
@@ -2152,7 +2314,7 @@
       "opacity": 0.8,
       "width": 1,
       "labelColor": "#ffffff",
-      "labelPos": 0.038404771907133387
+      "labelPos": 0.010113316000523237
     }
   ]
 }

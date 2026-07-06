@@ -45,10 +45,10 @@ const aggEdges = Object.values(agg);
 
 // ---- columns (6); initial within-column order is just a starting point for the optimizer ----
 const COLUMNS = [
-  ["individuals", "employers"],
+  ["individuals", "employers", "other_third_party"],
   ["federal_government", "state_governments"],
   ["medicare", "medicaid"],
-  ["health_insurance"],
+  ["health_insurance", "untraced_managed_care"],
   ["pharma_rx", "hospitals", "providers_clinicians", "long_term_care"],
   ["suppliers_vendors", "healthcare_workers", "capital_markets", "taxes"],
 ];

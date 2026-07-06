@@ -38,9 +38,11 @@ test('computeFlows conserves the grand total (sum inflows == sum outflows == all
   const totalOut = sum(outflow);
   // every edge lands in exactly one inflow and one outflow, so the two sides match...
   assert.ok(Math.abs(totalIn - totalOut) < 1e-6, `in ${totalIn} != out ${totalOut}`);
-  // ...and the grand total is unchanged — splitting a node into sub-nodes (or routing tax
-  // out of margin into the terminal Taxes sink) moves value between edges but conserves the whole.
-  assert.ok(Math.abs(totalOut - 13268.9337) < 1e-6, `got ${totalOut}`);
+  // ...and the grand total matches the pinned golden value. Transformations that only MOVE
+  // value (splitting a node into sub-nodes, routing tax out of margin into the Taxes sink)
+  // leave this unchanged; adding genuinely new traced flow raises it — e.g. the Other Payers
+  // source (+$603B closing Hospitals / Physician / Other-Professional to their NHE totals).
+  assert.ok(Math.abs(totalOut - 13871.9337) < 1e-6, `got ${totalOut}`);
 });
 
 test('multi-source edges keep every source; canonical is the value used (no flagging)', () => {

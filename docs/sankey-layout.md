@@ -17,7 +17,7 @@ Two goals pull against each other:
 1. **Honest geometry.** A single `$/pixel` scale (`SCALE = 0.18`) drives **both** a node's height
    (dollars it handles) **and** a ribbon's width (dollars it carries). Ribbons stack to exactly
    fill each node's face, so the picture can't lie about magnitudes.
-2. **Readability.** With ~14 nodes and ~54 flows — many of them spanning several columns — the
+2. **Readability.** With ~17 nodes and ~63 flows — many of them spanning several columns — the
    ribbons can turn into spaghetti.
 
 This doc is about goal 2: how the nodes and ribbons are placed so the flows stay legible.
@@ -157,6 +157,14 @@ overlap area (readability guard) — diff-color 83k px² · over-node 22k px² �
 (The printed guard is a dense, fine-grid rasterization for an accurate absolute area; the
 optimizer searches on a coarser, faster grid. Both count the same forward ribbons — including
 the corporate-tax flows into the terminal Taxes factor — so they move together.)
+
+The number is **absolute area**, so adding genuinely new flow moves it independently of layout
+quality — e.g. the 2026-06-28 **Other Third-Party Payers** + **Unattributed Insurer Claims**
+sources (+$603B of inflow into Hospitals & Providers, see [coverage.md](coverage.md)) put the
+combined guard at ~136k px². Read it against the prior build, not as a fixed target. (The
+Unattributed-Insurer-Claims node has since moved from column 0 to column 3, beside Health
+Insurance — it is a reconciliation of the insurer chain, not a payer — which shortens its
+ribbons to a single column span and brought the combined guard down to ~117k px².)
 
 ## Results
 

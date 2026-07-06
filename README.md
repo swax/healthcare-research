@@ -104,9 +104,12 @@ A separate generator renders the same graph as a Sankey-style flow diagram:
 
 ```bash
 node scripts/build_sankey.mjs   # → diagrams/healthcare-flows-sankey.jg
+npm run serve:sankey            # rebuild + open it in the browser at http://localhost:8080
 ```
 
-The `.jg` opens in the [Jumpgate](https://github.com/swax/jumpgate) VS Code extension. Node
+The `.jg` opens in the [Jumpgate](https://github.com/swax/jumpgate) VS Code extension, or
+`npm run serve:sankey` rebuilds it and serves it in the standalone Jumpgate demo (expects a
+sibling checkout at `../jumpgate`; Ctrl+C to stop). Node
 heights and ribbon widths share one honest `$/pixel` scale; the layout places nodes and routes
 ribbons to minimize **ribbon overlap area** (the muddy stretches that hurt readability), not
 crossing count. The algorithm — lanes for long flows, overlap-driven ordering, spacing knobs —
@@ -130,6 +133,7 @@ is written up in [docs/sankey-layout.md](docs/sankey-layout.md).
 | `scripts/derive_hi_claims.mjs` | offline helper: derive insurer→provider claim amounts from the CMS NHE CSV           |
 | `scripts/reconcile_labor.mjs`  | offline helper: cross-check labor edges vs BLS OEWS → `data/labor_bls.json`          |
 | `scripts/build_sankey.mjs`     | offline helper: render the graph as a Sankey `.jg` flow diagram                      |
+| `scripts/serve_sankey.mjs`     | `npm run serve:sankey`: rebuild the Sankey `.jg` and open it in the Jumpgate browser demo |
 | `diagrams/*.jg`                | generated Jumpgate flow diagrams (open in the Jumpgate VS Code extension)            |
 | `docs/data-model.md`           | design narrative (why observations, the traced-subset flow model)                    |
 | `docs/data-audit.md`           | the historical audit that motivated the model                                        |

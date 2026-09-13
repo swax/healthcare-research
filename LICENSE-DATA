@@ -1,0 +1,37 @@
+Data and documentation license
+==============================
+
+The curated data model, derived figures, and written documentation in this
+repository — everything under `data/`, `docs/`, and `diagrams/`, plus the
+narrative portions of `README.md` — are licensed under the
+
+    Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Copyright (c) 2026 swax
+
+You are free to share and adapt this material for any purpose, including
+commercially, provided you give appropriate credit, link to the license, and
+indicate if changes were made.
+
+Full license text: https://creativecommons.org/licenses/by/4.0/legalcode
+Human-readable summary: https://creativecommons.org/licenses/by/4.0/
+
+Suggested attribution:
+
+    "Healthcare Flow Graph" by swax,
+    https://github.com/swax/healthcare-research, licensed CC BY 4.0.
+
+Third-party sources
+-------------------
+
+This license covers the curation, reconciliation, and derived figures in this
+repository only. The underlying publications and datasets cited throughout
+(CMS National Health Expenditure Accounts, BLS OEWS, MedPAC, MACPAC, KFF, AMA,
+ADA, NBER working papers, company 10-K filings, and others named in
+`data/graph.json` `sources`) remain under their original publishers' terms.
+Source files are deliberately not redistributed here (see `references/` in
+`.gitignore`); each is cited with a link so it can be obtained from the
+publisher.
+
+The code in this repository (`src/`, `scripts/`, `test/`, and build
+configuration) is separately licensed under the MIT License — see `LICENSE`.

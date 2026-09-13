@@ -2,6 +2,7 @@
   "name": "healthcare-flow-graph",
   "version": "1.0.0",
   "private": true,
+  "license": "MIT",
   "type": "module",
   "description": "Single source of truth (data/graph.json, observations-first flow model) -> Excel workbook, built with native TypeScript on Node 24.",
   "scripts": {

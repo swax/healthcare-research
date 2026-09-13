@@ -5,11 +5,12 @@ _2026-06-28. Quantifies the model's deliberate traced-subset boundary (see
 The gap below is **by design, not a defect** — this is a traced-flow model, not closed
 national accounting. The point of this page is to make the boundary explicit and auditable._
 
-> **Vintage:** figures here are the **CMS NHE 2024 release (CY2023)**, taken from the in-repo
-> `references/nhe2024/NHE2024.csv`. That release **revised 2023 up** to **$4,925.3B** total NHE
-> (from the $4,866.5B the project's `data/sheets/*.json` still cite — an older vintage). Trueing
-> those sheets to this vintage is a separate follow-up; this page uses the in-repo data so the
-> per-service and by-source-of-funds numbers reconcile exactly.
+> **Vintage:** figures here are the **CMS NHE 2024 release (CY2023)**, taken from
+> `references/nhe2024/NHE2024.csv` — a local, git-ignored copy of the CMS "NHE Tables" download
+> (see [Sources](#sources) for the link). That release **revised 2023 up** to **$4,925.3B** total
+> NHE (from the $4,866.5B the project's `data/sheets/*.json` still cite — an older vintage).
+> Trueing those sheets to this vintage is a separate follow-up; this page uses the NHE2024 data so
+> the per-service and by-source-of-funds numbers reconcile exactly.
 
 ## The headline number
 
@@ -134,9 +135,11 @@ not one black box. The remaining categories are left out deliberately, not force
 
 ## Sources
 
-- **In-repo:** `references/nhe2024/NHE2024.csv` — CMS NHE 2024 release (CY1960–2024) by type of
-  service **and source of funds**; the 2023 column anchors every figure on this page.
-- CMS, [National Health Expenditure Data](https://www.cms.gov/data-research/statistics-trends-and-reports/national-health-expenditure-data) (release landing page).
+- **Local source file (git-ignored):** `references/nhe2024/NHE2024.csv` — CMS NHE 2024 release
+  (CY1960–2024) by type of service **and source of funds**; the 2023 column anchors every figure
+  on this page. Not committed; download the "NHE Tables" ZIP from the CMS page below and place
+  `NHE2024.csv` under `references/nhe2024/` to reproduce.
+- CMS, [National Health Expenditure Data](https://www.cms.gov/data-research/statistics-trends-and-reports/national-health-expenditure-data) (release landing page and NHE Tables download).
 - Repo cross-checks: `data/sheets/hospitals.json`, `pharma_rx.json`, `individuals.json` (each
   provider sheet's VALIDATION section reports its traced share of the NHE national total — on the
   older $4,866.5B vintage until those sheets are trued up).

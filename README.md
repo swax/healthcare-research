@@ -1,142 +1,157 @@
 # Healthcare Flow Graph
 
-One hand-edited data file → an Excel workbook modeling the flow of money through the U.S.
-healthcare system (FY 2023, USD billions). Built with native TypeScript on Node 24 — no
-compile step; Node strips the types and runs `src/build.ts` directly.
+Where does the money go in U.S. healthcare? This repo models the flow of funds through the
+U.S. healthcare system for 2023 as a graph — payers → government programs → insurers →
+providers → workers, suppliers, capital and taxes — with every dollar traced to a cited
+source. One hand-edited data file drives both an Excel workbook and the Sankey diagram below.
 
-## The idea
+![U.S. Healthcare Flow of Funds, 2023 — Sankey diagram](diagrams/healthcare-flows-sankey.png)
 
-The data lives in `data/`, an **observations-first flow model**:
+_Node height and ribbon width share one dollar scale. Roughly $13.9T of traced flow across 22
+nodes and 97 edges. Corporate income tax is drawn as a terminal Taxes sink rather than a loop
+back to government._
 
-- **`data/graph.json`** (the one you edit) — `meta`, three small lookup tables
-  (`layers`, `groups`, `sources`), plus the flow model: a `nodes` list and an `edges` list.
-  Nodes carry a stable slug `id` and a display `label`; an edge references nodes by `id` and
-  carries a set of **observations** — one per source measuring that flow — of which exactly
-  one is `canonical` (the value the model uses). Following the same flow across disparate
-  sources is built into the edge, not a side-table.
-- **`data/sheets/<node>.json`** (optional) — thin editorial overlays that add curated
-  labels, `extra` rows, and independent-source validation checks on top of a node's
-  auto-generated ledger.
+## What it is
 
-`src/build.ts` reads the graph and regenerates the workbook into `dist/`, so the numbers and
-the sheets can never drift apart.
+- **A traced-subset model, not closed national accounting.** It follows specific
+  payer → provider → worker / supplier / capital / tax flows (about $3.86T of the $4.69T in
+  national health consumption spending reaches a provider node). A node's inflow need not equal
+  its outflow; that's intentional. See [docs/data-model.md](docs/data-model.md) for the design
+  and [docs/coverage.md](docs/coverage.md) for exactly what is and isn't covered.
+- **Observations-first.** Each edge carries one observation per source that measures that flow.
+  Exactly one is canonical (the value used); the others stay as context, not discrepancies to
+  resolve. Following the same flow across CMS, MedPAC, MACPAC, KFF, BLS, and company filings is
+  built into the edge, not a side table.
+- **One source of truth.** `data/graph.json` is the only file you edit. The workbook, the
+  diagram, the checks, and the cross-sheet hyperlinks are all regenerated from it, so numbers
+  can never drift apart.
 
 ```
-data/graph.json ──> src/build.ts ──> dist/2023_healthcare_spending.xlsx
-data/sheets/*.json ─┘
+data/graph.json ──┬──> src/build.ts              ──> dist/2023_healthcare_spending.xlsx
+data/sheets/*.json ┘ └──> scripts/build_sankey.mjs ──> diagrams/healthcare-flows-sankey.jg / .png
 ```
 
-The model is a **traced subset**, not closed national accounting: it follows specific
-payer → provider → worker / supplier / capital / tax flows, so a node's inflow need not equal
-its outflow. That's intentional — see [docs/data-model.md](docs/data-model.md).
+## Quick start
 
-## Use
+Requires Node 22.6+ (designed for Node 24; native TypeScript, no compile step).
 
 ```bash
-npm install        # once — installs exceljs
-npm run build      # = node src/build.ts   (needs Node >= 22.6; designed for Node 24)
+npm install
+npm run build          # Excel workbook → dist/2023_healthcare_spending.xlsx
+npm test               # structural, observation, conservation and rendering tests
+npm run check          # console readout: total traced flow + every multi-source edge
+npm run build:sankey   # Sankey .jg diagram → diagrams/
 ```
 
-Output lands in `dist/` (git-ignored). Open the `.xlsx` in Excel; tabs lead with an
-**Overview** front page and end with a **Glossary**.
+The workbook opens with an **Overview** page, has one ledger sheet per node (inflows, outflows,
+splits, sources, and links to the counterpart sheet for every amount), a **Labor Cross-Check
+(BLS)** sheet, and ends with a **Glossary**. If Excel holds the file open on Windows, build to a
+temp path with `XLSX_OUT=dist/_tmp.xlsx npm run build`.
 
-If Excel holds the file open (exclusive lock on Windows), build to a temp path:
-`XLSX_OUT=dist/_tmp.xlsx npm run build`.
+## Editing the model
 
-## Editing
+- **Change an amount or add a flow:** edit the `edges` array in `data/graph.json` (add or adjust
+  an observation), then `npm run build`. Node totals are derived automatically.
+- **Add curated detail to a node's sheet:** edit or add its `data/sheets/<node>.json` overlay —
+  curated labels, `extra` rows, and independent-source validation checks. No code change.
+- **The build fails loudly on an invalid graph** (`validateGraph`), so a broken edit never
+  produces a silently wrong workbook.
 
-- **Change a flow / amount / add a connection:** edit the `edges` array in `data/graph.json`
-  (add or adjust an observation), then `npm run build`. Node sizes and the per-node
-  throughput totals are derived automatically (max of inflow/outflow).
-- **Add curated detail to a node's sheet:** edit or add its `data/sheets/<node>.json` overlay
-  — no code change.
-- The build **fails loudly if the graph is invalid** (`validateGraph`), so a broken
-  `data/graph.json` never produces a silently-wrong workbook.
+The field-by-field schema (observations, `split[]`, categories, sub-nodes, overlays) is in
+[`data/README.md`](data/README.md).
 
-The full field-by-field schema (observations, `split[]`, `category`, sub-nodes, overlays) is
-in [`data/README.md`](data/README.md).
+## What the tests guard
 
-## Tests & checks
+- **Structure:** unique ids, every edge endpoint resolves, valid layers / groups / sources,
+  sub-node parent rules.
+- **Observations:** at least one per edge, exactly one canonical, a `split[]` sums to its
+  parent within $1B.
+- **Conservation:** summing leaf nodes, total inflow equals total outflow equals a pinned grand
+  total. Splitting a node or carving tax out of a margin moves value without changing the whole.
+- **Rendering:** every node produces a ledger; grouping, splits, roll-ups, hyperlinks, Overview
+  and Glossary all produce the expected cells.
 
-Zero-dependency, native Node test runner (`node --test`). After any edit to `data/graph.json`:
+## Sankey diagram
+
+`scripts/build_sankey.mjs` lays out the graph as a Sankey with an overlap-minimizing algorithm:
+long flows are routed through lanes, and node order within a column is chosen to minimize
+ribbon overlap area rather than crossing count. The writeup is in
+[docs/sankey-layout.md](docs/sankey-layout.md).
+
+The output is a [Jumpgate](https://github.com/swax/jumpgate) `.jg` file. To view or render it:
 
 ```bash
-npm test          # structural + observation invariants + ledger/workbook rendering
-npm run check     # human-readable readout: total flow + every multi-source edge
+npm run serve:sankey   # rebuild and open in the browser (expects a sibling ../jumpgate checkout)
+
+# or render to PNG, from packages/jumpgate in the Jumpgate repo:
+npm run render -- ../../../healthcare-research/diagrams/healthcare-flows-sankey.jg --width 1800 --height 1000 --scale 2
 ```
 
-What the tests guard:
+The `.jg` also opens directly in the Jumpgate VS Code extension.
 
-- **Structural / reference** — unique node & edge ids; every edge endpoint resolves to a real
-  node; observation values are positive numbers; valid layers/groups/sources; sub-node parent
-  rules; role/balance sanity.
-- **Observations** — every edge has at least one observation and exactly one canonical; a
-  `split[]` sums to its canonical value within $1B.
-- **Conservation** — summing leaf nodes, total inflow == total outflow == the grand total, so
-  splitting a node or carving tax out of a margin into the Taxes sink moves value without changing the whole.
-- **Rendering** — every node renders a ledger; section grouping, splits, sub-node roll-ups,
-  cross-sheet hyperlinks, and the Overview/Glossary all produce the expected cells.
+## Complementary analyses
 
-`npm run check` prints the total traced flow and lists each edge that carries more than one
-source (the value used and what else was reported) — context, not a discrepancy to resolve.
+These read the graph or the source data but are not part of the flow model.
 
-## Labor cross-check (complementary)
+- **Labor cross-check (BLS OEWS May 2023).** Looks inside the ten labor edges that feed the
+  Healthcare Workers sink: headcount, wage bill, and top job functions per edge. Divergences
+  (self-employment income, wage top-coding, contract labor) are explained, not flagged.
+  `npm run reconcile:labor` rebuilds the committed `data/labor_bls.json` from the BLS files.
+- **Finkelstein (2005) Section 5, extended to 2024.** Reproduces the paper's back-of-the-envelope
+  on how much of the long-run rise in health spending the spread of insurance can explain, using
+  the CMS NHE 1960–2024 series. `npm run derive:finkelstein` writes `data/finkelstein_s5.json`.
+- **Insurer claims derivation.** `npm run derive:claims` derives insurer → provider claim amounts
+  from the CMS NHE source-of-funds tables.
 
-The workbook's **Labor Cross-Check (BLS)** sheet looks _inside_ the ten labor edges that feed
-the Healthcare Workers sink: headcount, wage bill and the top job functions per edge, from
-**BLS OEWS May 2023**. Each model dollar links back to its inflow row on the Healthcare Workers
-sheet. This is a traced-subset cross-check — divergences (self-employed income, BLS wage
-top-coding, contract labor, headcount scope, the pharma/insurer 50% labor split) are explained,
-not flagged. There is no gate.
+These need the source datasets under `references/` (git-ignored; see below).
 
-```bash
-npm run reconcile:labor   # rebuild data/labor_bls.json from references/bls2023 (BLS source files, git-ignored)
-```
+## Sources and reproducibility
 
-The numbers are derived offline into the committed `data/labor_bls.json` (the ~30 MB BLS source
-files stay git-ignored under `references/bls2023/`); `npm run build` renders that file, and also
-refreshes it automatically when the BLS files are present locally. The model dollars are read
-live from `data/graph.json`, so the sheet can never drift from the graph.
+Every observation in `data/graph.json` names a source from the `sources` table, each with a
+citation. Primary sources are the CMS National Health Expenditure Accounts (2024 release),
+MedPAC, MACPAC, KFF, AMA, ADA, BLS OEWS, NBER working paper w11619, and public-company 10-K
+filings. The source files themselves are not redistributed. To run the offline derivation
+scripts, download them into `references/`:
 
-## Flow diagram (Sankey)
+| Folder                          | What                                                                      |
+| ------------------------------- | ------------------------------------------------------------------------- |
+| `references/nhe2024/`           | CMS "NHE Tables" download, `NHE2024.csv` (by service and source of funds) |
+| `references/bls2023/`           | BLS OEWS May 2023 national and industry tables                            |
+| `references/2023_plan_payment/` | CMS Medicare Part C / D plan payment data                                 |
+| `references/w11619.pdf`         | Finkelstein (2005), NBER w11619                                           |
 
-A separate generator renders the same graph as a Sankey-style flow diagram:
+## Repository layout
 
-```bash
-node scripts/build_sankey.mjs   # → diagrams/healthcare-flows-sankey.jg
-npm run serve:sankey            # rebuild + open it in the browser at http://localhost:8080
-```
+| Path                                     | Role                                                        |
+| ---------------------------------------- | ----------------------------------------------------------- |
+| `data/graph.json`                        | **source of truth** — nodes, edges, observations, sources   |
+| `data/sheets/<node>.json`                | optional editorial overlays per node                        |
+| `data/labor_bls.json`                    | committed derived artifact (BLS headcount / wages by edge)  |
+| `data/finkelstein_s5.json`               | committed derived artifact (Finkelstein §5 extension)       |
+| `data/README.md`                         | field-by-field schema                                       |
+| `src/graph.ts`                           | loader, types, flow arithmetic, `validateGraph`             |
+| `src/ledger.ts` · `src/xlsx.ts`          | per-node ledger renderer · workbook assembly                |
+| `src/workbook.ts` · `src/sheet-model.ts` | cell model and ExcelJS pour-in with citation footnoting     |
+| `src/build.ts` · `src/check.ts`          | CLI entry points                                            |
+| `scripts/build_sankey.mjs`               | Sankey layout → `.jg`                                       |
+| `scripts/serve_sankey.mjs`               | rebuild and preview the Sankey in a browser                 |
+| `scripts/build_flow_diagram.mjs`         | earlier non-Sankey flow diagram (14 major nodes)            |
+| `scripts/derive_hi_claims.mjs`           | insurer → provider claims from CMS NHE                      |
+| `scripts/reconcile_labor.mjs`            | labor cross-check against BLS OEWS                          |
+| `scripts/extend_finkelstein_s5.mjs`      | Finkelstein §5 extension                                    |
+| `diagrams/`                              | generated `.jg` diagrams and the rendered Sankey PNG        |
+| `docs/data-model.md`                     | design narrative: the observations-first flow model         |
+| `docs/coverage.md`                       | what the traced model captures vs. national health spending |
+| `docs/data-audit.md`                     | the audit that motivated the model                          |
+| `docs/sankey-layout.md`                  | the overlap-minimizing Sankey layout algorithm              |
+| `test/`                                  | native `node --test` suite                                  |
+| `dist/` · `references/`                  | generated output · local source datasets (both git-ignored) |
 
-The `.jg` opens in the [Jumpgate](https://github.com/swax/jumpgate) VS Code extension, or
-`npm run serve:sankey` rebuilds it and serves it in the standalone Jumpgate demo (expects a
-sibling checkout at `../jumpgate`; Ctrl+C to stop). Node
-heights and ribbon widths share one honest `$/pixel` scale; the layout places nodes and routes
-ribbons to minimize **ribbon overlap area** (the muddy stretches that hurt readability), not
-crossing count. The algorithm — lanes for long flows, overlap-driven ordering, spacing knobs —
-is written up in [docs/sankey-layout.md](docs/sankey-layout.md).
+## License
 
-## Files
+- **Code** (`src/`, `scripts/`, `test/`, build config): [MIT](LICENSE).
+- **Data, docs, and diagrams** (`data/`, `docs/`, `diagrams/`, README narrative):
+  [CC BY 4.0](LICENSE-DATA) — reuse freely with attribution.
+- **Cited sources** keep their publishers' terms; their files are deliberately not committed.
 
-| Path                           | Role                                                                                 |
-| ------------------------------ | ------------------------------------------------------------------------------------ |
-| `data/graph.json`              | **source of truth you edit** (nodes + edges with observations)                       |
-| `data/sheets/<node>.json`      | optional editorial overlays (curated labels, extras, checks)                         |
-| `data/labor_bls.json`          | committed derived artifact (BLS headcount/wages by edge); built by `reconcile:labor` |
-| `data/README.md`               | field-by-field schema + how-to                                                       |
-| `src/build.ts`                 | generator → xlsx                                                                     |
-| `src/check.ts`                 | console readout: total + multi-source edges                                          |
-| `src/graph.ts`                 | loader, types, flow arithmetic, `validateGraph`                                      |
-| `src/ledger.ts`                | per-node ledger renderer (auto + overlay)                                            |
-| `src/xlsx.ts`                  | assembles the workbook (ledgers + audit sheets + links)                              |
-| `src/workbook.ts`              | `Sheet → ExcelJS` pour-in + citation footnoting                                      |
-| `src/sheet-model.ts`           | the `Sheet`/`Cell`/`Style` cell model                                                |
-| `scripts/derive_hi_claims.mjs` | offline helper: derive insurer→provider claim amounts from the CMS NHE CSV           |
-| `scripts/reconcile_labor.mjs`  | offline helper: cross-check labor edges vs BLS OEWS → `data/labor_bls.json`          |
-| `scripts/build_sankey.mjs`     | offline helper: render the graph as a Sankey `.jg` flow diagram                      |
-| `scripts/serve_sankey.mjs`     | `npm run serve:sankey`: rebuild the Sankey `.jg` and open it in the Jumpgate browser demo |
-| `diagrams/*.jg`                | generated Jumpgate flow diagrams (open in the Jumpgate VS Code extension)            |
-| `docs/data-model.md`           | design narrative (why observations, the traced-subset flow model)                    |
-| `docs/data-audit.md`           | the historical audit that motivated the model                                        |
-| `docs/sankey-layout.md`        | design narrative (the Sankey overlap-minimizing layout algorithm)                    |
-| `dist/`                        | generated output (git-ignored)                                                       |
-| `tsconfig.json`                | editor/type-check config (`erasableSyntaxOnly`)                                      |
+To cite: _"Healthcare Flow Graph" by swax, https://github.com/swax/healthcare-research, CC BY 4.0._
